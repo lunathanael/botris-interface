@@ -292,6 +292,18 @@ class TetrisGame:
             'G': Fore.BLACK + Back.WHITE
         }
 
+        piece_info = []
+
+        piece_info.append('Queue:')
+        for i, piece in enumerate(self.queue[:6]):
+            if i > 0:
+                piece_info.append('')
+            piece_matrix = get_piece_matrix(piece, 0)
+            for row in piece_matrix[:-1]:
+                piece_info.append('    ' + ''.join([f'{color_map[cell]}██{Style.RESET_ALL}' if cell else '  ' for cell in row]))
+
+        piece_info = [piece for piece in reversed(piece_info)]
+
         print('┌' + '──' * self.options['board_width'] + '┐')
 
         for y in range(self.options['board_height'] - 1, -1, -1):
@@ -304,34 +316,17 @@ class TetrisGame:
                     print('  ', end='')
             print('│', end='')
 
-            if y == self.options['board_height'] - 1:
-                print(f'  Score: {self.score}')
-            elif y == self.options['board_height'] - 3:
-                print(f'  Combo: {self.combo}')
-            elif y == self.options['board_height'] - 5:
-                print(f'  B2B: {"Yes" if self.b2b else "No"}')
-            elif y == self.options['board_height'] - 7:
-                print(f'  Pieces: {self.pieces_placed}')
-            elif y == self.options['board_height'] - 9:
-                print(f'  Hold: {self.held or "Empty"}')
+            if len(piece_info):
+                print(piece_info.pop())
             else:
                 print()
 
         print('└' + '──' * self.options['board_width'] + '┘')
-
-        print(f'\nCurrent piece: {self.current["piece"]}')
-        piece_matrix = get_piece_matrix(self.current['piece'], self.current['rotation'])
-        for row in piece_matrix:
-            print('  ' + ''.join([f'{color_map[cell]}██{Style.RESET_ALL}' if cell else '  ' for cell in row]))
-
-        print('\nNext pieces:')
-        for i, piece in enumerate(self.queue[:5]):
-            if i > 0:
-                print()
-            print(f'  {piece}:')
-            piece_matrix = get_piece_matrix(piece, 0)
-            for row in piece_matrix:
-                print('    ' + ''.join([f'{color_map[cell]}██{Style.RESET_ALL}' if cell else '  ' for cell in row]))
+        print(f'  Score: {self.score}')
+        print(f'  Combo: {self.combo}')
+        print(f'  B2B: {"Yes" if self.b2b else "No"}')
+        print(f'  Pieces: {self.pieces_placed}')
+        print(f'  Hold: {self.held or "Empty"}')
 
         print(f'\nGarbage queued: {len(self.garbage_queue)}')
         self.board = t_board
