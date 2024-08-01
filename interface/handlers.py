@@ -50,15 +50,15 @@ async def handle_message(message, websocket):
         game_state = GameState(**data["payload"]["gameState"])
         print("Player Damage Received:", session_id, damage, game_state)
     elif message_type == "round_over":
-        winner_session = data["payload"]["winnerSession"]
+        winner_id = data["payload"]["winnerId"]
         winner_info = PlayerInfo(**data["payload"]["winnerInfo"])
         room_data = RoomData(**data["payload"]["roomData"])
-        print("Round Over:", winner_session, winner_info, room_data)
+        print("Round Over:", winner_id, winner_info, room_data)
     elif message_type == "game_over":
-        winner_session = data["payload"]["winnerSession"]
+        winner_id = data["payload"]["winnerId"]
         winner_info = PlayerInfo(**data["payload"]["winnerInfo"])
         room_data = RoomData(**data["payload"]["roomData"])
-        print("Game Over:", winner_session, winner_info, room_data)
+        print("Game Over:", winner_id, winner_info, room_data)
     elif message_type == "game_reset":
         room_data = RoomData(**data["payload"]["roomData"])
         print("Game Reset:", room_data)

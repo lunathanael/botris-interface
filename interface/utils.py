@@ -8,4 +8,5 @@ def process_game_state(game_state: GameState, players: List[PlayerData]) -> List
         Command(command="rotate_cw"),
         Command(command="drop")
     ]
+    return []
     return commands

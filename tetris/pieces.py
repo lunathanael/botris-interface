@@ -1,64 +1,48 @@
-from typing import List, Tuple
+# pieces.py
 
-class Piece:
-    I = 'I'
-    O = 'O'
-    J = 'J'
-    L = 'L'
-    S = 'S'
-    Z = 'Z'
-    T = 'T'
+import random
 
-    @classmethod
-    def all_pieces(cls) -> List[str]:
-        return [cls.I, cls.O, cls.J, cls.L, cls.S, cls.Z, cls.T]
-
-class PieceData:
-    def __init__(self, piece: str, x: int, y: int, rotation: int):
-        self.piece = piece
-        self.x = x
-        self.y = y
-        self.rotation = rotation
+PIECES = ['I', 'O', 'J', 'L', 'S', 'Z', 'T']
 
 PIECE_MATRICES = {
-    Piece.Z: [
+    "Z": [
         ["Z", "Z", None],
         [None, "Z", "Z"],
         [None, None, None]
     ],
-    Piece.L: [
+    "L": [
         [None, None, "L"],
         ["L", "L", "L"],
         [None, None, None]
     ],
-    Piece.O: [
+    "O": [
         ["O", "O"],
         ["O", "O"]
     ],
-    Piece.S: [
+    "S": [
         [None, "S", "S"],
         ["S", "S", None],
         [None, None, None]
     ],
-    Piece.I: [
+    "I": [
         [None, None, None, None],
         ["I", "I", "I", "I"],
         [None, None, None, None],
         [None, None, None, None]
     ],
-    Piece.J: [
+    "J": [
         ["J", None, None],
         ["J", "J", "J"],
         [None, None, None]
     ],
-    Piece.T: [
+    "T": [
         [None, "T", None],
         ["T", "T", "T"],
         [None, None, None]
-    ]
+    ],
 }
 
-WALL_KICKS = {
+WALLKICKS = {
     "0-1": [(0, 0), (-1, 0), (-1, 1), (0, -2), (-1, -2)],
     "1-0": [(0, 0), (1, 0), (1, -1), (0, 2), (1, 2)],
     "1-2": [(0, 0), (1, 0), (1, -1), (0, 2), (1, 2)],
@@ -66,10 +50,10 @@ WALL_KICKS = {
     "2-3": [(0, 0), (1, 0), (1, 1), (0, -2), (1, -2)],
     "3-2": [(0, 0), (-1, 0), (-1, -1), (0, 2), (-1, 2)],
     "3-0": [(0, 0), (-1, 0), (-1, -1), (0, 2), (-1, 2)],
-    "0-3": [(0, 0), (1, 0), (1, 1), (0, -2), (1, -2)]
+    "0-3": [(0, 0), (1, 0), (1, 1), (0, -2), (1, -2)],
 }
 
-I_WALL_KICKS = {
+I_WALLKICKS = {
     "0-1": [(0, 0), (-2, 0), (1, 0), (-2, -1), (1, 2)],
     "1-0": [(0, 0), (2, 0), (-1, 0), (2, 1), (-1, -2)],
     "1-2": [(0, 0), (-1, 0), (2, 0), (-1, 2), (2, -1)],
@@ -77,5 +61,18 @@ I_WALL_KICKS = {
     "2-3": [(0, 0), (2, 0), (-1, 0), (2, 1), (-1, -2)],
     "3-2": [(0, 0), (-2, 0), (1, 0), (-2, -1), (1, 2)],
     "3-0": [(0, 0), (1, 0), (-2, 0), (1, -2), (-2, 1)],
-    "0-3": [(0, 0), (-1, 0), (2, 0), (-1, 2), (2, -1)]
+    "0-3": [(0, 0), (-1, 0), (2, 0), (-1, 2), (2, -1)],
 }
+
+def generate_bag():
+    bag = PIECES.copy()
+    random.shuffle(bag)
+    return bag
+
+def rotate_matrix(matrix, rotation):
+    for _ in range(rotation):
+        matrix = list(zip(*matrix[::-1]))
+    return [list(row) for row in matrix]
+
+def get_piece_matrix(piece, rotation):
+    return rotate_matrix(PIECE_MATRICES[piece], rotation)
