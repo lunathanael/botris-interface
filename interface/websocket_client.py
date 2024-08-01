@@ -1,5 +1,7 @@
 import asyncio
+
 import websockets
+
 
 class WebSocketClient:
     def __init__(self, url, message_handler):

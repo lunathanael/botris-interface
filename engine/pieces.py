@@ -1,5 +1,3 @@
-# pieces.py
-
 import random
 
 PIECES = ['I', 'O', 'J', 'L', 'S', 'Z', 'T']

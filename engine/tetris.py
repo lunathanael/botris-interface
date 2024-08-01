@@ -1,12 +1,18 @@
-import colorama
-from colorama import Fore, Back, Style
+from __future__ import annotations
 
-from pieces import generate_bag, get_piece_matrix, WALLKICKS, I_WALLKICKS
-from utils import (
-    check_collision, check_immobile, place_piece, clear_lines,
-    check_pc, calculate_score, generate_garbage, add_garbage,
-    get_board_heights, get_board_bumpiness, get_board_avg_height
-)
+from typing import TYPE_CHECKING
+
+import colorama
+from colorama import Back, Fore, Style
+
+from .pieces import I_WALLKICKS, WALLKICKS, generate_bag, get_piece_matrix
+from .utils import (add_garbage, calculate_score, check_collision,
+                    check_immobile, check_pc, clear_lines, generate_garbage,
+                    get_board_avg_height, get_board_bumpiness,
+                    get_board_heights, place_piece)
+
+if TYPE_CHECKING:
+    from interface.models import GameState
 
 DEFAULT_OPTIONS = {
     'board_width': 10,
@@ -30,6 +36,33 @@ class TetrisGame:
     def __init__(self, options=None):
         self.options = {**DEFAULT_OPTIONS, **(options or {})}
         self.reset()
+
+    @classmethod
+    def from_game_state(cls, game_state: GameState, options=None) -> TetrisGame:
+        game = cls(options)
+        
+        game.board = game_state.board
+        game.queue = game_state.queue
+        game.garbage_queue = [0] * game_state.garbageQueued
+        game.held = game_state.held
+        game.current = {
+            'piece': game_state.current.piece,
+            'x': game_state.current.x,
+            'y': game_state.current.y,
+            'rotation': game_state.current.rotation
+        }
+        game.is_immobile = game_state.isImmobile
+        game.can_hold = game_state.canHold
+        game.combo = game_state.combo
+        game.b2b = game_state.b2b
+        game.score = game_state.score
+        game.pieces_placed = game_state.piecesPlaced
+        game.dead = game_state.dead
+
+        while len(game.queue) < 6:
+            game.queue.extend(generate_bag())
+
+        return game
 
     def reset(self):
         self.board = []
@@ -221,6 +254,15 @@ class TetrisGame:
     def queue_garbage(self, hole_indices):
         self.garbage_queue.extend(hole_indices)
 
+    def __str__(self) -> str:
+        representation = ''
+        rendered_board = [['.' if cell is None else cell for cell in row] for row in self.board]
+        rendered_board.reverse()
+        for row in rendered_board:
+            representation += ''.join(row) + '\n'
+        return representation
+
+
     def print_board(self):
         rendered_board = [['.' if cell is None else cell for cell in row] for row in self.board]
         rendered_board.reverse()
@@ -295,20 +337,20 @@ class TetrisGame:
         self.board = t_board
 
 if __name__ == "__main__":
-    game = TetrisGame()
+    gs = TetrisGame()
     
-    game.execute_command('move_right')
-    game.execute_command('hard_drop')
-    game.execute_command('rotate_cw')
-    game.execute_command('move_left')
-    game.execute_command('hard_drop')
+    gs.execute_command('move_right')
+    gs.execute_command('hard_drop')
+    gs.execute_command('rotate_cw')
+    gs.execute_command('move_left')
+    gs.execute_command('hard_drop')
     
     # Print the current state
     print("Current game state:")
-    game.render_board()
+    gs.render_board()
     
     # Print some stats
-    print("Board stats:", game.get_board_stats())
+    print("Board stats:", gs.get_board_stats())
     
     # Print the public game state
-    print("Public game state:", game.get_public_state())
+    print("Public game state:", gs.get_public_state())

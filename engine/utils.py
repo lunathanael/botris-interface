@@ -1,5 +1,7 @@
-from pieces import get_piece_matrix, WALLKICKS, I_WALLKICKS
 import random
+
+from .pieces import I_WALLKICKS, WALLKICKS, get_piece_matrix
+
 
 def check_collision(board, piece_data, options):
     piece_matrix = get_piece_matrix(piece_data['piece'], piece_data['rotation'])

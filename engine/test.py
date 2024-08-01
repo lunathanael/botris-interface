@@ -1,9 +1,11 @@
 # test_tetris.py
 
 import unittest
-from tetris import TetrisGame
-from pieces import generate_bag
-from utils import generate_garbage
+
+from .engine import TetrisGame
+from .pieces import generate_bag
+from .utils import generate_garbage
+
 
 class TestTetrisGame(unittest.TestCase):
     def test_sonic_drop(self):

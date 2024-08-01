@@ -1,5 +1,7 @@
 from typing import List, Optional, Union
+
 from pydantic import BaseModel, constr
+
 
 class PlayerInfo(BaseModel):
     userId: str
