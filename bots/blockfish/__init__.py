@@ -1,0 +1,1 @@
+from .blockfish import BlockFish

@@ -330,22 +330,3 @@ class TetrisGame:
 
         print(f'\nGarbage queued: {len(self.garbage_queue)}')
         self.board = t_board
-
-if __name__ == "__main__":
-    gs = TetrisGame()
-    
-    gs.execute_command('move_right')
-    gs.execute_command('hard_drop')
-    gs.execute_command('rotate_cw')
-    gs.execute_command('move_left')
-    gs.execute_command('hard_drop')
-    
-    # Print the current state
-    print("Current game state:")
-    gs.render_board()
-    
-    # Print some stats
-    print("Board stats:", gs.get_board_stats())
-    
-    # Print the public game state
-    print("Public game state:", gs.get_public_state())

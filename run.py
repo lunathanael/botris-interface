@@ -1,15 +1,15 @@
 import asyncio
 
-from interface.handlers import handle_message
-from interface.websocket_client import WebSocketClient
+from interface import Interface
+
+from bots import BlockFish
 
 TOKEN = "913b8eb2-10ce-43b4-a8c1-ffb7dd4a5376"
-ROOM_KEY = "sbkkfis8h0kh6dnkibeawb2q"
+ROOM_KEY = "yovabhl27ckuk4ssrqs3l15n"
 
 async def main():
-    url = f"wss://botrisbattle.com/ws?token={TOKEN}&roomKey={ROOM_KEY}"
-    client = WebSocketClient(url, handle_message)
-    await client.connect()
+    itf = Interface.create(TOKEN, ROOM_KEY, BlockFish(node_limit=1000))
+    await itf.connect()
 
 if __name__ == "__main__":
     asyncio.run(main())
