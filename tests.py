@@ -1,35 +1,35 @@
-# test_tetris.py
-
 import unittest
 
-from .engine import TetrisGame
-from .pieces import generate_bag
-from .utils import generate_garbage
+from typing import List
+from engine.models import Event
+
+from engine import TetrisGame
+from engine.utils import generate_garbage
 
 
 class TestTetrisGame(unittest.TestCase):
     def test_sonic_drop(self):
-        game = TetrisGame()
-        game.queue = ['I']
+        game: TetrisGame = TetrisGame()
+        game.queue.appendleft('I')
         game.current = game.spawn_piece()
         game.execute_command('sonic_drop')
-        self.assertEqual(game.current['y'], 1)
+        self.assertEqual(game.current.y, 1)
 
     def test_move_horizontally(self):
         game = TetrisGame()
-        game.queue = ['I']
+        game.queue.appendleft('I')
         game.current = game.spawn_piece()
-        self.assertEqual(game.current['x'], 3)
+        self.assertEqual(game.current.x, 3)
         game.execute_command('move_right')
-        self.assertEqual(game.current['x'], 4)
+        self.assertEqual(game.current.x, 4)
         game.execute_command('sonic_left')
-        self.assertEqual(game.current['x'], 0)
+        self.assertEqual(game.current.x, 0)
         game.execute_command('move_left')
-        self.assertEqual(game.current['x'], 0)
+        self.assertEqual(game.current.x, 0)
 
     def test_hard_drop(self):
         game = TetrisGame()
-        game.queue = ['I']
+        game.queue.appendleft('I')
         game.current = game.spawn_piece()
         game.execute_command('hard_drop')
         expected_board = [[None] * 3 + ['I'] * 4 + [None] * 3]
@@ -37,7 +37,7 @@ class TestTetrisGame(unittest.TestCase):
 
     def test_tspin(self):
         game = TetrisGame()
-        game.queue = ['T']
+        game.queue.appendleft('T')
         game.current = game.spawn_piece()
         tspin_setup = [
             [None] * 10,
@@ -51,15 +51,15 @@ class TestTetrisGame(unittest.TestCase):
         game.execute_command('sonic_drop')
         game.execute_command('rotate_cw')
         result = game.execute_command('hard_drop')
-        self.assertTrue(any([event['type'] == 'clear' for event in result['events']]))
-        clear_event = next((event for event in result['events'] if event['type'] == 'clear'), None)
+        self.assertTrue(any([event.type == 'clear' for event in result]))
+        clear_event = next((event for event in result if event.type == 'clear'), None)
         self.assertIsNotNone(clear_event)
-        self.assertEqual(clear_event['payload']['attack'], 4)
-        self.assertEqual(clear_event['payload']['clear_name'], 'All-Spin Double')
+        self.assertEqual(clear_event.payload['attack'], 4)
+        self.assertEqual(clear_event.payload['clearName'], 'All-Spin Double')
 
     def test_tspin_wallkick(self):
         game = TetrisGame()
-        game.queue = ['T']
+        game.queue.appendleft('T')
         game.current = game.spawn_piece()
         tspin_setup = [
             [None] * 10,
@@ -73,16 +73,17 @@ class TestTetrisGame(unittest.TestCase):
         game.execute_command('rotate_ccw')
         game.execute_command('sonic_drop')
         game.execute_command('rotate_ccw')
-        result = game.execute_command('hard_drop')
-        self.assertTrue(any([event['type'] == 'clear' for event in result['events']]))
-        clear_event = next((event for event in result['events'] if event['type'] == 'clear'), None)
+        result: List[Event] = game.execute_command('hard_drop')
+
+        self.assertTrue(any([event.type == 'clear' for event in result]))
+        clear_event = next((event for event in result if event.type == 'clear'), None)
         self.assertIsNotNone(clear_event)
-        self.assertEqual(clear_event['payload']['attack'], 4)
-        self.assertEqual(clear_event['payload']['clear_name'], 'All-Spin Double')
+        self.assertEqual(clear_event.payload['attack'], 4)
+        self.assertEqual(clear_event.payload['clearName'], 'All-Spin Double')
 
     def test_add_garbage(self):
         game = TetrisGame()
-        garbage_indices = generate_garbage(4, game.options)
+        garbage_indices = generate_garbage(4, game.options.garbage_messiness, game.options.board_width)
         game.queue_garbage(garbage_indices)
         self.assertFalse(any('G' in row for row in game.board))
         game.execute_command('hard_drop')

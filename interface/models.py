@@ -1,7 +1,11 @@
-from typing import List, Optional, Union
+from __future__ import annotations
+from typing import List, Optional, Union, Literal
 
 from pydantic import BaseModel, constr
 
+Piece = Literal['I', 'O', 'J', 'L', 'S', 'Z', 'T']
+Block = Optional[Literal['I', 'O', 'J', 'L', 'S', 'Z', 'T', 'G']]
+Board = List[List[Block]]
 
 class PlayerInfo(BaseModel):
     userId: str
@@ -13,7 +17,7 @@ class PlayerData(BaseModel):
     playing: bool
     info: PlayerInfo
     wins: int
-    gameState: Optional['GameState']
+    gameState: Optional[GameState]
 
 class RoomData(BaseModel):
     id: str
@@ -34,16 +38,16 @@ class RoomData(BaseModel):
     banned: List[PlayerInfo]
 
 class PieceData(BaseModel):
-    piece: str
+    piece: Piece
     x: int
     y: int
-    rotation: int
+    rotation: Literal[0, 1, 2, 3]
 
 class GameState(BaseModel):
-    board: List[List[Union[str, None]]]
-    queue: List[str]
+    board: Board
+    queue: List[Piece]
     garbageQueued: int
-    held: Optional[str]
+    held: Optional[Piece]
     current: PieceData
     isImmobile: bool
     canHold: bool
