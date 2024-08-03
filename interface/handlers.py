@@ -102,7 +102,7 @@ class GameBuffer:
 
     def add_frame(self, game_state: GameState, commands: List[Command]):
         if self.num_games == 0:
-            self.trajectory_buffer.append([])
+            self.new_game()
         self.trajectory_buffer[-1].append((commands, game_state))
         self.total_frames += 1
 
