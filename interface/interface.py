@@ -1,7 +1,11 @@
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
-from .handlers import construct_message_handler, tracker_construct_message_handler
+
+from .handlers import (construct_message_handler,
+                       tracker_construct_message_handler)
 from .websocket_client import WebSocketClient
+
 if TYPE_CHECKING:
     from bots import Bot
 

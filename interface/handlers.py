@@ -1,7 +1,9 @@
 import json
+from typing import Awaitable, Callable, List, Tuple
+
 from websockets import WebSocketServerProtocol
+
 from .models import Command, GameState, PlayerData, PlayerInfo, RoomData
-from typing import Callable, Awaitable, List, Tuple
 
 
 def construct_message_handler(analyze_function: Callable[[GameState, List[PlayerData]], Awaitable[List[Command]]], verbose: bool=False) -> Callable[[str, WebSocketServerProtocol], Awaitable[None]]:

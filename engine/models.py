@@ -1,7 +1,7 @@
 from __future__ import annotations
-from typing import List, Optional, Tuple, Literal, Dict
-from dataclasses import dataclass, field, asdict
 
+from dataclasses import asdict, dataclass, field
+from typing import Dict, List, Literal, Optional, Tuple
 
 Piece = Literal['I', 'O', 'J', 'L', 'S', 'Z', 'T']
 Block = Optional[Literal['I', 'O', 'J', 'L', 'S', 'Z', 'T', 'G']]

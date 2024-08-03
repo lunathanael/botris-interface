@@ -1,21 +1,24 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, TypedDict, List, Optional, Deque, Dict, Any, Literal
 from collections import deque
+from typing import (TYPE_CHECKING, Any, Deque, Dict, List, Literal, Optional,
+                    TypedDict)
 
 import colorama
 from colorama import Back, Fore, Style
-from .models import PieceData, Options, Piece, Command, Board, Event, ClearEvent, GameOverEvent, PiecePlacedEvent, DamageTankedEvent, Statistics, ScoreInfo, ScoreData
-from .pieces import generate_bag, get_piece_matrix, WALLKICKS, I_WALLKICKS
 
+from interface.models import GameState
+
+from .models import (Board, ClearEvent, Command, DamageTankedEvent, Event,
+                     GameOverEvent, Options, Piece, PieceData,
+                     PiecePlacedEvent, ScoreData, ScoreInfo, Statistics)
+from .pieces import I_WALLKICKS, WALLKICKS, generate_bag, get_piece_matrix
 from .utils import (add_garbage, calculate_score, check_collision,
                     check_immobile, check_pc, clear_lines, generate_garbage,
                     get_board_avg_height, get_board_bumpiness,
                     get_board_heights, place_piece)
 
-from interface.models import GameState
 
-    
 class TetrisGame:
     def __init__(self, options: Optional[Dict[str, Any]]=None):
         self.options: Options = Options(**(options or {}))
@@ -118,6 +121,10 @@ class TetrisGame:
                 self.current.x += 1
                 if check_collision(self.board, self.current, self.options.board_width):
                     self.current.x -= 1
+            case 'drop':
+                self.current.y -= 1
+                if check_collision(self.board, self.current, self.options.board_width):
+                    self.current.y += 1
             case 'sonic_left':
                 while not check_collision(self.board, self.current, self.options.board_width):
                     self.current.x -= 1
@@ -126,10 +133,6 @@ class TetrisGame:
                 while not check_collision(self.board, self.current, self.options.board_width):
                     self.current.x += 1
                 self.current.x -= 1
-            case 'drop':
-                self.current.y -= 1
-                if check_collision(self.board, self.current, self.options.board_width):
-                    self.current.y += 1
             case 'sonic_drop':
                 while not check_collision(self.board, self.current, self.options.board_width):
                     self.current.y -= 1

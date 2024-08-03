@@ -1,11 +1,13 @@
 from __future__ import annotations
-from .src import Snapshot, AI, Suggestion, Statistics
-from typing import List, Tuple, TYPE_CHECKING
-from bots import Bot
-from interface.models import GameState, PlayerData, Command
-import asyncio
 
+import asyncio
+from typing import TYPE_CHECKING, List, Tuple
+
+from bots import Bot
 from engine.tetris import TetrisGame
+from interface.models import Command, GameState, PlayerData
+
+from .src import AI, Snapshot, Statistics, Suggestion
 
 
 def timeout_wrapper(func, timeout=1.0):

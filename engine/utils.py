@@ -1,9 +1,11 @@
-import random
-from typing import List, Optional, Tuple, Dict
-import math
-from .models import Board, Block, ScoreInfo, ScoreData, AttackTable, ClearName, PieceData
-from .pieces import get_piece_matrix, PieceMatrix
 import copy
+import math
+import random
+from typing import Dict, List, Optional, Tuple
+
+from .models import (AttackTable, Block, Board, ClearName, PieceData,
+                     ScoreData, ScoreInfo)
+from .pieces import PieceMatrix, get_piece_matrix
 
 
 def check_collision(board: Board, piece_data: PieceData, board_width: int) -> bool:

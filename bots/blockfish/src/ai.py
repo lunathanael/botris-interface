@@ -1,9 +1,8 @@
 import asyncio
 from collections import namedtuple
 
-from .ipc import IPC, create_subprocess_ipc
 from . import blockfish_pb2 as protos
-
+from .ipc import IPC, create_subprocess_ipc
 
 INPUT_NAMES = ('left', 'right', 'cw', 'ccw', 'hold', 'sd', 'hd')
 

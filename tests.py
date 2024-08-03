@@ -1,12 +1,11 @@
+import pickle
 import unittest
-
-from typing import List, Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Tuple
 
 from engine import TetrisGame
 from engine.utils import generate_garbage
+from interface.models import Command, GameState
 
-from interface.models import GameState, Command
-import pickle
 if TYPE_CHECKING:
     from engine.models import Event
 

@@ -1,6 +1,7 @@
 import random
-from .models import Block, Piece, PIECES
-from typing import Dict, Tuple, Optional, Literal, List
+from typing import Dict, List, Literal, Optional, Tuple
+
+from .models import PIECES, Block, Piece
 
 PieceMatrix = Tuple[Tuple[Optional[Piece]]]
 

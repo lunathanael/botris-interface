@@ -1,7 +1,9 @@
-import asyncio, subprocess
+import asyncio
+import os
+import subprocess
+
 from google.protobuf.internal.decoder import _DecodeVarint32
 from google.protobuf.internal.encoder import _EncodeVarint
-import os
 
 from . import blockfish_pb2 as protos
 

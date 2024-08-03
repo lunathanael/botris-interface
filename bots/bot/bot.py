@@ -1,5 +1,7 @@
-from interface.models import GameState, PlayerData, Command
 from typing import List
+
+from interface.models import Command, GameState, PlayerData
+
 
 class Bot:
     def __init__(self, *args, **kwargs):
