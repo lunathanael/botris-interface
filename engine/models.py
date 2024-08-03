@@ -10,7 +10,7 @@ PIECES: Tuple[Piece] = ('I', 'O', 'J', 'L', 'S', 'Z', 'T')
 
 Board = List[List[Block]]
 
-@dataclass
+@dataclass(frozen=True)
 class PieceData:
     piece: Piece
     x: int

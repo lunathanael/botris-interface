@@ -123,35 +123,45 @@ class TetrisGame:
 
         match command:
             case 'move_left':
-                self.current.x -= 1
-                if check_collision(self.board, self.current, self.options.board_width):
-                    self.current.x += 1
+                test_piece: PieceData = PieceData(self.current.piece, self.current.x - 1, self.current.y, self.current.rotation)
+                if not check_collision(self.board, test_piece, self.options.board_width):
+                    self.current: PieceData = test_piece
             case 'move_right':
-                self.current.x += 1
-                if check_collision(self.board, self.current, self.options.board_width):
-                    self.current.x -= 1
+                test_piece: PieceData = PieceData(self.current.piece, self.current.x + 1, self.current.y, self.current.rotation)
+                if not check_collision(self.board, test_piece, self.options.board_width):
+                    self.current: PieceData = test_piece
             case 'drop':
-                self.current.y -= 1
-                if check_collision(self.board, self.current, self.options.board_width):
-                    self.current.y += 1
+                test_piece: PieceData = PieceData(self.current.piece, self.current.x, self.current.y - 1, self.current.rotation)
+                if not check_collision(self.board, test_piece, self.options.board_width):
+                    self.current: PieceData = test_piece
             case 'sonic_left':
-                while not check_collision(self.board, self.current, self.options.board_width):
-                    self.current.x -= 1
-                self.current.x += 1
+                while True:
+                    test_piece: PieceData = PieceData(self.current.piece, self.current.x - 1, self.current.y, self.current.rotation)
+                    if check_collision(self.board, test_piece, self.options.board_width):
+                        break
+                    self.current: PieceData = test_piece
             case 'sonic_right':
-                while not check_collision(self.board, self.current, self.options.board_width):
-                    self.current.x += 1
-                self.current.x -= 1
+                while True:
+                    test_piece: PieceData = PieceData(self.current.piece, self.current.x + 1, self.current.y, self.current.rotation)
+                    if check_collision(self.board, test_piece, self.options.board_width):
+                        break
+                    self.current: PieceData = test_piece
             case 'sonic_drop':
-                while not check_collision(self.board, self.current, self.options.board_width):
-                    self.current.y -= 1
-                self.current.y += 1
+                while True:
+                    test_piece: PieceData = PieceData(self.current.piece, self.current.x, self.current.y - 1, self.current.rotation)
+                    if check_collision(self.board, test_piece, self.options.board_width):
+                        break
+                    self.current: PieceData = test_piece
             case 'hard_drop':
-                initial_piece_state = self.current.copy()
-                while not check_collision(self.board, self.current, self.options.board_width):
-                    self.current.y -= 1
-                self.current.y += 1
-                final_piece_state = self.current.copy()
+                initial_piece_state: PieceData = self.current.copy()
+
+                while True:
+                    test_piece: PieceData = PieceData(self.current.piece, self.current.x, self.current.y - 1, self.current.rotation)
+                    if check_collision(self.board, test_piece, self.options.board_width):
+                        break
+                    self.current: PieceData = test_piece
+
+                final_piece_state: PieceData = self.current.copy()
 
                 self.board = place_piece(self.board, self.current, self.options.board_width)
                 self.board, cleared_lines = clear_lines(self.board)
@@ -219,10 +229,7 @@ class TetrisGame:
                 kick_data = wallkicks[initial_rotation][new_rotation]
                 
                 for dx, dy in kick_data:
-                    test_piece: PieceData = self.current.copy()
-                    test_piece.rotation = new_rotation
-                    test_piece.x += dx
-                    test_piece.y += dy
+                    test_piece: PieceData = PieceData(self.current.piece, self.current.x + dx, self.current.y + dy, new_rotation)
                     if not check_collision(self.board, test_piece, self.options.board_width):
                         self.current = test_piece
                         self.is_immobile = check_immobile(self.board, self.current, self.options.board_width)

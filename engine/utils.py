@@ -22,9 +22,7 @@ def check_collision(board: Board, piece_data: PieceData, board_width: int) -> bo
 
 def check_immobile(board: Board, piece_data: PieceData, board_width: int) -> bool:
     for dx, dy in ((0, -1), (0, 1), (-1, 0), (1, 0)):
-        new_piece_data: PieceData = piece_data.copy()
-        new_piece_data.x += dx
-        new_piece_data.y += dy
+        new_piece_data: PieceData = PieceData(piece_data.piece, piece_data.x + dx, piece_data.y + dy, piece_data.rotation)
         if not check_collision(board, new_piece_data, board_width):
             return False
     return True
