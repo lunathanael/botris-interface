@@ -16,7 +16,7 @@ from .pieces import I_WALLKICKS, WALLKICKS, generate_bag, get_piece_matrix
 from .utils import (add_garbage, calculate_score, check_collision,
                     check_immobile, check_pc, clear_lines, generate_garbage,
                     get_board_avg_height, get_board_bumpiness,
-                    get_board_heights, place_piece)
+                    get_board_heights, place_piece, create_piece)
 
 
 class TetrisGame:
@@ -80,16 +80,11 @@ class TetrisGame:
         self.pieces_placed = 0
         self.dead = False
 
-    def _spawn_piece(self, piece: Piece) -> PieceData:
-        x: int = self.options.board_width // 2 - ((len(get_piece_matrix(piece, 0)[0]) + 1) // 2)
-        y: int = self.options.board_height
-        return PieceData(piece=piece, x=x, y=y, rotation=0)
-
     def spawn_piece(self) -> PieceData:
         piece = self.queue.popleft()
         if len(self.queue) < 6:
             self.queue.extend(generate_bag())
-        return self._spawn_piece(piece)
+        return create_piece(piece, self.options.board_height, self.options.board_width)
 
     def get_public_state(self) -> GameState:
         return GameState(
@@ -105,6 +100,12 @@ class TetrisGame:
             piecesPlaced=self.pieces_placed,
             dead=self.dead,
         )
+
+    def execute_commands(self, commands: List[Command]) -> List[Event]:
+        events: List[Event] = []
+        for command in commands:
+            events.extend(self.execute_command(command))
+        return events
 
     def execute_command(self, command: Command) -> List[Event]:
         if self.dead:
