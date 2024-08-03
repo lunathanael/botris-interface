@@ -102,10 +102,18 @@ class TetrisGame:
         )
 
     def execute_commands(self, commands: List[Command]) -> List[Event]:
+        """
+        Execute List of commands until harddrop
+        """
         events: List[Event] = []
         for command in commands:
-            events.extend(self.execute_command(command))
-        return events
+            if self.dead:
+                break
+            new_events = self.execute_command(command)
+            events.extend(new_events)
+            if command == 'hard_drop':
+                break
+        return
 
     def execute_command(self, command: Command) -> List[Event]:
         if self.dead:
