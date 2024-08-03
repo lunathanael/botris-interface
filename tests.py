@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING, List, Tuple
 from engine import TetrisGame
 from engine.utils import generate_garbage
 from interface.models import Command, GameState
+from engine.move_generator import generate_moves
+from timeit import default_timer as timer
 
 if TYPE_CHECKING:
     from engine.models import Event
@@ -333,8 +335,7 @@ def check_gamestates(gs1: GameState, gs2: GameState) -> bool:
 
 def verify_game_state(prev_game_state: GameState, game_state: GameState, prev_commands: List[Command], commands: List[Command]) -> bool:
     gs = TetrisGame.from_game_state(prev_game_state)
-    for command in prev_commands:
-        gs.execute_command(command)
+    gs.execute_commands(prev_commands)
     predicted_gs = gs.get_public_state()
     if not check_gamestates(predicted_gs, game_state):
         print("Different game states")
@@ -359,12 +360,13 @@ class GameBuffer:
         self.trajectory_buffer.append([])
 
 class TestGameState(unittest.TestCase):
-    def test_buffer(self):
+
+    def test_buffer_gamestate(self):
         try:
             with open('test.game_buffer', 'rb') as f:
                 gb: GameBuffer = pickle.load(f)
 
-            print(f'Games to Analyze: {gb.num_games}, frames to analyze: {gb.total_frames}')
+            print(f'Analyzing gamestate engine. Games to Analyze: {gb.num_games}, frames to analyze: {gb.total_frames}')
             for _, game in enumerate(gb.trajectory_buffer):
                 for idx, val in enumerate(game):
                     if idx == 0:
@@ -379,9 +381,66 @@ class TestGameState(unittest.TestCase):
         except FileNotFoundError:
             print("File not found")
             self.fail("File not found")
-        except Exception as e:
-            print(e)
-            self.fail(f"Error occured {e}")
+
+    def test_buffer_movegen(self):
+        try:
+            moves_found: int = 0
+            cum_time: float = 0
+            searches: int = 0
+
+            with open('test.game_buffer', 'rb') as f:
+                gb: GameBuffer = pickle.load(f)
+
+            print(f'Analyzing movegen. Games to Analyze: {gb.num_games}, frames to analyze: {gb.total_frames}')
+            for _, game in enumerate(gb.trajectory_buffer):
+                for idx, val in enumerate(game):
+                    prev_commands, prev_game_state = game[idx - 1]
+
+                    gamestate = TetrisGame.from_game_state(prev_game_state)
+                    start = timer()
+                    moves = generate_moves(gamestate.board, gamestate.current.piece, gamestate.held or gamestate.queue[0], gamestate.options.board_height, gamestate.options.board_width)
+                    end = timer()
+                    searches += 1
+
+                    cum_time += end - start
+                    moves_found += len(moves)
+
+                    prev_commands.append(Command('sonic_drop'))
+                    gamestate.execute_commands(prev_commands)
+                    if gamestate.current not in moves:
+                        TetrisGame.from_game_state(prev_game_state).render_board()
+                        gamestate.render_board()
+                    self.assertIn(gamestate.current, moves.keys())
+            
+            print(f"All Moves were found, total moves found: {moves_found}, total time taken: {cum_time}, average time: {cum_time / searches} average moves: {moves_found / searches}")
+        except FileNotFoundError:
+            print("File not found")
+            self.fail("File not found")
+
+class TestMoveGenerator(unittest.TestCase):
+
+    def test_tspin(self):
+        game = TetrisGame()
+        game.queue.appendleft('T')
+        game.current = game.spawn_piece()
+        tspin_setup = [
+            [None] * 10,
+            ['G'] * 8 + [None] * 2,
+            ['G'] * 8 + [None] * 2,
+            ['G'] * 7 + [None] * 3,
+        ]
+        tspin_setup.reverse()
+        game.board = tspin_setup
+
+        moves = generate_moves(game.board, game.current.piece, game.held, game.options.board_height, game.options.board_width)
+
+        game.execute_command('rotate_ccw')
+        game.execute_command('sonic_right')
+        game.execute_command('sonic_drop')
+        game.execute_command('rotate_cw')
+        game.execute_command('sonic_drop')
+        current_piece = game.current
+        self.assertIn(current_piece, moves.keys())
 
 if __name__ == '__main__':
     unittest.main()

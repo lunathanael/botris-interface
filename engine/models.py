@@ -12,10 +12,10 @@ Board = List[List[Block]]
 
 @dataclass(frozen=True)
 class PieceData:
-    piece: Piece
-    x: int
-    y: int
-    rotation: Literal[0, 1, 2, 3]
+    piece: Piece = field(hash=True)
+    x: int = field(hash=True)
+    y: int = field(hash=True)
+    rotation: Literal[0, 1, 2, 3] = field(hash=True)
 
     def copy(self) -> PieceData:
         return PieceData(self.piece, self.x, self.y, self.rotation)
@@ -26,8 +26,8 @@ class AttackTable:
     double: int = 1
     triple: int = 2
     quad: int = 4
-    asd: int = 4
     ass: int = 2
+    asd: int = 4
     ast: int = 6
     pc: int = 10
     b2b: int = 1

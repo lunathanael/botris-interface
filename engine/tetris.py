@@ -275,8 +275,11 @@ class TetrisGame:
             avg_height=get_board_avg_height(self.board, self.options.board_width),
         )
 
-    def render_board(self) -> None:
-        t_board = place_piece(self.board, self.current, self.options.board_width)
+    def render_board(self, render_current: bool=True) -> None:
+        if render_current:
+            t_board = place_piece(self.board, self.current, self.options.board_width)
+        else:
+            t_board = self.board
         colorama.init()
         color_map = {
             'I': Fore.CYAN,

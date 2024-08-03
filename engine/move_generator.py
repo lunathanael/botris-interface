@@ -7,7 +7,7 @@ from .utils import check_collision, check_immobile, create_piece
 
 Move = List[Command]
 
-def generate_moves(board: Board, piece: Piece, held: Optional[Piece], board_height: int, board_width: int):
+def generate_moves(board: Board, piece: Piece, alternative: Optional[Piece], board_height: int, board_width: int):
 
     generated_moves: Dict[PieceData, Move] = dict()
     visited: Set[PieceData] = set()
@@ -15,10 +15,10 @@ def generate_moves(board: Board, piece: Piece, held: Optional[Piece], board_heig
     current_piece: PieceData = create_piece(piece, board_height, board_width)
     if not check_collision(board, current_piece, board_width):
         generate_move_helper(board, current_piece, generated_moves, board_height, board_width, [], visited)
-        held_piece: Optional[PieceData] = create_piece(held, board_height, board_width) if held else None
-        if (held_piece is not None) and (not check_collision(board, current_piece, board_width)):
+        alternative_piece: Optional[PieceData] = create_piece(alternative, board_height, board_width) if alternative else None
+        if (alternative_piece is not None) and (not check_collision(board, alternative_piece, board_width)):
             visited = set()
-            generate_move_helper(board, held_piece, generated_moves, board_height, board_width, [], visited)
+            generate_move_helper(board, alternative_piece, generated_moves, board_height, board_width, [], visited)
 
     return generated_moves
 
@@ -67,7 +67,7 @@ def rotate_ccw(board: Board, current: PieceData, board_width: int) -> Optional[P
     new_rotation: Literal[0, 1, 2, 3] = (initial_rotation + 3) % 4
 
     wallkicks = I_WALLKICKS if current.piece == 'I' else WALLKICKS
-    kick_data = wallkicks[new_rotation][initial_rotation]
+    kick_data = wallkicks[initial_rotation][new_rotation]
 
     for dx, dy in kick_data:
         test_piece: PieceData = PieceData(current.piece, current.x + dx, current.y + dy, new_rotation)
@@ -87,9 +87,6 @@ def generate_move_helper(board: Board, current_piece: PieceData, generated_moves
     visited.add(current_piece)
 
     add_move(board, generated_moves, current_piece, move, board_width)
-
-    if check_immobile(board, current_piece, board_width):
-        return
 
     move_left_piece: Optional[PieceData] = move_left(board, current_piece, board_width)
     if move_left_piece:
