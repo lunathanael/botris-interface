@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, TypedDict, List, Optional, Deque, Dict, Any
+from typing import TYPE_CHECKING, TypedDict, List, Optional, Deque, Dict, Any, Literal
 from collections import deque
 
 import colorama
@@ -217,14 +217,14 @@ class TetrisGame:
                     events.append(GameOverEvent())
 
             case 'rotate_cw' | 'rotate_ccw':
-                initial_rotation = self.current.rotation
-                new_rotation = (initial_rotation + (1 if command == 'rotate_cw' else 3)) % 4
+                initial_rotation: Literal[0, 1, 2, 3] = self.current.rotation
+                new_rotation: Literal[0, 1, 2, 3] = (initial_rotation + (1 if command == 'rotate_cw' else 3)) % 4
                 
                 wallkicks = I_WALLKICKS if self.current.piece == 'I' else WALLKICKS
                 kick_data = wallkicks[initial_rotation][new_rotation]
                 
                 for dx, dy in kick_data:
-                    test_piece = self.current.copy()
+                    test_piece: PieceData = self.current.copy()
                     test_piece.rotation = new_rotation
                     test_piece.x += dx
                     test_piece.y += dy
@@ -258,7 +258,7 @@ class TetrisGame:
         self.garbage_queue.extend(hole_indices)
 
     def __str__(self) -> str:
-        representation = ''
+        representation: str = ''
         rendered_board = [['.' if cell is None else cell for cell in row] for row in self.board]
         rendered_board.reverse()
         for row in rendered_board:
@@ -273,8 +273,7 @@ class TetrisGame:
         )
 
     def render_board(self) -> None:
-        t_board = self.board.copy()
-        self.board = place_piece(self.board, self.current, self.options.board_width)
+        t_board = place_piece(self.board, self.current, self.options.board_width)
         colorama.init()
         color_map = {
             'I': Fore.CYAN,
@@ -290,7 +289,7 @@ class TetrisGame:
         piece_info = []
 
         piece_info.append('Queue:')
-        for i, piece in enumerate(self.queue[:6]):
+        for i, piece in enumerate(list(self.queue)[:6]):
             if i > 0:
                 piece_info.append('')
             piece_matrix = get_piece_matrix(piece, 0)
@@ -304,8 +303,8 @@ class TetrisGame:
         for y in range(self.options.board_height - 1, -1, -1):
             print('│', end='')
             for x in range(self.options.board_width):
-                if y < len(self.board) and self.board[y][x] is not None:
-                    piece = self.board[y][x]
+                if y < len(t_board) and t_board[y][x] is not None:
+                    piece = t_board[y][x]
                     print(f'{color_map[piece]}██{Style.RESET_ALL}', end='')
                 else:
                     print('  ', end='')
@@ -324,4 +323,3 @@ class TetrisGame:
         print(f'  Hold: {self.held or "Empty"}')
 
         print(f'\nGarbage queued: {len(self.garbage_queue)}')
-        self.board = t_board

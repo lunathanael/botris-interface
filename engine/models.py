@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import List, Optional, Tuple, Literal, Dict
 from dataclasses import dataclass, field, asdict
+import copy
 
 
 Piece = Literal['I', 'O', 'J', 'L', 'S', 'Z', 'T']

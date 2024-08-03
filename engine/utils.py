@@ -3,6 +3,7 @@ from typing import List, Optional, Tuple, Dict
 import math
 from .models import Board, Block, ScoreInfo, ScoreData, AttackTable, ClearName, PieceData
 from .pieces import get_piece_matrix, PieceMatrix
+import copy
 
 
 def check_collision(board: Board, piece_data: PieceData, board_width: int) -> bool:
@@ -28,7 +29,7 @@ def check_immobile(board: Board, piece_data: PieceData, board_width: int) -> boo
 
 def place_piece(board: Board, piece_data: PieceData, board_width: int) -> Board:
     piece_matrix: PieceMatrix = get_piece_matrix(piece_data.piece, piece_data.rotation)
-    new_board: Board = board.copy()
+    new_board: Board = copy.deepcopy(board)
     for piece_y, row in enumerate(piece_matrix):
         for piece_x, cell in enumerate(row):
             if cell:
@@ -122,7 +123,7 @@ def generate_garbage(damage: int, garbage_messiness: float, board_width: int) ->
     return hole_indices
 
 def add_garbage(board: Board, hole_indices: List[int], board_width: int) -> Board:
-    new_board: Board = board.copy()
+    new_board: Board = copy.deepcopy(board)
     for hole_index in hole_indices:
         line: List[Block] = ['G'] * board_width
         line[hole_index] = None
