@@ -1,10 +1,11 @@
 from __future__ import annotations
 from .src import Snapshot, AI, Suggestion, Statistics
-from engine.tetris import TetrisGame
-from typing import List, Tuple
+from typing import List, Tuple, TYPE_CHECKING
 from bots import Bot
 from interface.models import GameState, PlayerData, Command
 import asyncio
+
+from engine.tetris import TetrisGame
 
 
 def timeout_wrapper(func, timeout=1.0):
@@ -15,7 +16,9 @@ def timeout_wrapper(func, timeout=1.0):
             try:
                 return await asyncio.wait_for(func(*args, **kwargs), timeout=timeout)
             except asyncio.TimeoutError:
-                print(f"BlockFish Double Failure. Args: {args}, Kwargs: {kwargs}")  
+                print(f"BlockFish Double Failure. Args: {args}, Kwargs: {kwargs}")
+                args[0].shutdown()
+                await args[0].start()
                 return []
     return wrapped_function
 
@@ -59,8 +62,8 @@ class BlockFish(Bot):
 
     @staticmethod
     def to_snapshot(gs: TetrisGame):
-        queue = gs.queue[:6]
-        queue = gs.current['piece'] + ''.join(queue)
+        queue = list(gs.queue)[:6]
+        queue = gs.current.piece + ''.join(queue)
         hold = gs.held
         matrix = gs.board
         matrix = [''.join(['x' if j else '.' for j in i]) for i in gs.board]

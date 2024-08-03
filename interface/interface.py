@@ -1,8 +1,9 @@
 from __future__ import annotations
-
-from .handlers import construct_message_handler
+from typing import TYPE_CHECKING
+from .handlers import construct_message_handler, tracker_construct_message_handler
 from .websocket_client import WebSocketClient
-from bots import Bot
+if TYPE_CHECKING:
+    from bots import Bot
 
 async def connect(token, room_key) -> Interface:
     return Interface.create(token, room_key)
@@ -16,14 +17,17 @@ class Interface:
         self.bot: Bot = None
 
     @classmethod
-    def create(cls, token: str, room_key: str, bot: Bot) -> Interface:
+    def create(cls, token: str, room_key: str, bot: Bot, tracking: bool=False) -> Interface:
         self: Interface = cls()
         self.token = token
         self.room_key = room_key
         self.url = f"wss://botrisbattle.com/ws?token={token}&roomKey={room_key}"
         
         self.bot = bot
-        handle_message = construct_message_handler(self.bot.analyze)
+        if tracking:
+            handle_message = tracker_construct_message_handler(self.bot.analyze)
+        else:
+            handle_message = construct_message_handler(self.bot.analyze)
 
         self.client = WebSocketClient(self.url, handle_message)
         return self

@@ -49,7 +49,6 @@ class GameState(BaseModel):
     garbageQueued: int
     held: Optional[Piece]
     current: PieceData
-    isImmobile: bool
     canHold: bool
     combo: int
     b2b: bool

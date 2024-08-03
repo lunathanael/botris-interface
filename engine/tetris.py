@@ -13,23 +13,7 @@ from .utils import (add_garbage, calculate_score, check_collision,
                     get_board_avg_height, get_board_bumpiness,
                     get_board_heights, place_piece)
 
-if TYPE_CHECKING:
-    from interface.models import GameState
-
-class PublicGameState(TypedDict):
-    board: Board
-    queue: List[Piece]
-    garbageQueued: int
-    held: Optional[Piece]
-    current: PieceData
-    isImmobile: bool
-    canHold: bool
-    combo: int
-    b2b: bool
-    score: int
-    piecesPlaced: int
-    dead: bool
-
+from interface.models import GameState
 
     
 class TetrisGame:
@@ -66,7 +50,7 @@ class TetrisGame:
             rotation=game_state.current.rotation
         )
 
-        self.is_immobile = game_state.isImmobile
+        self.is_immobile = False
         self.can_hold = game_state.canHold
         self.combo = game_state.combo
         self.b2b = game_state.b2b
@@ -105,13 +89,12 @@ class TetrisGame:
         return self._spawn_piece(piece)
 
     def get_public_state(self) -> GameState:
-        return PublicGameState(
+        return GameState(
             board=self.board,
             queue=list(self.queue)[:6],
             garbageQueued=len(self.garbage_queue),
             held=self.held,
-            current=self.current,
-            isImmobile=self.is_immobile,
+            current=self.current.__dict__,
             canHold=self.can_hold,
             combo=self.combo,
             b2b=self.b2b,
@@ -239,8 +222,9 @@ class TetrisGame:
 
                 new_held = self.current.piece
                 if self.held:
+                    self.queue.appendleft(self.held)
+                    self.held = self.current.piece
                     self.current = self.spawn_piece()
-                    self.current.piece = self.held
                 else:
                     self.current = self.spawn_piece()
                 
