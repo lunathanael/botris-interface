@@ -1,0 +1,37 @@
+         20689554 function calls in 26.308 seconds
+
+   Ordered by: internal time
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+   914897    6.270    0.000    7.529    0.000 C:\Users\lunat\Desktop\blocc\engine\utils.py:89(_check_collision)
+      398    3.795    0.010   26.249    0.066 C:\Users\lunat\Desktop\blocc\engine\move_generator.py:176(bfs_generate_move_helper)
+   984794    2.448    0.000    2.448    0.000 <string>:2(__init__)
+   984794    1.909    0.000   14.617    0.000 C:\Users\lunat\Desktop\blocc\engine\utils.py:20(check_collision)
+   634240    1.886    0.000    4.256    0.000 C:\Users\lunat\Desktop\blocc\engine\utils.py:11(<genexpr>)
+  7575626    1.827    0.000    1.827    0.000 {built-in method builtins.len}
+  2536960    1.695    0.000    2.370    0.000 C:\Users\lunat\Desktop\blocc\engine\utils.py:12(<genexpr>)
+  1107318    0.832    0.000    1.262    0.000 <string>:2(__hash__)
+   192481    0.602    0.000    4.156    0.000 C:\Users\lunat\Desktop\blocc\engine\move_generator.py:116(rotate_cw)
+   126848    0.574    0.000    4.830    0.000 C:\Users\lunat\Desktop\blocc\engine\utils.py:10(get_subgrid)
+   192481    0.549    0.000    4.080    0.000 C:\Users\lunat\Desktop\blocc\engine\move_generator.py:130(rotate_ccw)
+   892549    0.494    0.000    0.494    0.000 {method 'pop' of 'list' objects}
+   700628    0.485    0.000    0.485    0.000 <string>:2(__eq__)
+   892151    0.454    0.000    0.454    0.000 {method 'append' of 'list' objects}
+   192481    0.432    0.000    4.135    0.000 C:\Users\lunat\Desktop\blocc\engine\move_generator.py:88(move_down)
+  1107318    0.430    0.000    0.430    0.000 {built-in method builtins.hash}
+   192481    0.417    0.000    3.432    0.000 C:\Users\lunat\Desktop\blocc\engine\move_generator.py:76(move_left)
+   192481    0.412    0.000    3.369    0.000 C:\Users\lunat\Desktop\blocc\engine\move_generator.py:82(move_right)
+   915295    0.362    0.000    0.362    0.000 C:\Users\lunat\Desktop\blocc\engine\pieces.py:131(get_piece_matrix)
+   192481    0.225    0.000    0.431    0.000 {method 'add' of 'set' objects}
+   126848    0.064    0.000    0.064    0.000 C:\Users\lunat\Desktop\blocc\engine\pieces.py:135(get_piece_mask)
+    11144    0.036    0.000    0.387    0.000 C:\Users\lunat\Desktop\blocc\engine\move_generator.py:144(add_move)
+      199    0.033    0.000   26.292    0.132 C:\Users\lunat\Desktop\blocc\engine\move_generator.py:40(bfs_generate_moves)
+    11144    0.027    0.000    0.324    0.000 C:\Users\lunat\Desktop\blocc\engine\move_generator.py:95(sonic_drop)
+     8290    0.022    0.000    0.031    0.000 C:\Users\lunat\Desktop\blocc\engine\pieces.py:68(<genexpr>)
+      200    0.016    0.000    0.016    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+     1215    0.005    0.000    0.036    0.000 {built-in method builtins.sum}
+     1215    0.003    0.000    0.039    0.000 C:\Users\lunat\Desktop\blocc\engine\pieces.py:66(get_matrix_mask)
+      398    0.003    0.000    0.005    0.000 C:\Users\lunat\Desktop\blocc\engine\utils.py:234(create_piece)
+      199    0.001    0.000   26.292    0.132 C:\Users\lunat\Desktop\blocc\engine\move_generator.py:12(generate_moves)
+
+

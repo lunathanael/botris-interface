@@ -1,5 +1,6 @@
 import random
 from typing import Dict, List, Literal, Optional, Tuple
+from functools import lru_cache
 
 from .models import PIECES, Block, Piece
 
@@ -54,12 +55,29 @@ def _get_piece_matrix(piece: Piece, rotation: Literal[0, 1, 2, 3]) -> PieceMatri
     return rotate_matrix(PIECE_MATRICES[piece], rotation)
 
 
-FAST_PIECE_MATRICES: Tuple[Tuple[Piece, int]] = tuple(
+FAST_PIECE_MATRICES: Tuple[Tuple[PieceMatrix]] = tuple(
     tuple(
         _get_piece_matrix(piece, rotation)
         for rotation in range(4)
     )
     for piece in PIECES
+)
+
+@lru_cache(None)
+def get_matrix_mask(board: Tuple[Tuple[Optional[Block]]]) -> int:
+    return sum(
+        1 << (y * 3 + x)
+        for y, row in enumerate(board)
+        for x, cell in enumerate(row)
+        if cell is not None
+    )
+
+FAST_PIECE_MASKS: Tuple[Tuple[int]] = tuple(
+    tuple(
+        get_matrix_mask(FAST_PIECE_MATRICES[piece_index][rotation])
+        for rotation in range(4)
+    )
+    for piece_index, _ in enumerate(PIECES)
 )
 
 WALLKICK = Tuple[Tuple[int, int]]
@@ -108,6 +126,14 @@ def generate_bag() -> List[Piece]:
     random.shuffle(bag)
     return bag
 
+PIECE_INDEX_MAP = {piece: PIECES.index(piece) for i, piece in enumerate(PIECES)}
+
 def get_piece_matrix(piece: Piece, rotation: Literal[0, 1, 2, 3]) -> PieceMatrix:
-    piece_index: int = PIECES.index(piece)
+    piece_index: int = PIECE_INDEX_MAP[piece]
     return FAST_PIECE_MATRICES[piece_index][rotation]
+
+def get_piece_mask(piece: Piece, rotation: Literal[0, 1, 2, 3]) -> int:
+    piece_index: int = PIECE_INDEX_MAP[piece]
+    # print(get_piece_matrix(piece, rotation))
+    # print(FAST_PIECE_MASKS[piece_index][rotation])
+    return FAST_PIECE_MASKS[piece_index][rotation]
