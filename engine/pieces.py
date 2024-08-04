@@ -1,6 +1,6 @@
 import random
 from typing import Dict, List, Literal, Optional, Tuple
-from functools import lru_cache
+from itertools import product
 
 from .models import PIECES, Block, Piece
 
@@ -63,13 +63,13 @@ FAST_PIECE_MATRICES: Tuple[Tuple[PieceMatrix]] = tuple(
     for piece in PIECES
 )
 
-@lru_cache(None)
-def get_matrix_mask(board: Tuple[Tuple[Optional[Block]]]) -> int:
+
+def _get_matrix_mask(board: Tuple[Tuple[bool]]) -> int:
     return sum(
         1 << (y * 4 + x)
         for y in range(4)
         for x in range(4)
-        if y < len(board) and x < len(board[y]) and board[y][x] is not None
+        if board[y][x]
     )
 
 def _get_piece_mask(piece_index: int, rotation: Literal[0, 1, 2, 3]) -> int:
@@ -83,6 +83,27 @@ def _get_piece_mask(piece_index: int, rotation: Literal[0, 1, 2, 3]) -> int:
                 board_y = 3 - piece_y
                 mask |= 1 << (board_y * 4 + board_x)
     return mask
+    
+def _generate_all_4x4_masks() -> Dict[Tuple[Tuple[bool]], int]:
+    all_combinations = product([False, True], repeat=16)
+    
+    mask_dict: Dict[Tuple[Tuple[bool]], int] = {}
+    
+    for combo in all_combinations:
+        board = tuple(
+            tuple(combo[i * 4:(i + 1) * 4])
+            for i in range(4)
+        )
+        mask = _get_matrix_mask(board)
+        
+        mask_dict[board] = mask
+        
+    return mask_dict
+
+FAST_MATRIX_MASKS: Dict[Tuple[Tuple[bool]], int] = _generate_all_4x4_masks()
+
+def get_matrix_mask(board: Tuple[Tuple[bool]]) -> int:
+    return FAST_MATRIX_MASKS[board]
 
 FAST_PIECE_MASKS: Tuple[Tuple[int]] = tuple(
     tuple(

@@ -8,16 +8,18 @@ from .models import (AttackTable, Block, Board, ClearName, PieceData,
 from .pieces import PieceMatrix, get_piece_matrix, get_piece_mask, get_matrix_mask, get_piece_border
 
 
-def get_subgrid(board: Board, start_x: int, start_y: int) -> Tuple[Tuple[int]]:
+def get_subgrid(board: Board, start_x: int, start_y: int, board_width: int, board_height: int) -> Tuple[Tuple[bool, bool, bool, bool], ...]:
+    x_max = min(start_x + 4, board_width)
+    y_min = max(start_y - 3, 0)
+    y_max = min(start_y + 1, board_height)
     
-    subgrid = tuple(
-        tuple(
-            board[start_y - y][start_x + x] if start_x + x >= 0 and start_y - y < len(board) and start_x + x >= 0 and start_x + x < len(board[start_y - y]) else None
-            for x in range(4)
-        )
-        for y in range(3, -1, -1)
-    )
-    return subgrid
+    subgrid = [[False] * 4 for _ in range(4)]
+
+    for y in range(y_min, y_max):
+        for x in range(start_x, x_max):
+            subgrid[y - (start_y - 3)][x - start_x] = bool(board[y][x])
+    
+    return tuple(tuple(row) for row in subgrid)
 
 def check_collision(board: Board, piece_data: PieceData, board_width: int) -> bool:
     piece_x = piece_data.x
@@ -25,93 +27,30 @@ def check_collision(board: Board, piece_data: PieceData, board_width: int) -> bo
 
     lowest_x, highest_x, lowest_y, highest_y = get_piece_border(piece_data.piece, piece_data.rotation)
     if ((piece_x + lowest_x) < 0) or ((piece_x + highest_x) >= board_width) or ((piece_y - highest_y) < 0):
-        if not _check_collision(board, piece_data, board_width):
-            print("FALSE POSITIVE")
-            print(f'Board: {board}')
-            print(f'Piece: {piece_data}')
         return True
-    board_height = len(board)
+    
+    board_height: int = len(board)
     if piece_y - 3 >= board_height:
-        if _check_collision(board, piece_data, board_width):
-            print("FALSE NEGATIVE")
-            print(f'Board: {board}')
-            print(f'Piece: {piece_data}')
         return False
 
-    subgrid = get_subgrid(board, piece_x, piece_y)
+    subgrid = get_subgrid(board, piece_x, piece_y, board_width, board_height)
     board_mask = get_matrix_mask(subgrid)
     piece_mask = get_piece_mask(piece_data.piece, piece_data.rotation)
         
     if piece_mask & board_mask:
-        if not _check_collision(board, piece_data, board_width):
-            print("FALSE POSITIVE")
-            print(f'Board: {board}')
-            for board_row in reversed(board):
-                print(' '.join([x or '.' for x in board_row]))
-            print(f'Piece: {piece_data}')
-            print(f'Subgrid: {subgrid}')
-            print(f'Piece mask: {piece_mask}')
-            print(f'Board mask: {board_mask}')
-            #render mask
-            for row in range(4):
-                for col in range(4):
-                    if piece_mask & (1 << (row * 4 + col)):
-                        print('X', end='')
-                    else:
-                        print('O', end='')
-                print()
-            print('------')
-            for row in range(4):
-                for col in range(4):
-                    if board_mask & (1 << (row * 4 + col)):
-                        print('X', end='')
-                    else:
-                        print('O', end='')
-                print()
-            
-            print('------')
-            render_collision(board, piece_data, board_width)
         return True
-    if _check_collision(board, piece_data, board_width):
-        print("FALSE NEGATIVE1")
-        print(f'Board: {board}')
-        for board_row in reversed(board):
-            print(' '.join([x or '.' for x in board_row]))
-        print(f'Piece: {piece_data}')
-        print(f'Subgrid: {subgrid}')
-        print(f'Piece mask: {piece_mask}')
-        print(f'Board mask: {board_mask}')
-        #render mask
-        for row in range(4):
-            for col in range(4):
-                if piece_mask & (1 << (row * 4 + col)):
-                    print('X', end='')
-                else:
-                    print('O', end='')
-            print()
-        print('------')
-        for row in range(4):
-            for col in range(4):
-                if board_mask & (1 << (row * 4 + col)):
-                    print('X', end='')
-                else:
-                    print('O', end='')
-            print()
-        
-        print('------')
-        render_collision(board, piece_data, board_width)
-        
     return False
 
 def _check_collision(board: Board, piece_data: PieceData, board_width: int) -> bool:
     piece_matrix: PieceMatrix = get_piece_matrix(piece_data.piece, piece_data.rotation)
+    board_height: int = len(board)
     for piece_y, row in enumerate(piece_matrix):
         for piece_x, cell in enumerate(row):
             if cell:
                 board_x = piece_data.x + piece_x
                 board_y = piece_data.y - piece_y
                 if (board_x < 0 or board_x >= board_width or
-                    board_y < 0 or (board_y < len(board) and board[board_y][board_x])):
+                    board_y < 0 or (board_y < board_height and board[board_y][board_x])):
                     return True
     return False 
 

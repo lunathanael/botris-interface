@@ -428,7 +428,7 @@ class TestGameState(unittest.TestCase):
                             self.fail("SOMETHING REALLY BAD HAPPENED")
                         if searches % 200 == 199:
                             with open('tottime.txt', 'w') as f:
-                                ps = pstats.Stats(pr, stream=f).sort_stats(pstats.SortKey.TIME).print_stats()
+                                ps = pstats.Stats(pr, stream=f).sort_stats(pstats.SortKey.TIME).print_callers()
                             with open('percall.txt', 'w') as f:
                                 ps = pstats.Stats(pr, stream=f).get_stats_profile().func_profiles
                                 vals = ps.items()
