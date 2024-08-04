@@ -66,15 +66,52 @@ FAST_PIECE_MATRICES: Tuple[Tuple[PieceMatrix]] = tuple(
 @lru_cache(None)
 def get_matrix_mask(board: Tuple[Tuple[Optional[Block]]]) -> int:
     return sum(
-        1 << (y * 3 + x)
-        for y, row in enumerate(board)
-        for x, cell in enumerate(row)
-        if cell is not None
+        1 << (y * 4 + x)
+        for y in range(4)
+        for x in range(4)
+        if y < len(board) and x < len(board[y]) and board[y][x] is not None
     )
+
+def _get_piece_mask(piece_index: int, rotation: Literal[0, 1, 2, 3]) -> int:
+    mask: int = 0
+
+    piece_matrix: PieceMatrix = FAST_PIECE_MATRICES[piece_index][rotation]
+    for piece_y, row in enumerate(piece_matrix):
+        for piece_x, cell in enumerate(row):
+            if cell is not None:
+                board_x = 0 + piece_x
+                board_y = 3 - piece_y
+                mask |= 1 << (board_y * 4 + board_x)
+    return mask
 
 FAST_PIECE_MASKS: Tuple[Tuple[int]] = tuple(
     tuple(
-        get_matrix_mask(FAST_PIECE_MATRICES[piece_index][rotation])
+        _get_piece_mask(piece_index, rotation)
+        for rotation in range(4)
+    )
+    for piece_index, _ in enumerate(PIECES)
+)
+
+def _get_piece_border(piece_index: int, rotation: Literal[0, 1, 2, 3]) -> Tuple[Tuple[int]]:
+    lowest_x = 3
+    highest_x = 0
+    lowest_y = 3
+    highest_y = 0
+
+    piece_matrix: PieceMatrix = FAST_PIECE_MATRICES[piece_index][rotation]
+    for piece_y, row in enumerate(piece_matrix):
+        for piece_x, cell in enumerate(row):
+            if cell is not None:
+                lowest_x = min(lowest_x, piece_x)
+                highest_x = max(highest_x, piece_x)
+                lowest_y = min(lowest_y, piece_y)
+                highest_y = max(highest_y, piece_y)
+    
+    return lowest_x, highest_x, lowest_y, highest_y
+
+PIECE_BORDERS: Tuple[Tuple[Tuple[int]]] = tuple(
+    tuple(
+        _get_piece_border(piece_index, rotation)
         for rotation in range(4)
     )
     for piece_index, _ in enumerate(PIECES)
@@ -137,3 +174,7 @@ def get_piece_mask(piece: Piece, rotation: Literal[0, 1, 2, 3]) -> int:
     # print(get_piece_matrix(piece, rotation))
     # print(FAST_PIECE_MASKS[piece_index][rotation])
     return FAST_PIECE_MASKS[piece_index][rotation]
+
+def get_piece_border(piece: Piece, rotation: Literal[0, 1, 2, 3]) -> Tuple[int, int, int, int]:
+    piece_index: int = PIECE_INDEX_MAP[piece]
+    return PIECE_BORDERS[piece_index][rotation]
