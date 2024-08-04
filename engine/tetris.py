@@ -17,6 +17,7 @@ from .utils import (add_garbage, calculate_score, check_collision,
                     check_immobile, check_pc, clear_lines, generate_garbage,
                     get_board_avg_height, get_board_bumpiness,
                     get_board_heights, place_piece, create_piece)
+from .move_generator import generate_moves
 
 
 class TetrisGame:
@@ -106,12 +107,14 @@ class TetrisGame:
         Execute List of commands until harddrop
         """
         events: List[Event] = []
+
+        commands.append('hard_drop')
         for command in commands:
             if self.dead:
                 break
             new_events = self.execute_command(command)
             events.extend(new_events)
-            if command == 'hard_drop':
+            if command in ['hard_drop', 'hard_down']:
                 break
         return
 
@@ -329,3 +332,9 @@ class TetrisGame:
         print(f'  Hold: {self.held or "Empty"}')
 
         print(f'\nGarbage queued: {len(self.garbage_queue)}')
+
+    def generate_moves(self, include_held: bool=True, include_queue: bool=True) -> Dict[PieceData, List[Command]]:
+        held: Optional[Piece] = self.held if include_held else None
+        first_piece: Optional[Piece] = self.queue[0] if include_queue else None
+        alternative: Optional[Piece] = first_place if held is None else held
+        return generate_moves(self.board, self.current.piece, alternative, self.options.board_height, self.options.board_width)

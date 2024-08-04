@@ -4,7 +4,7 @@ import random
 from typing import Dict, List, Optional, Tuple
 
 from .models import (AttackTable, Block, Board, ClearName, PieceData,
-                     ScoreData, ScoreInfo, Piece)
+                     ScoreData, ScoreInfo, Piece, Command)
 from .pieces import PieceMatrix, get_piece_matrix
 
 
@@ -157,3 +157,5 @@ def create_piece(piece: Piece, board_height: int, board_width: int) -> PieceData
     x: int = board_width // 2 - ((len(get_piece_matrix(piece, 0)[0]) + 1) // 2)
     y: int = board_height
     return PieceData(piece=piece, x=x, y=y, rotation=0)
+
+        

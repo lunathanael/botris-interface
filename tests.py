@@ -388,31 +388,41 @@ class TestGameState(unittest.TestCase):
             cum_time: float = 0
             searches: int = 0
 
+            move_lengths: int = 0
+
             with open('test.game_buffer', 'rb') as f:
                 gb: GameBuffer = pickle.load(f)
 
             print(f'Analyzing movegen. Games to Analyze: {gb.num_games}, frames to analyze: {gb.total_frames}')
-            for _, game in enumerate(gb.trajectory_buffer):
-                for idx, val in enumerate(game):
-                    prev_commands, prev_game_state = game[idx - 1]
+            for game in gb.trajectory_buffer:
+                for trajectory in game:
+                    prev_commands, prev_game_state = trajectory
 
                     gamestate = TetrisGame.from_game_state(prev_game_state)
                     start = timer()
-                    moves = generate_moves(gamestate.board, gamestate.current.piece, gamestate.held or gamestate.queue[0], gamestate.options.board_height, gamestate.options.board_width)
+                    moves = generate_moves(gamestate.board, gamestate.current.piece, gamestate.held or gamestate.queue[0], gamestate.options.board_height, gamestate.options.board_width, 'bfs')
                     end = timer()
                     searches += 1
 
                     cum_time += end - start
                     moves_found += len(moves)
+                    move_lengths += sum([len(move) for move in moves.values()])
 
-                    prev_commands.append(Command('sonic_drop'))
-                    gamestate.execute_commands(prev_commands)
+                    for command in prev_commands:
+                        if command == 'hard_drop':
+                            break
+                        gamestate.execute_command(command)
+                    gamestate.execute_command('sonic_drop')
                     if gamestate.current not in moves:
+                        print(prev_game_state)
                         TetrisGame.from_game_state(prev_game_state).render_board()
                         gamestate.render_board()
-                    self.assertIn(gamestate.current, moves.keys())
-            
-            print(f"All Moves were found, total moves found: {moves_found}, total time taken: {cum_time}, average time: {cum_time / searches} average moves: {moves_found / searches}")
+                        print(prev_commands)
+                        self.assertIn(gamestate.current, moves.keys())
+                        print("HUH!")
+                        self.fail("SOMETHING REALLY BAD HAPPENED")
+                    if searches % 100 == 99:
+                        print(f"All Moves were found.\nTotal moves found: {moves_found}\nTotal time taken: {cum_time}\tAverage search time: {cum_time / searches}\nAverage moves per search: {moves_found / searches}\nAverage Move Length: {move_lengths / moves_found}")
         except FileNotFoundError:
             print("File not found")
             self.fail("File not found")

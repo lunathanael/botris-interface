@@ -19,6 +19,12 @@ class PieceData:
 
     def copy(self) -> PieceData:
         return PieceData(self.piece, self.x, self.y, self.rotation)
+    
+    def __lt__(self, nxt): 
+        """
+        Arbitrary comparison function to allow for heapq of PieceData objects
+        """
+        return (self.y, self.x, self.rotation) < (nxt.y, nxt.x, nxt.rotation)
 
 @dataclass
 class AttackTable:
@@ -52,6 +58,7 @@ class Options:
             self.attack_table = AttackTable()
 
 Command = Literal['hold', 'move_left', 'move_right', 'rotate_cw', 'rotate_ccw', 'drop', 'sonic_drop']
+Move = List[Command]
 
 @dataclass
 class ClearedLine:
