@@ -44,11 +44,12 @@ class TetrisGame:
         self = cls(options)
         
         self.board = game_state.board
-        self.queue = deque(game_state.queue)
+        # convert 'I' to Piece.I, and etc for queue
+        self.queue = deque([Piece.from_str(piece) for piece in game_state.queue])
         self.garbage_queue = generate_garbage(game_state.garbageQueued, self.options.garbage_messiness, self.options.board_width)
-        self.held = game_state.held
+        self.held = Piece.from_str(game_state.held) if game_state.held else None
         self.current = PieceData(
-            piece=game_state.current.piece,
+            piece=Piece.from_str(game_state.current.piece),
             x=game_state.current.x,
             y=game_state.current.y,
             rotation=game_state.current.rotation
@@ -90,9 +91,9 @@ class TetrisGame:
     def get_public_state(self) -> GameState:
         return GameState(
             board=self.board,
-            queue=list(self.queue)[:6],
+            queue=[piece.value for piece in list(self.queue)][:6],
             garbageQueued=len(self.garbage_queue),
-            held=self.held,
+            held=self.held.value if self.held else None,
             current=self.current.__dict__,
             canHold=self.can_hold,
             combo=self.combo,
@@ -228,7 +229,7 @@ class TetrisGame:
                 initial_rotation: Literal[0, 1, 2, 3] = self.current.rotation
                 new_rotation: Literal[0, 1, 2, 3] = (initial_rotation + (1 if command == 'rotate_cw' else 3)) % 4
                 
-                wallkicks = I_WALLKICKS if self.current.piece == 'I' else WALLKICKS
+                wallkicks = I_WALLKICKS if self.current.piece == Piece.I else WALLKICKS
                 kick_data = wallkicks[initial_rotation][new_rotation]
                 
                 for dx, dy in kick_data:

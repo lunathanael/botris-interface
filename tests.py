@@ -6,6 +6,7 @@ from engine import TetrisGame
 from engine.utils import generate_garbage
 from interface.models import Command, GameState
 from engine.move_generator import generate_moves
+from engine.pieces import Piece
 from timeit import default_timer as timer
 
 if TYPE_CHECKING:
@@ -16,14 +17,14 @@ class TestTetrisGame(unittest.TestCase):
 
     def test_sonic_drop(self):
         game = TetrisGame()
-        game.queue.appendleft('I')
+        game.queue.appendleft(Piece.I)
         game.current = game.spawn_piece()
         game.execute_command('sonic_drop')
         self.assertEqual(game.current.y, 1)
 
     def test_move_horizontally(self):
         game = TetrisGame()
-        game.queue.appendleft('I')
+        game.queue.appendleft(Piece.I)
         game.current = game.spawn_piece()
         self.assertEqual(game.current.x, 3)
         game.execute_command('move_right')
@@ -35,7 +36,7 @@ class TestTetrisGame(unittest.TestCase):
 
     def test_hard_drop(self):
         game = TetrisGame()
-        game.queue.appendleft('I')
+        game.queue.appendleft(Piece.I)
         game.current = game.spawn_piece()
         game.execute_command('hard_drop')
         expected_board = [[None] * 3 + ['I'] * 4 + [None] * 3]
@@ -52,7 +53,7 @@ class TestTetrisGame(unittest.TestCase):
         tspin_setup.reverse()
         game.board = tspin_setup
 
-        game.queue.appendleft('T')
+        game.queue.appendleft(Piece.T)
         game.current = game.spawn_piece()
         game.execute_command('rotate_cw')
         game.execute_command('sonic_drop')
@@ -79,7 +80,7 @@ class TestTetrisGame(unittest.TestCase):
         tspin_setup.reverse()
         game.board = tspin_setup
 
-        game.queue.appendleft('O')
+        game.queue.appendleft(Piece.O)
         game.current = game.spawn_piece()
         result = game.execute_command('hard_drop')
         self.assertTrue(any([event.type == 'clear' for event in result]))
@@ -103,7 +104,7 @@ class TestTetrisGame(unittest.TestCase):
         tspin_setup.reverse()
         game.board = tspin_setup
 
-        game.queue.appendleft('O')
+        game.queue.appendleft(Piece.O)
         game.current = game.spawn_piece()
         game.execute_command('rotate_cw')
         result = game.execute_command('hard_drop')
@@ -115,7 +116,7 @@ class TestTetrisGame(unittest.TestCase):
 
     def test_tspin_wallkick(self):
         game = TetrisGame()
-        game.queue.appendleft('T')
+        game.queue.appendleft(Piece.T)
         game.current = game.spawn_piece()
         tspin_setup = [
             [None] * 10,
@@ -155,7 +156,7 @@ class TestTetrisGame(unittest.TestCase):
         single_clear_setup.reverse()
         game.board = single_clear_setup
 
-        game.queue.appendleft('I')
+        game.queue.appendleft(Piece.I)
         game.current = game.spawn_piece()
         game.execute_command('sonic_right')
         result = game.execute_command('hard_drop')
@@ -173,7 +174,7 @@ class TestTetrisGame(unittest.TestCase):
         double_clear_setup.reverse()
         game.board = double_clear_setup
 
-        game.queue.appendleft('O')
+        game.queue.appendleft(Piece.O)
         game.current = game.spawn_piece()
         game.execute_command('sonic_right')
         result = game.execute_command('hard_drop')
@@ -209,13 +210,13 @@ class TestTetrisGame(unittest.TestCase):
         game = TetrisGame()
         result: List[Event] = []
         
-        game.queue.appendleft('I')
+        game.queue.appendleft(Piece.I)
         game.current = game.spawn_piece()
         game.execute_command('rotate_ccw')
         game.execute_command('sonic_left')
         result = game.execute_command('hard_drop')
         for i in range(10):
-            game.queue.appendleft('I')
+            game.queue.appendleft(Piece.I)
             game.current = game.spawn_piece()
             game.execute_command('rotate_ccw')
             game.execute_command('sonic_left')
@@ -240,7 +241,7 @@ class TestTetrisGame(unittest.TestCase):
         ]
         perfect_clear_setup.reverse()
         game.board = perfect_clear_setup
-        game.queue.appendleft('I')
+        game.queue.appendleft(Piece.I)
         game.current = game.spawn_piece()
         game.execute_command('rotate_ccw')
         game.execute_command('move_right')
@@ -251,7 +252,7 @@ class TestTetrisGame(unittest.TestCase):
 
     def test_all_spin_single_clear(self):
         game = TetrisGame()
-        game.queue.appendleft('T')
+        game.queue.appendleft(Piece.T)
         game.current = game.spawn_piece()
         tspin_setup = [
             [None] * 10,
@@ -272,7 +273,7 @@ class TestTetrisGame(unittest.TestCase):
 
     def test_all_spin_triple_clear(self):
         game = TetrisGame()
-        game.queue.appendleft('T')
+        game.queue.appendleft(Piece.T)
         game.current = game.spawn_piece()
         tspin_setup = [
             [None] * 6 + ['G'] * 4,
@@ -426,9 +427,9 @@ class TestGameState(unittest.TestCase):
                             self.assertIn(gamestate.current, moves.keys())
                             print("HUH!")
                             self.fail("SOMETHING REALLY BAD HAPPENED")
-                        if searches % 200 == 199:
+                        if searches % 100 == 99:
                             with open('tottime.txt', 'w') as f:
-                                ps = pstats.Stats(pr, stream=f).sort_stats(pstats.SortKey.TIME).print_callers()
+                                ps = pstats.Stats(pr, stream=f).sort_stats(pstats.SortKey.CUMULATIVE).print_stats()
                             with open('percall.txt', 'w') as f:
                                 ps = pstats.Stats(pr, stream=f).get_stats_profile().func_profiles
                                 vals = ps.items()
@@ -447,7 +448,7 @@ class TestMoveGenerator(unittest.TestCase):
 
     def test_tspin(self):
         game = TetrisGame()
-        game.queue.appendleft('T')
+        game.queue.appendleft(Piece.T)
         game.current = game.spawn_piece()
         tspin_setup = [
             [None] * 10,

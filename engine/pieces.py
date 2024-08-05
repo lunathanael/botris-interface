@@ -2,11 +2,11 @@ import random
 from typing import Dict, List, Literal, Optional, Tuple
 from itertools import product
 
-from .models import PIECES, Block, Piece
+from .models import  _Piece,  PIECES, Block, Piece
 
 PieceMatrix = Tuple[Tuple[Optional[Piece]]]
 
-PIECE_MATRICES: Dict[Piece, PieceMatrix] = {
+PIECE_MATRICES: Dict[_Piece, PieceMatrix] = {
     "Z": (
         ("Z", "Z", None),
         (None, "Z", "Z"),
@@ -52,7 +52,7 @@ def rotate_matrix(matrix: PieceMatrix, rotation: Literal[0, 1, 2, 3]) -> PieceMa
 
 
 def _get_piece_matrix(piece: Piece, rotation: Literal[0, 1, 2, 3]) -> PieceMatrix:
-    return rotate_matrix(PIECE_MATRICES[piece], rotation)
+    return rotate_matrix(PIECE_MATRICES[piece.value], rotation)
 
 
 FAST_PIECE_MATRICES: Tuple[Tuple[PieceMatrix]] = tuple(
@@ -184,18 +184,11 @@ def generate_bag() -> List[Piece]:
     random.shuffle(bag)
     return bag
 
-PIECE_INDEX_MAP = {piece: PIECES.index(piece) for i, piece in enumerate(PIECES)}
-
 def get_piece_matrix(piece: Piece, rotation: Literal[0, 1, 2, 3]) -> PieceMatrix:
-    piece_index: int = PIECE_INDEX_MAP[piece]
-    return FAST_PIECE_MATRICES[piece_index][rotation]
+    return FAST_PIECE_MATRICES[piece.index][rotation]
 
 def get_piece_mask(piece: Piece, rotation: Literal[0, 1, 2, 3]) -> int:
-    piece_index: int = PIECE_INDEX_MAP[piece]
-    # print(get_piece_matrix(piece, rotation))
-    # print(FAST_PIECE_MASKS[piece_index][rotation])
-    return FAST_PIECE_MASKS[piece_index][rotation]
+    return FAST_PIECE_MASKS[piece.index][rotation]
 
 def get_piece_border(piece: Piece, rotation: Literal[0, 1, 2, 3]) -> Tuple[int, int, int, int]:
-    piece_index: int = PIECE_INDEX_MAP[piece]
-    return PIECE_BORDERS[piece_index][rotation]
+    return PIECE_BORDERS[piece.index][rotation]

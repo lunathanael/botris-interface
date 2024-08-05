@@ -5,11 +5,11 @@ from collections import deque
 
 
 from .pieces import I_WALLKICKS, WALLKICKS
-from .models import Board, Piece, PieceData, Command, Move
+from .models import Board, Piece, PieceData, Command, GameAction, Move
 from .utils import check_collision, check_immobile, create_piece
 
 
-def generate_moves(board: Board, piece: Piece, alternative: Optional[Piece], board_height: int, board_width: int, algo: Literal['bfs', 'dfs', 'dijk', 'dijk-short']='dijk-short') -> Dict[PieceData, Move]:
+def generate_moves(board: Board, piece: Piece, alternative: Optional[Piece], board_height: int, board_width: int, algo: Literal['bfs', 'dfs', 'dijk', 'dijk-short']='bfs') -> Dict[PieceData, GameAction]:
     match algo:
         case 'bfs':
             return bfs_generate_moves(board, piece, alternative, board_height, board_width)
@@ -24,7 +24,7 @@ def generate_moves(board: Board, piece: Piece, alternative: Optional[Piece], boa
 
 def dfs_generate_moves(board: Board, piece: Piece, alternative: Optional[Piece], board_height: int, board_width: int):
 
-    generated_moves: Dict[PieceData, Move] = dict()
+    generated_moves: Dict[PieceData, GameAction] = dict()
     visited: Set[PieceData] = set()
 
     current_piece: PieceData = create_piece(piece, board_height, board_width)
@@ -36,7 +36,6 @@ def dfs_generate_moves(board: Board, piece: Piece, alternative: Optional[Piece],
             dfs_generate_move_helper(board, alternative_piece, generated_moves, board_height, board_width, ['hold'], visited)
     return generated_moves
 
-
 def bfs_generate_moves(board: Board, piece: Piece, alternative: Optional[Piece], board_height: int, board_width: int):
 
     generated_moves: Dict[PieceData, Move] = dict()
@@ -47,11 +46,13 @@ def bfs_generate_moves(board: Board, piece: Piece, alternative: Optional[Piece],
         alternative_piece: Optional[PieceData] = create_piece(alternative, board_height, board_width) if alternative else None
         if (alternative_piece is not None) and (not check_collision(board, alternative_piece, board_width)):
             bfs_generate_move_helper(board, alternative_piece, generated_moves, board_height, board_width, True)
+
+    generated_moves = {piece: [move.value for move in moves] for piece, moves in generated_moves.items()}
     return generated_moves
 
 def dijkstra_generate_moves(board: Board, piece: Piece, alternative: Optional[Piece], board_height: int, board_width: int):
 
-    generated_moves: Dict[PieceData, Move] = dict()
+    generated_moves: Dict[PieceData, GameAction] = dict()
 
     current_piece: PieceData = create_piece(piece, board_height, board_width)
     if not check_collision(board, current_piece, board_width):
@@ -63,7 +64,7 @@ def dijkstra_generate_moves(board: Board, piece: Piece, alternative: Optional[Pi
 
 def dijkstra_generate_moves_short(board: Board, piece: Piece, alternative: Optional[Piece], board_height: int, board_width: int):
 
-    generated_moves: Dict[PieceData, Move] = dict()
+    generated_moves: Dict[PieceData, GameAction] = dict()
 
     current_piece: PieceData = create_piece(piece, board_height, board_width)
     if not check_collision(board, current_piece, board_width):
@@ -73,6 +74,7 @@ def dijkstra_generate_moves_short(board: Board, piece: Piece, alternative: Optio
             short_dijkstra_generate_move_helper(board, alternative_piece, generated_moves, board_height, board_width, True)
     return generated_moves
 
+from sys import intern
 def move_left(board: Board, piece: PieceData, board_width: int) -> Optional[PieceData]:
     current: PieceData = PieceData(piece.piece, piece.x - 1, piece.y, piece.rotation)
     if check_collision(board, current, board_width):
@@ -117,7 +119,7 @@ def rotate_cw(board: Board, current: PieceData, board_width: int) -> Optional[Pi
     initial_rotation: Literal[0, 1, 2, 3] = current.rotation
     new_rotation: Literal[0, 1, 2, 3] = (initial_rotation + 1) % 4
     
-    wallkicks = I_WALLKICKS if current.piece == 'I' else WALLKICKS
+    wallkicks = I_WALLKICKS if current.piece == Piece.I else WALLKICKS
     kick_data = wallkicks[initial_rotation][new_rotation]
 
     for dx, dy in kick_data:
@@ -141,12 +143,12 @@ def rotate_ccw(board: Board, current: PieceData, board_width: int) -> Optional[P
 
     return None
 
-def add_move(board: Board, generated_moves: Dict[PieceData, Move], piece: PieceData, move: Move, board_width: int):
+def add_move(board: Board, generated_moves: Dict[PieceData, GameAction], piece: PieceData, move: GameAction, board_width: int):
     piece = sonic_drop(board, piece, board_width)
     if (piece not in generated_moves) or (len(move) < len(generated_moves[piece])):
         generated_moves[piece] = move
 
-def dfs_generate_move_helper(board: Board, current_piece: PieceData, generated_moves: Dict[PieceData, Move], board_height: int, board_width: int, move: Move, visited: Set[PieceData]):
+def dfs_generate_move_helper(board: Board, current_piece: PieceData, generated_moves: Dict[PieceData, GameAction], board_height: int, board_width: int, move: GameAction, visited: Set[PieceData]):
     if current_piece in visited:
         return
     
@@ -173,8 +175,8 @@ def dfs_generate_move_helper(board: Board, current_piece: PieceData, generated_m
     if rotate_ccw_piece is not None:
         dfs_generate_move_helper(board, rotate_ccw_piece, generated_moves, board_height, board_width, move + ['rotate_ccw'], visited)
 
-def bfs_generate_move_helper(board: Board, current_piece: PieceData, generated_moves: Dict[PieceData, Move], board_height: int, board_width: int, held: bool=False):
-    queue: Deque[Tuple[PieceData, Move]] = [(current_piece, ['hold'] if held else [])]
+def bfs_generate_move_helper(board: Board, current_piece: PieceData, generated_moves: Dict[PieceData, GameAction], board_height: int, board_width: int, held: bool=False):
+    queue: Deque[Tuple[PieceData, Move]] = [(current_piece, [Move.hold] if held else [])]
     visited: Set[PieceData] = set()
 
     while queue:
@@ -189,25 +191,25 @@ def bfs_generate_move_helper(board: Board, current_piece: PieceData, generated_m
         if move_down_piece is None:
             add_move(board, generated_moves, current_piece, move, board_width)
         else:
-            queue.append((move_down_piece, move + ['drop']))
+            queue.append((move_down_piece, move + [Move.drop]))
 
         move_left_piece: Optional[PieceData] = move_left(board, current_piece, board_width)
         if move_left_piece is not None:
-            queue.append((move_left_piece, move + ['move_left']))
+            queue.append((move_left_piece, move + [Move.move_left]))
         move_right_piece: Optional[PieceData] = move_right(board, current_piece, board_width)
         if move_right_piece is not None:
-            queue.append((move_right_piece, move + ['move_right']))
+            queue.append((move_right_piece, move + [Move.move_right]))
 
         rotate_cw_piece: Optional[PieceData] = rotate_cw(board, current_piece, board_width)
         if rotate_cw_piece is not None:
-            queue.append((rotate_cw_piece, move + ['rotate_cw']))
+            queue.append((rotate_cw_piece, move + [Move.rotate_cw]))
 
         rotate_ccw_piece: Optional[PieceData] = rotate_ccw(board, current_piece, board_width)
         if rotate_ccw_piece is not None:
-            queue.append((rotate_ccw_piece, move + ['rotate_ccw']))
+            queue.append((rotate_ccw_piece, move + [Move.rotate_ccw]))
 
-def dijkstra_generate_move_helper(board: Board, current_piece: PieceData, generated_moves: Dict[PieceData, Move], board_height: int, board_width: int, held: bool=False):
-    priority_queue: List[Tuple[int, PieceData, Move]] = [(0, current_piece, ['hold'] if held else [])]
+def dijkstra_generate_move_helper(board: Board, current_piece: PieceData, generated_moves: Dict[PieceData, GameAction], board_height: int, board_width: int, held: bool=False):
+    priority_queue: List[Tuple[int, PieceData, GameAction]] = [(0, current_piece, ['hold'] if held else [])]
     visited: Set[PieceData] = set()
     distance: Dict[PieceData, int] = {current_piece: 0}
 
@@ -258,8 +260,8 @@ def dijkstra_generate_move_helper(board: Board, current_piece: PieceData, genera
                 heappush(priority_queue, (new_distance, rotate_ccw_piece, move + ['rotate_ccw']))
 
 
-def short_dijkstra_generate_move_helper(board: Board, current_piece: PieceData, generated_moves: Dict[PieceData, Move], board_height: int, board_width: int, held: bool=False):
-    priority_queue: List[Tuple[int, PieceData, Move]] = [(0, current_piece, ['hold'] if held else [])]
+def short_dijkstra_generate_move_helper(board: Board, current_piece: PieceData, generated_moves: Dict[PieceData, GameAction], board_height: int, board_width: int, held: bool=False):
+    priority_queue: List[Tuple[int, PieceData, GameAction]] = [(0, current_piece, ['hold'] if held else [])]
     visited: Set[PieceData] = set()
     distance: Dict[PieceData, int] = {current_piece: 0}
 

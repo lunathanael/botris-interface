@@ -2,15 +2,92 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
 from typing import Dict, List, Literal, Optional, Tuple
+from sys import intern
 
-Piece = Literal['I', 'O', 'J', 'L', 'S', 'Z', 'T']
+_Move = Literal['move_left', 'move_right', 'rotate_cw', 'rotate_ccw', 'drop', 'sonic_drop', 'hold']
+_MOVES: Tuple[_Move] = ('move_left', 'move_right', 'rotate_cw', 'rotate_ccw', 'drop', 'sonic_drop', 'hold')
+class Move:
+    
+        move_left: Move = None
+        move_right: Move = None
+        rotate_cw: Move = None
+        rotate_ccw: Move = None
+        drop: Move = None
+        sonic_drop: Move = None
+        hold: Move = None
+    
+        def __init__(self, value: str, index: int):
+            self.value: str = intern(value)
+            self.index: int = index
+    
+        @classmethod
+        def from_str(cls, value: str) -> Move:
+            return getattr(cls, value)
+        
+        def __eq__(self, other):
+            return self.index == other.index
+        
+        def __hash__(self):
+            return self.index
+        
+        def __repr__(self):
+            return self.value
+        
+        def __str__(self):
+            return self.value
+        
+        def __lt__(self, other):
+            return self.index < other.index
+        
+for index, value in enumerate(_MOVES):
+    setattr(Move, value, Move(value, index))
+
+MOVES = (Move.move_left, Move.move_right, Move.rotate_cw, Move.rotate_ccw, Move.drop, Move.sonic_drop, Move.hold)
+
+
+_Piece = Literal['I', 'O', 'J', 'L', 'S', 'Z', 'T']
+_PIECES: Tuple[_Piece] = ('I', 'O', 'J', 'L', 'S', 'Z', 'T')
+class Piece:
+
+    I: Piece = None
+    O: Piece = None
+    J: Piece = None
+    L: Piece = None
+    S: Piece = None
+    Z: Piece = None
+    T: Piece = None
+
+    def __init__(self, value: str, index: int):
+        self.value: str = intern(value)
+        self.index: int = index
+
+    @classmethod
+    def from_str(cls, value: str) -> Piece:
+        return getattr(cls, value.upper())
+    
+    def __eq__(self, other):
+        return self.index == other.index
+    
+    def __hash__(self):
+        return self.index
+    
+    def __repr__(self):
+        return self.value
+    
+    def __str__(self):
+        return self.value
+    
+    def __lt__(self, other):
+        return self.index < other.index
+
+for index, value in enumerate(_PIECES):
+    setattr(Piece, value, Piece(value, index))
+
 Block = Optional[Literal['I', 'O', 'J', 'L', 'S', 'Z', 'T', 'G']]
-
-PIECES: Tuple[Piece] = ('I', 'O', 'J', 'L', 'S', 'Z', 'T')
-
+PIECES: Tuple[Piece] = (Piece.I, Piece.O, Piece.J, Piece.L, Piece.S, Piece.Z, Piece.T)
 Board = List[List[Block]]
 
-@dataclass(frozen=True)
+@dataclass
 class PieceData:
     piece: Piece = field(hash=True)
     x: int = field(hash=True)
@@ -25,6 +102,15 @@ class PieceData:
         Arbitrary comparison function to allow for heapq of PieceData objects
         """
         return (self.y, self.x, self.rotation) < (nxt.y, nxt.x, nxt.rotation)
+    
+    def __eq__(self, nxt):
+        return (self.piece, self.y, self.x, self.rotation) == (self.piece, nxt.y, nxt.x, nxt.rotation)
+
+    def __hash__(self):
+        return hash((self.piece.index, self.x, self.y, self.rotation))
+    
+    def __dict__(self):
+        return dict(piece=self.piece.val, x=self.x, y=self.y, rotation=self.rotation)
 
 @dataclass
 class AttackTable:
@@ -58,7 +144,7 @@ class Options:
             self.attack_table = AttackTable()
 
 Command = Literal['hold', 'move_left', 'move_right', 'rotate_cw', 'rotate_ccw', 'drop', 'sonic_drop']
-Move = List[Command]
+GameAction = List[Command]
 
 @dataclass
 class ClearedLine:
