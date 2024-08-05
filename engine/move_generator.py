@@ -139,7 +139,7 @@ def rotate_ccw(board: Board, current: PieceData, board_width: int) -> Optional[P
     return None
 
 def add_move(board: Board, generated_moves: Dict[PieceData, GameAction], piece: PieceData, move: GameAction, board_width: int):
-    piece = sonic_drop(board, piece, board_width)
+    #piece = sonic_drop(board, piece, board_width)
     if (piece not in generated_moves) or (len(move) < len(generated_moves[piece])):
         generated_moves[piece] = move
 
@@ -183,7 +183,7 @@ def bfs_generate_move_helper(board: Board, current_piece: PieceData, generated_m
         visited.add(current_piece)
 
         move_down_piece: Optional[PieceData] = move_down(board, current_piece, board_width)
-        if move_down_piece is None:
+        if move_down_piece is not None:
             add_move(board, generated_moves, current_piece, move, board_width)
         else:
             queue.append((move_down_piece, move + [Move.drop]))

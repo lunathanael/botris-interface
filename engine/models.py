@@ -109,7 +109,7 @@ class PieceData:
         return hash((self.piece.index, self.x, self.y, self.rotation))
     
     def __dict__(self):
-        return dict(piece=self.piece.val, x=self.x, y=self.y, rotation=self.rotation)
+        return dict(piece=self.piece.value, x=self.x, y=self.y, rotation=self.rotation)
 
 @dataclass
 class AttackTable:

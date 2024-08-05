@@ -94,7 +94,7 @@ class TetrisGame:
             queue=[piece.value for piece in list(self.queue)][:6],
             garbageQueued=len(self.garbage_queue),
             held=self.held.value if self.held else None,
-            current=self.current.__dict__,
+            current=self.current.__dict__(),
             canHold=self.can_hold,
             combo=self.combo,
             b2b=self.b2b,

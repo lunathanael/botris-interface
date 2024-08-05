@@ -18,7 +18,7 @@ def get_subgrid_mask(board: Board, start_x: int, start_y: int, board_width: int,
     for y in range(y_min, y_max):
         for x in range(start_x, x_max):
             if board[y][x]:
-                subgrid_mask += 1 << ((y - y_min) * 4 + x - start_x)
+                subgrid_mask += (1 << ((y - (start_y - 3)) * 4 + x - start_x))
     
     return subgrid_mask
 
