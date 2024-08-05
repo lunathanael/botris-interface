@@ -47,7 +47,8 @@ class BlockFish(Bot):
         await self.ai.start()
 
     def shutdown(self) -> None:
-        self.ai.shutdown()
+        if self.ai is not None:
+            self.ai.shutdown()
 
     async def _analyze(
         self, snapshot
