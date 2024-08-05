@@ -395,51 +395,34 @@ class TestGameState(unittest.TestCase):
                 gb: GameBuffer = pickle.load(f)
 
             print(f'Analyzing movegen. Games to Analyze: {gb.num_games}, frames to analyze: {gb.total_frames}')
-            import cProfile, pstats, io
-            with cProfile.Profile() as pr:
-                pr.disable()
-                for game in gb.trajectory_buffer:
-                    for trajectory in game:
-                        prev_commands, prev_game_state = trajectory
+            for game in gb.trajectory_buffer:
+                for trajectory in game:
+                    prev_commands, prev_game_state = trajectory
 
-                        gamestate = TetrisGame.from_game_state(prev_game_state)
-                        start = timer()
-                        pr.enable()
-                        moves = generate_moves(gamestate.board, gamestate.current.piece, gamestate.held or gamestate.queue[0], gamestate.options.board_height, gamestate.options.board_width, 'bfs')
-                        pr.disable()
-                        end = timer()
-                        searches += 1
+                    gamestate = TetrisGame.from_game_state(prev_game_state)
+                    start = timer()
+                    moves = generate_moves(gamestate.board, gamestate.current.piece, gamestate.held or gamestate.queue[0], gamestate.options.board_height, gamestate.options.board_width, 'bfs')
+                    end = timer()
+                    searches += 1
 
-                        cum_time += end - start
-                        moves_found += len(moves)
-                        move_lengths += sum([len(move) for move in moves.values()])
+                    cum_time += end - start
+                    moves_found += len(moves)
+                    move_lengths += sum([len(move) for move in moves.values()])
 
-                        for command in prev_commands:
-                            if command == 'hard_drop':
-                                break
-                            gamestate.execute_command(command)
-                        gamestate.execute_command('sonic_drop')
-                        if gamestate.current not in moves:
-                            print(prev_game_state)
-                            TetrisGame.from_game_state(prev_game_state).render_board()
-                            gamestate.render_board()
-                            print(prev_commands)
-                            self.assertIn(gamestate.current, moves.keys())
-                            print("HUH!")
-                            self.fail("SOMETHING REALLY BAD HAPPENED")
-                        if searches % 100 == 99:
-                            with open('tottime.txt', 'w') as f:
-                                ps = pstats.Stats(pr, stream=f).sort_stats(pstats.SortKey.CUMULATIVE).print_stats()
-                            with open('percall.txt', 'w') as f:
-                                ps = pstats.Stats(pr, stream=f).get_stats_profile().func_profiles
-                                vals = ps.items()
-                                vals = sorted(vals, key=lambda x: x[1].percall_tottime)
-                                #print headers
-                                f.write(f'{"Function":<60}{"ncalls":<10}{"tottime":<10}{"percall_tottime":<20}{"cumtime":<10}{"percall_cumtime":<20}{"file_name":<70}{"line_number":<10}\n')
-                                for key, val in vals:
-                                    f.write(f'{key:<60}{val.ncalls:<10}{val.tottime:<10}{val.percall_tottime:<20.6f}{val.cumtime:<10}{val.percall_cumtime:<20.6f}{val.file_name:<70}{val.line_number:<10}\n')
-                            
-                            print(f"All Moves were found.\nTotal moves found: {moves_found}\nTotal time taken: {cum_time}\tAverage search time: {cum_time / searches}\nAverage moves per search: {moves_found / searches}\nAverage Move Length: {move_lengths / moves_found}")
+                    for command in prev_commands:
+                        if command == 'hard_drop':
+                            break
+                        gamestate.execute_command(command)
+                    gamestate.execute_command('sonic_drop')
+                    if gamestate.current not in moves:
+                        print(prev_game_state)
+                        TetrisGame.from_game_state(prev_game_state).render_board()
+                        gamestate.render_board()
+                        print(prev_commands)
+                        self.assertIn(gamestate.current, moves.keys())
+                        print("HUH!")
+                        self.fail("SOMETHING REALLY BAD HAPPENED")
+            print(f"All Moves were found.\nTotal moves found: {moves_found}\nTotal time taken: {cum_time}\tAverage search time: {cum_time / searches}\nAverage moves per search: {moves_found / searches}\nAverage Move Length: {move_lengths / moves_found}")
         except FileNotFoundError:
             print("File not found")
             self.fail("File not found")

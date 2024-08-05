@@ -6,7 +6,7 @@ from collections import deque
 
 from .pieces import I_WALLKICKS, WALLKICKS
 from .models import Board, Piece, PieceData, Command, GameAction, Move
-from .utils import check_collision, create_piece, _check_collision
+from .utils import check_collision, create_piece, _check_collision, move_left, move_right, move_drop, sonic_left, sonic_right, sonic_drop, rotate_ccw, rotate_cw
 
 
 def generate_moves(board: Board, piece: Piece, alternative: Optional[Piece], board_height: int, board_width: int, algo: Literal['bfs', 'dfs', 'dijk', 'dijk-short']='bfs') -> Dict[PieceData, GameAction]:
@@ -74,74 +74,11 @@ def dijkstra_generate_moves_short(board: Board, piece: Piece, alternative: Optio
             short_dijkstra_generate_move_helper(board, alternative_piece, generated_moves, board_height, board_width, True)
     return generated_moves
 
-from sys import intern
-def move_left(board: Board, piece: PieceData, board_width: int) -> Optional[PieceData]:
-    if _check_collision(board, piece.piece, piece.x - 1, piece.y, piece.rotation, board_width):
-        return None
-    return PieceData(piece.piece, piece.x - 1, piece.y, piece.rotation)
-
-def move_right(board: Board, piece: PieceData, board_width: int) -> Optional[PieceData]:
-    if _check_collision(board, piece.piece, piece.x + 1, piece.y, piece.rotation, board_width):
-        return None
-    return PieceData(piece.piece, piece.x + 1, piece.y, piece.rotation)
-
-def move_down(board: Board, piece: PieceData, board_width: int) -> Optional[PieceData]:
-    if _check_collision(board, piece.piece, piece.x, piece.y - 1, piece.rotation, board_width):
-        return None
-    return PieceData(piece.piece, piece.x, piece.y - 1, piece.rotation)
-
-
-def sonic_drop(board: Board, piece: PieceData, board_width: int) -> PieceData:
-    drop_dist: int = 1
-    while True:
-        if _check_collision(board, piece.piece, piece.x, piece.y - drop_dist, piece.rotation, board_width):
-            return PieceData(piece.piece, piece.x, piece.y - drop_dist + 1, piece.rotation)
-        drop_dist += 1
-
-def sonic_left(board: Board, piece: PieceData, board_width: int) -> PieceData:
-    left_dist: int = 1
-    while True:
-        if _check_collision(board, piece.piece, piece.x - left_dist, piece.y, piece.rotation, board_width):
-            return PieceData(piece.piece, piece.x - left_dist + 1, piece.y, piece.rotation)
-        left_dist += 1
-
-def sonic_right(board: Board, piece: PieceData, board_width: int) -> PieceData:
-    right_dist: int = 1
-    while True:
-        if _check_collision(board, piece.piece, piece.x + right_dist, piece.y, piece.rotation, board_width):
-            return PieceData(piece.piece, piece.x + right_dist - 1, piece.y, piece.rotation)
-        right_dist += 1
-
-def rotate_cw(board: Board, current: PieceData, board_width: int) -> Optional[PieceData]:
-    initial_rotation: Literal[0, 1, 2, 3] = current.rotation
-    new_rotation: Literal[0, 1, 2, 3] = (initial_rotation + 1) % 4
-
-    wallkicks = I_WALLKICKS if current.piece == Piece.I else WALLKICKS
-    kick_data = wallkicks[initial_rotation][new_rotation]
-
-    for dx, dy in kick_data:
-        if not _check_collision(board, current.piece, current.x + dx, current.y + dy, new_rotation, board_width):
-            return PieceData(current.piece, current.x + dx, current.y + dy, new_rotation)
-
-    return None
-
-def rotate_ccw(board: Board, current: PieceData, board_width: int) -> Optional[PieceData]:
-    initial_rotation: Literal[0, 1, 2, 3] = current.rotation
-    new_rotation: Literal[0, 1, 2, 3] = (initial_rotation + 3) % 4
-
-    wallkicks = I_WALLKICKS if current.piece == 'I' else WALLKICKS
-    kick_data = wallkicks[initial_rotation][new_rotation]
-
-    for dx, dy in kick_data:
-        if not _check_collision(board, current.piece, current.x + dx, current.y + dy, new_rotation, board_width):
-            return PieceData(current.piece, current.x + dx, current.y + dy, new_rotation)
-
-    return None
 
 def add_move(board: Board, generated_moves: Dict[PieceData, GameAction], piece: PieceData, move: GameAction, board_width: int):
-    #piece = sonic_drop(board, piece, board_width)
     if (piece not in generated_moves) or (len(move) < len(generated_moves[piece])):
         generated_moves[piece] = move
+
 
 def dfs_generate_move_helper(board: Board, current_piece: PieceData, generated_moves: Dict[PieceData, GameAction], board_height: int, board_width: int, move: GameAction, visited: Set[PieceData]):
     if current_piece in visited:
@@ -149,7 +86,7 @@ def dfs_generate_move_helper(board: Board, current_piece: PieceData, generated_m
     
     visited.add(current_piece)
 
-    move_down_piece: Optional[PieceData] = move_down(board, current_piece, board_width)
+    move_down_piece: Optional[PieceData] = move_drop(board, current_piece, board_width)
     if move_down_piece is None:
         add_move(board, generated_moves, current_piece, move, board_width)
     else:
@@ -182,7 +119,7 @@ def bfs_generate_move_helper(board: Board, current_piece: PieceData, generated_m
 
         visited.add(current_piece)
 
-        move_down_piece: Optional[PieceData] = move_down(board, current_piece, board_width)
+        move_down_piece: Optional[PieceData] = move_drop(board, current_piece, board_width)
         if move_down_piece is None:
             add_move(board, generated_moves, current_piece, move, board_width)
         else:
@@ -216,7 +153,7 @@ def dijkstra_generate_move_helper(board: Board, current_piece: PieceData, genera
 
         visited.add(current_piece)
 
-        move_down_piece: Optional[PieceData] = move_down(board, current_piece, board_width)
+        move_down_piece: Optional[PieceData] = move_drop(board, current_piece, board_width)
         if move_down_piece is not None:
             new_distance = current_distance + 1
             if move_down_piece not in distance or new_distance < distance[move_down_piece]:
@@ -269,7 +206,7 @@ def short_dijkstra_generate_move_helper(board: Board, current_piece: PieceData, 
         visited.add(current_piece)
         add_move(board, generated_moves, current_piece, move, board_width)
 
-        move_down_piece: Optional[PieceData] = move_down(board, current_piece, board_width)
+        move_down_piece: Optional[PieceData] = move_drop(board, current_piece, board_width)
         if move_down_piece is not None:
             new_distance = current_distance + 1
             if move_down_piece not in distance or new_distance < distance[move_down_piece]:

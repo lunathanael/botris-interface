@@ -4,8 +4,8 @@ import random
 from typing import Dict, List, Optional, Tuple, Literal
 
 from .models import (AttackTable, Block, Board, ClearName, PieceData,
-                     ScoreData, ScoreInfo, Piece, Command)
-from .pieces import PieceMatrix, get_piece_matrix, get_piece_mask, get_piece_border
+                     ScoreData, ScoreInfo, Piece, Command, GameAction, Move)
+from .pieces import PieceMatrix, get_piece_matrix, get_piece_mask, get_piece_border, WALLKICKS, I_WALLKICKS
 
 
 def get_subgrid_mask(board: Board, start_x: int, start_y: int, board_width: int, board_height: int) -> int:
@@ -49,18 +49,22 @@ def check_immobile(board: Board, piece_data: PieceData, board_width: int) -> boo
             return False
     return True
 
-def place_piece(board: Board, piece_data: PieceData, board_width: int) -> Board:
+def _place_piece(board: Board, piece_data: PieceData, board_width: int) -> Board:
     piece_matrix: PieceMatrix = get_piece_matrix(piece_data.piece, piece_data.rotation)
-    new_board: Board = copy.deepcopy(board)
     for piece_y, row in enumerate(piece_matrix):
         for piece_x, cell in enumerate(row):
             if cell:
                 board_x: int = piece_data.x + piece_x
                 board_y: int = piece_data.y - piece_y
-                if board_y >= len(new_board):
-                    diff: int = board_y - len(new_board) + 1
-                    new_board.extend([[None] * board_width for _ in range(diff)])
-                new_board[board_y][board_x] = cell
+                if board_y >= len(board):
+                    diff: int = board_y - len(board) + 1
+                    board.extend([[None] * board_width for _ in range(diff)])
+                board[board_y][board_x] = cell
+    return board
+
+def place_piece(board: Board, piece_data: PieceData, board_width: int) -> Board:
+    new_board: Board = copy.deepcopy(board)
+    new_board = _place_piece(new_board, piece_data, board_width)
     return new_board
 
 def clear_lines(board: Board) -> Tuple[Board, List[Dict[str, int | List[Block]]]]:
@@ -180,4 +184,64 @@ def create_piece(piece: Piece, board_height: int, board_width: int) -> PieceData
     y: int = board_height
     return PieceData(piece=piece, x=x, y=y, rotation=0)
 
-        
+def move_left(board: Board, piece: PieceData, board_width: int) -> Optional[PieceData]:
+    if _check_collision(board, piece.piece, piece.x - 1, piece.y, piece.rotation, board_width):
+        return None
+    return PieceData(piece.piece, piece.x - 1, piece.y, piece.rotation)
+
+def move_right(board: Board, piece: PieceData, board_width: int) -> Optional[PieceData]:
+    if _check_collision(board, piece.piece, piece.x + 1, piece.y, piece.rotation, board_width):
+        return None
+    return PieceData(piece.piece, piece.x + 1, piece.y, piece.rotation)
+
+def move_drop(board: Board, piece: PieceData, board_width: int) -> Optional[PieceData]:
+    if _check_collision(board, piece.piece, piece.x, piece.y - 1, piece.rotation, board_width):
+        return None
+    return PieceData(piece.piece, piece.x, piece.y - 1, piece.rotation)
+
+def sonic_drop(board: Board, piece: PieceData, board_width: int) -> PieceData:
+    drop_dist: int = 1
+    while True:
+        if _check_collision(board, piece.piece, piece.x, piece.y - drop_dist, piece.rotation, board_width):
+            return PieceData(piece.piece, piece.x, piece.y - drop_dist + 1, piece.rotation)
+        drop_dist += 1
+
+def sonic_left(board: Board, piece: PieceData, board_width: int) -> PieceData:
+    left_dist: int = 1
+    while True:
+        if _check_collision(board, piece.piece, piece.x - left_dist, piece.y, piece.rotation, board_width):
+            return PieceData(piece.piece, piece.x - left_dist + 1, piece.y, piece.rotation)
+        left_dist += 1
+
+def sonic_right(board: Board, piece: PieceData, board_width: int) -> PieceData:
+    right_dist: int = 1
+    while True:
+        if _check_collision(board, piece.piece, piece.x + right_dist, piece.y, piece.rotation, board_width):
+            return PieceData(piece.piece, piece.x + right_dist - 1, piece.y, piece.rotation)
+        right_dist += 1
+
+def rotate_cw(board: Board, current: PieceData, board_width: int) -> Optional[PieceData]:
+    initial_rotation: Literal[0, 1, 2, 3] = current.rotation
+    new_rotation: Literal[0, 1, 2, 3] = (initial_rotation + 1) % 4
+
+    wallkicks = I_WALLKICKS if current.piece == Piece.I else WALLKICKS
+    kick_data = wallkicks[initial_rotation][new_rotation]
+
+    for dx, dy in kick_data:
+        if not _check_collision(board, current.piece, current.x + dx, current.y + dy, new_rotation, board_width):
+            return PieceData(current.piece, current.x + dx, current.y + dy, new_rotation)
+
+    return None
+
+def rotate_ccw(board: Board, current: PieceData, board_width: int) -> Optional[PieceData]:
+    initial_rotation: Literal[0, 1, 2, 3] = current.rotation
+    new_rotation: Literal[0, 1, 2, 3] = (initial_rotation + 3) % 4
+
+    wallkicks = I_WALLKICKS if current.piece == Piece.I else WALLKICKS
+    kick_data = wallkicks[initial_rotation][new_rotation]
+
+    for dx, dy in kick_data:
+        if not _check_collision(board, current.piece, current.x + dx, current.y + dy, new_rotation, board_width):
+            return PieceData(current.piece, current.x + dx, current.y + dy, new_rotation)
+
+    return None

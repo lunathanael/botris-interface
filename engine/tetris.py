@@ -13,10 +13,10 @@ from .models import (Board, ClearEvent, Command, DamageTankedEvent, Event,
                      GameOverEvent, Options, Piece, PieceData,
                      PiecePlacedEvent, ScoreData, ScoreInfo, Statistics)
 from .pieces import I_WALLKICKS, WALLKICKS, generate_bag, get_piece_matrix
-from .utils import (add_garbage, calculate_score, check_collision,
+from .utils import (add_garbage, calculate_score, check_collision, _check_collision,
                     check_immobile, check_pc, clear_lines, generate_garbage,
                     get_board_avg_height, get_board_bumpiness,
-                    get_board_heights, place_piece, create_piece)
+                    get_board_heights, place_piece, create_piece, move_left, move_right, move_drop, sonic_left, sonic_right, sonic_drop, rotate_cw, rotate_ccw)
 from .move_generator import generate_moves
 
 
@@ -127,43 +127,57 @@ class TetrisGame:
 
         match command:
             case 'move_left':
-                test_piece: PieceData = PieceData(self.current.piece, self.current.x - 1, self.current.y, self.current.rotation)
-                if not check_collision(self.board, test_piece, self.options.board_width):
-                    self.current: PieceData = test_piece
+                test_piece: Optional[PieceData] = move_left(self.board, self.current, self.options.board_width)
+                if test_piece is not None:
+                    self.current = test_piece
             case 'move_right':
-                test_piece: PieceData = PieceData(self.current.piece, self.current.x + 1, self.current.y, self.current.rotation)
-                if not check_collision(self.board, test_piece, self.options.board_width):
-                    self.current: PieceData = test_piece
+                test_piece: Optional[PieceData] = move_right(self.board, self.current, self.options.board_width)
+                if test_piece is not None:
+                    self.current = test_piece
             case 'drop':
-                test_piece: PieceData = PieceData(self.current.piece, self.current.x, self.current.y - 1, self.current.rotation)
-                if not check_collision(self.board, test_piece, self.options.board_width):
-                    self.current: PieceData = test_piece
+                test_piece: Optional[PieceData] = move_drop(self.board, self.current, self.options.board_width)
+                if test_piece is not None:
+                    self.current = test_piece
             case 'sonic_left':
-                while True:
-                    test_piece: PieceData = PieceData(self.current.piece, self.current.x - 1, self.current.y, self.current.rotation)
-                    if check_collision(self.board, test_piece, self.options.board_width):
-                        break
-                    self.current: PieceData = test_piece
+                test_piece: PieceData = sonic_left(self.board, self.current, self.options.board_width)
+                self.current = test_piece
             case 'sonic_right':
-                while True:
-                    test_piece: PieceData = PieceData(self.current.piece, self.current.x + 1, self.current.y, self.current.rotation)
-                    if check_collision(self.board, test_piece, self.options.board_width):
-                        break
-                    self.current: PieceData = test_piece
+                test_piece: PieceData = sonic_right(self.board, self.current, self.options.board_width)
+                self.current = test_piece
             case 'sonic_drop':
-                while True:
-                    test_piece: PieceData = PieceData(self.current.piece, self.current.x, self.current.y - 1, self.current.rotation)
-                    if check_collision(self.board, test_piece, self.options.board_width):
-                        break
-                    self.current: PieceData = test_piece
+                test_piece: PieceData = sonic_drop(self.board, self.current, self.options.board_width)
+                self.current = test_piece
+            case 'rotate_cw':
+                test_piece: Optional[PieceData] = rotate_cw(self.board, self.current, self.options.board_width)
+                if test_piece is not None:
+                    self.current = test_piece
+                    self.is_immobile = check_immobile(self.board, self.current, self.options.board_width)
+            case 'rotate_ccw':
+                test_piece: Optional[PieceData] = rotate_ccw(self.board, self.current, self.options.board_width)
+                if test_piece is not None:
+                    self.current = test_piece
+                    self.is_immobile = check_immobile(self.board, self.current, self.options.board_width)
+            case 'hold':
+                if not self.can_hold:
+                    return events
+
+                new_held = self.current.piece
+                if self.held:
+                    self.queue.appendleft(self.held)
+                    self.held = self.current.piece
+                self.current = self.spawn_piece()
+                
+                self.held = new_held
+                self.can_hold = False
+                self.is_immobile = check_immobile(self.board, self.current, self.options.board_width)
+                
+                if _check_collision(self.board, self.current.piece, self.current.x, self.current.y, self.current.rotation, self.options.board_width):
+                    self.dead = True
+                    events.append(GameOverEvent())
             case 'hard_drop':
                 initial_piece_state: PieceData = self.current.copy()
-
-                while True:
-                    test_piece: PieceData = PieceData(self.current.piece, self.current.x, self.current.y - 1, self.current.rotation)
-                    if check_collision(self.board, test_piece, self.options.board_width):
-                        break
-                    self.current: PieceData = test_piece
+                
+                self.current: PieceData = sonic_drop(self.board, self.current, self.options.board_width)
 
                 final_piece_state: PieceData = self.current.copy()
 
@@ -224,40 +238,8 @@ class TetrisGame:
                 if check_collision(self.board, self.current, self.options.board_width):
                     self.dead = True
                     events.append(GameOverEvent())
-
-            case 'rotate_cw' | 'rotate_ccw':
-                initial_rotation: Literal[0, 1, 2, 3] = self.current.rotation
-                new_rotation: Literal[0, 1, 2, 3] = (initial_rotation + (1 if command == 'rotate_cw' else 3)) % 4
-                
-                wallkicks = I_WALLKICKS if self.current.piece == Piece.I else WALLKICKS
-                kick_data = wallkicks[initial_rotation][new_rotation]
-                
-                for dx, dy in kick_data:
-                    test_piece: PieceData = PieceData(self.current.piece, self.current.x + dx, self.current.y + dy, new_rotation)
-                    if not check_collision(self.board, test_piece, self.options.board_width):
-                        self.current = test_piece
-                        self.is_immobile = check_immobile(self.board, self.current, self.options.board_width)
-                        break
-
-            case 'hold':
-                if not self.can_hold:
-                    return events
-
-                new_held = self.current.piece
-                if self.held:
-                    self.queue.appendleft(self.held)
-                    self.held = self.current.piece
-                    self.current = self.spawn_piece()
-                else:
-                    self.current = self.spawn_piece()
-                
-                self.held = new_held
-                self.can_hold = False
-                self.is_immobile = check_immobile(self.board, self.current, self.options.board_width)
-                
-                if check_collision(self.board, self.current, self.options.board_width):
-                    self.dead = True
-                    events.append(GameOverEvent())
+            case _:
+                raise ValueError(f"Invalid command: {command}")
 
         return events
 
