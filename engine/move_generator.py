@@ -6,7 +6,7 @@ from collections import deque
 
 from .pieces import I_WALLKICKS, WALLKICKS
 from .models import Board, Piece, PieceData, Command, GameAction, Move
-from .utils import check_collision, check_immobile, create_piece
+from .utils import check_collision, create_piece, _check_collision
 
 
 def generate_moves(board: Board, piece: Piece, alternative: Optional[Piece], board_height: int, board_width: int, algo: Literal['bfs', 'dfs', 'dijk', 'dijk-short']='bfs') -> Dict[PieceData, GameAction]:
@@ -76,56 +76,52 @@ def dijkstra_generate_moves_short(board: Board, piece: Piece, alternative: Optio
 
 from sys import intern
 def move_left(board: Board, piece: PieceData, board_width: int) -> Optional[PieceData]:
-    current: PieceData = PieceData(piece.piece, piece.x - 1, piece.y, piece.rotation)
-    if check_collision(board, current, board_width):
+    if _check_collision(board, piece.piece, piece.x - 1, piece.y, piece.rotation, board_width):
         return None
-    return current
+    return PieceData(piece.piece, piece.x - 1, piece.y, piece.rotation)
 
 def move_right(board: Board, piece: PieceData, board_width: int) -> Optional[PieceData]:
-    current: PieceData = PieceData(piece.piece, piece.x + 1, piece.y, piece.rotation)
-    if check_collision(board, current, board_width):
+    if _check_collision(board, piece.piece, piece.x + 1, piece.y, piece.rotation, board_width):
         return None
-    return current
+    return PieceData(piece.piece, piece.x + 1, piece.y, piece.rotation)
 
 def move_down(board: Board, piece: PieceData, board_width: int) -> Optional[PieceData]:
-    current: PieceData = PieceData(piece.piece, piece.x, piece.y - 1, piece.rotation)
-    if check_collision(board, current, board_width):
+    if _check_collision(board, piece.piece, piece.x, piece.y - 1, piece.rotation, board_width):
         return None
-    return current
+    return PieceData(piece.piece, piece.x, piece.y - 1, piece.rotation)
 
 
 def sonic_drop(board: Board, piece: PieceData, board_width: int) -> PieceData:
+    drop_dist: int = 1
     while True:
-        current: PieceData = PieceData(piece.piece, piece.x, piece.y - 1, piece.rotation)
-        if check_collision(board, current, board_width):
-            return piece
-        piece = current
+        if _check_collision(board, piece.piece, piece.x, piece.y - drop_dist, piece.rotation, board_width):
+            return PieceData(piece.piece, piece.x, piece.y - drop_dist + 1, piece.rotation)
+        drop_dist += 1
 
 def sonic_left(board: Board, piece: PieceData, board_width: int) -> PieceData:
+    left_dist: int = 1
     while True:
-        current: PieceData = PieceData(piece.piece, piece.x - 1, piece.y, piece.rotation)
-        if check_collision(board, current, board_width):
-            return piece
-        piece = current
+        if _check_collision(board, piece.piece, piece.x - left_dist, piece.y, piece.rotation, board_width):
+            return PieceData(piece.piece, piece.x - left_dist + 1, piece.y, piece.rotation)
+        left_dist += 1
 
 def sonic_right(board: Board, piece: PieceData, board_width: int) -> PieceData:
+    right_dist: int = 1
     while True:
-        current: PieceData = PieceData(piece.piece, piece.x + 1, piece.y, piece.rotation)
-        if check_collision(board, current, board_width):
-            return piece
-        piece = current
+        if _check_collision(board, piece.piece, piece.x + right_dist, piece.y, piece.rotation, board_width):
+            return PieceData(piece.piece, piece.x + right_dist - 1, piece.y, piece.rotation)
+        right_dist += 1
 
 def rotate_cw(board: Board, current: PieceData, board_width: int) -> Optional[PieceData]:
     initial_rotation: Literal[0, 1, 2, 3] = current.rotation
     new_rotation: Literal[0, 1, 2, 3] = (initial_rotation + 1) % 4
-    
+
     wallkicks = I_WALLKICKS if current.piece == Piece.I else WALLKICKS
     kick_data = wallkicks[initial_rotation][new_rotation]
 
     for dx, dy in kick_data:
-        test_piece: PieceData = PieceData(current.piece, current.x + dx, current.y + dy, new_rotation)
-        if not check_collision(board, test_piece, board_width):
-            return test_piece
+        if not _check_collision(board, current.piece, current.x + dx, current.y + dy, new_rotation, board_width):
+            return PieceData(current.piece, current.x + dx, current.y + dy, new_rotation)
 
     return None
 
@@ -137,9 +133,8 @@ def rotate_ccw(board: Board, current: PieceData, board_width: int) -> Optional[P
     kick_data = wallkicks[initial_rotation][new_rotation]
 
     for dx, dy in kick_data:
-        test_piece: PieceData = PieceData(current.piece, current.x + dx, current.y + dy, new_rotation)
-        if not check_collision(board, test_piece, board_width):
-            return test_piece
+        if not _check_collision(board, current.piece, current.x + dx, current.y + dy, new_rotation, board_width):
+            return PieceData(current.piece, current.x + dx, current.y + dy, new_rotation)
 
     return None
 

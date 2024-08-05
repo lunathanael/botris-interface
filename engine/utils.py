@@ -1,7 +1,7 @@
 import copy
 import math
 import random
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Literal
 
 from .models import (AttackTable, Block, Board, ClearName, PieceData,
                      ScoreData, ScoreInfo, Piece, Command)
@@ -23,10 +23,10 @@ def get_subgrid_mask(board: Board, start_x: int, start_y: int, board_width: int,
     return subgrid_mask
 
 def check_collision(board: Board, piece_data: PieceData, board_width: int) -> bool:
-    piece_x = piece_data.x
-    piece_y = piece_data.y
+    return _check_collision(board, piece_data.piece, piece_data.x, piece_data.y, piece_data.rotation, board_width)
 
-    lowest_x, highest_x, lowest_y, highest_y = get_piece_border(piece_data.piece, piece_data.rotation)
+def _check_collision(board: Board, piece: Piece, piece_x: int, piece_y: int, piece_rotation: Literal[0, 1, 2, 3], board_width: int) -> bool:
+    lowest_x, highest_x, lowest_y, highest_y = get_piece_border(piece, piece_rotation)
     if ((piece_x + lowest_x) < 0) or ((piece_x + highest_x) >= board_width) or ((piece_y - highest_y) < 0):
         return True
     
@@ -35,7 +35,7 @@ def check_collision(board: Board, piece_data: PieceData, board_width: int) -> bo
         return False
 
     board_mask = get_subgrid_mask(board, piece_x, piece_y, board_width, board_height)
-    piece_mask = get_piece_mask(piece_data.piece, piece_data.rotation)
+    piece_mask = get_piece_mask(piece, piece_rotation)
         
     if piece_mask & board_mask:
         return True
