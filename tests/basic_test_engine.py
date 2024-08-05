@@ -9,7 +9,7 @@ class TestTetrisGame(unittest.TestCase):
 
     def test_spawn_piece(self):
         game = TetrisGame()
-        piece = game.spawn_piece()
+        piece = game.next_piece()
         self.assertIsInstance(piece, PieceData)
 
     def test_queue_garbage(self):

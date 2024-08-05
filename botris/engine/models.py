@@ -13,8 +13,11 @@ class GarbageLine:
     delay: int
     index: int
 
-    def public(self):
+    def public(self) -> dict[str, int]:
         return dict(delay=self.delay)
+
+    def copy(self) -> GarbageLine:
+        return GarbageLine(self.delay, self.index)
 
 
 _Move = Literal[
@@ -173,7 +176,7 @@ class PieceData:
     def __hash__(self):
         return hash((self.piece.index, self.x, self.y, self.rotation))
 
-    def public(self):
+    def public(self) -> dict[str, Piece | int]:
         return dict(piece=self.piece.value, x=self.x, y=self.y, rotation=self.rotation)
 
 

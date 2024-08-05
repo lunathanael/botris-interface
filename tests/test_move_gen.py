@@ -11,7 +11,7 @@ class TestMoveGenerator(unittest.TestCase):
     def test_tspin(self):
         game = TetrisGame()
         game.queue.appendleft(Piece.T)
-        game.current = game.spawn_piece()
+        game.current = game.next_piece()
         tspin_setup = [
             [None] * 10,
             ["G"] * 8 + [None] * 2,

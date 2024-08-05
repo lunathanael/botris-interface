@@ -253,7 +253,7 @@ class TetrisGame:
         self.queue = deque(generate_bag())
         self.garbage_queue = deque([])
         self.held = None
-        self.current = self.spawn_piece()
+        self.current = self.next_piece()
         self.is_immobile = False
         self.can_hold = True
         self.combo = 0
@@ -263,9 +263,28 @@ class TetrisGame:
         self.garbage_cleared = 0
         self.dead = False
 
-    def spawn_piece(self) -> PieceData:
+    def place_piece(self, piece_data: PieceData) -> Board:
         """
-        Spawns a new piece on the game board.
+        Places the given piece on the game board.
+
+        Parameters:
+        --------
+        piece_data : PieceData
+            The piece data to place on the game board.
+        
+        Returns:
+        --------
+        Board
+            The updated game board with the piece placed.
+        """
+        self.board = place_piece(
+            self.board, piece_data, self.options.board_width
+        )
+        return self.board
+
+    def next_piece(self) -> PieceData:
+        """
+        Spawns a new piece for current from the queue.
 
         Returns:
         --------
@@ -436,7 +455,7 @@ class TetrisGame:
                 if self.held:
                     self.queue.appendleft(self.held)
                     self.held = self.current.piece
-                self.current = self.spawn_piece()
+                self.current = self.next_piece()
 
                 self.held = new_held
                 self.can_hold = False
@@ -528,7 +547,7 @@ class TetrisGame:
                 if tanked_lines:
                     events.append(DamageTankedEvent(holeIndices=tanked_lines))
 
-                self.current = self.spawn_piece()
+                self.current = self.next_piece()
                 self.can_hold = True
                 self.is_immobile = check_immobile(
                     self.board, self.current, self.options.board_width

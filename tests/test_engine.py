@@ -13,14 +13,14 @@ class TestTetrisGame(unittest.TestCase):
     def test_sonic_drop(self):
         game = TetrisGame()
         game.queue.appendleft(Piece.I)
-        game.current = game.spawn_piece()
+        game.current = game.next_piece()
         game.execute_command("sonic_drop")
         self.assertEqual(game.current.y, 1)
 
     def test_move_horizontally(self):
         game = TetrisGame()
         game.queue.appendleft(Piece.I)
-        game.current = game.spawn_piece()
+        game.current = game.next_piece()
         self.assertEqual(game.current.x, 3)
         game.execute_command("move_right")
         self.assertEqual(game.current.x, 4)
@@ -32,7 +32,7 @@ class TestTetrisGame(unittest.TestCase):
     def test_hard_drop(self):
         game = TetrisGame()
         game.queue.appendleft(Piece.I)
-        game.current = game.spawn_piece()
+        game.current = game.next_piece()
         game.execute_command("hard_drop")
         expected_board = [[None] * 3 + ["I"] * 4 + [None] * 3]
         self.assertEqual(game.board, expected_board)
@@ -49,7 +49,7 @@ class TestTetrisGame(unittest.TestCase):
         game.board = tspin_setup
 
         game.queue.appendleft(Piece.T)
-        game.current = game.spawn_piece()
+        game.current = game.next_piece()
         game.execute_command("rotate_cw")
         game.execute_command("sonic_drop")
         game.execute_command("rotate_cw")
@@ -73,7 +73,7 @@ class TestTetrisGame(unittest.TestCase):
         game.board = tspin_setup
 
         game.queue.appendleft(Piece.O)
-        game.current = game.spawn_piece()
+        game.current = game.next_piece()
         result = game.execute_command("hard_drop")
         self.assertTrue(any([event.type == "clear" for event in result]))
         clear_event = next((event for event in result if event.type == "clear"), None)
@@ -94,7 +94,7 @@ class TestTetrisGame(unittest.TestCase):
         game.board = tspin_setup
 
         game.queue.appendleft(Piece.O)
-        game.current = game.spawn_piece()
+        game.current = game.next_piece()
         game.execute_command("rotate_cw")
         result = game.execute_command("hard_drop")
         self.assertTrue(any([event.type == "clear" for event in result]))
@@ -106,7 +106,7 @@ class TestTetrisGame(unittest.TestCase):
     def test_tspin_wallkick(self):
         game = TetrisGame()
         game.queue.appendleft(Piece.T)
-        game.current = game.spawn_piece()
+        game.current = game.next_piece()
         tspin_setup = [
             [None] * 10,
             [None] * 3 + ["G"] + [None] * 2 + ["G"] + [None] * 3,
@@ -138,20 +138,20 @@ class TestTetrisGame(unittest.TestCase):
         game.queue_garbage_lines(garbage_lines)
         self.assertFalse(any("G" in row for row in game.board))
         game.queue.appendleft(Piece.I)
-        game.current = game.spawn_piece()
+        game.current = game.next_piece()
         game.execute_command("hard_drop")
         self.assertTrue("G" in game.board[0])
         self.assertTrue("G" in game.board[1])
         self.assertFalse(len(game.board) >= 3 and "G" in game.board[2])
         game.queue.appendleft(Piece.I)
-        game.current = game.spawn_piece()
+        game.current = game.next_piece()
         game.execute_command("hard_drop")
         self.assertTrue("G" in game.board[0])
         self.assertTrue("G" in game.board[1])
         self.assertTrue("G" in game.board[2])
         self.assertFalse(len(game.board) >= 4 and "G" in game.board[3])
         game.queue.appendleft(Piece.I)
-        game.current = game.spawn_piece()
+        game.current = game.next_piece()
         game.execute_command("hard_drop")
         self.assertTrue("G" in game.board[0])
         self.assertTrue("G" in game.board[1])
@@ -168,7 +168,7 @@ class TestTetrisGame(unittest.TestCase):
         game.board = single_clear_setup
 
         game.queue.appendleft(Piece.I)
-        game.current = game.spawn_piece()
+        game.current = game.next_piece()
         game.execute_command("sonic_right")
         result = game.execute_command("hard_drop")
         clear_event = next((event for event in result if event.type == "clear"), None)
@@ -186,7 +186,7 @@ class TestTetrisGame(unittest.TestCase):
         game.board = double_clear_setup
 
         game.queue.appendleft(Piece.O)
-        game.current = game.spawn_piece()
+        game.current = game.next_piece()
         game.execute_command("sonic_right")
         result = game.execute_command("hard_drop")
         clear_event = next((event for event in result if event.type == "clear"), None)
@@ -209,7 +209,7 @@ class TestTetrisGame(unittest.TestCase):
         game.board = triple_clear_setup
 
         game.queue.appendleft(Piece.L)
-        game.current = game.spawn_piece()
+        game.current = game.next_piece()
         game.execute_command("rotate_ccw")
         game.execute_command("sonic_right")
         result = game.execute_command("hard_drop")
@@ -222,13 +222,13 @@ class TestTetrisGame(unittest.TestCase):
         result: List[Event] = []
 
         game.queue.appendleft(Piece.I)
-        game.current = game.spawn_piece()
+        game.current = game.next_piece()
         game.execute_command("rotate_ccw")
         game.execute_command("sonic_left")
         result = game.execute_command("hard_drop")
         for i in range(10):
             game.queue.appendleft(Piece.I)
-            game.current = game.spawn_piece()
+            game.current = game.next_piece()
             game.execute_command("rotate_ccw")
             game.execute_command("sonic_left")
             for j in range(i):
@@ -253,7 +253,7 @@ class TestTetrisGame(unittest.TestCase):
         perfect_clear_setup.reverse()
         game.board = perfect_clear_setup
         game.queue.appendleft(Piece.I)
-        game.current = game.spawn_piece()
+        game.current = game.next_piece()
         game.execute_command("rotate_ccw")
         game.execute_command("move_right")
         result = game.execute_command("hard_drop")
@@ -264,7 +264,7 @@ class TestTetrisGame(unittest.TestCase):
     def test_all_spin_single_clear(self):
         game = TetrisGame()
         game.queue.appendleft(Piece.T)
-        game.current = game.spawn_piece()
+        game.current = game.next_piece()
         tspin_setup = [
             [None] * 10,
             ["G"] * 8 + [None] * 2,
@@ -285,7 +285,7 @@ class TestTetrisGame(unittest.TestCase):
     def test_all_spin_triple_clear(self):
         game = TetrisGame()
         game.queue.appendleft(Piece.T)
-        game.current = game.spawn_piece()
+        game.current = game.next_piece()
         tspin_setup = [
             [None] * 6 + ["G"] * 4,
             [None] * 7 + ["G"] * 3,
