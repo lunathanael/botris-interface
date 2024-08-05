@@ -133,7 +133,7 @@ class Interface:
         await self.bot.start()
 
         self.status = "connecting"
-        session_id: Optional[SessionId] = await self.client.connect()
+        session_id: SessionId | None = await self.client.connect()
         if session_id is None:
             self.status = "disconnected"
             raise Exception("Failed to connect to WebSocket client!")

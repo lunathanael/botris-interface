@@ -25,7 +25,7 @@ def timeout_wrapper(func, timeout=1.0):
     return wrapped_function
 
 class BlockFish(Bot):
-    INPUT_MOVE_MAP: Dict[str, Command] ={
+    INPUT_MOVE_MAP: dict[str, Command] ={
         'left': 'move_left',
         'right': 'move_right',
         'cw': 'rotate_cw',
@@ -34,9 +34,9 @@ class BlockFish(Bot):
         'sd': 'sonic_drop',
     }
 
-    def __init__(self, node_limit: int=10000, timeout: Optional[float]=1):
+    def __init__(self, node_limit: int=10000, timeout: float | None=1):
         self.node_limit: int = node_limit
-        self.timeout: Optional[float] = timeout
+        self.timeout: float | None = timeout
         if timeout is not None:
             self.analyze = timeout_wrapper(self.analyze, timeout=timeout)
 
@@ -47,18 +47,18 @@ class BlockFish(Bot):
     async def shutdown(self) -> Awaitable[None]:
         self.ai.shutdown()
 
-    async def _analyze(self, snapshot) -> Awaitable[Tuple[List[Suggestion], Statistics]]:
+    async def _analyze(self, snapshot) -> Awaitable[tuple[list[Suggestion], Statistics]]:
         return await self.ai.analyze(snapshot, suggestion_limit=1, max_placements=1, node_limit=self.node_limit)
 
-    async def analyze(self, game_state: GameState, players: List[PlayerData]) -> Awaitable[List[Command]]:
+    async def analyze(self, game_state: GameState, players: list[PlayerData]) -> Awaitable[list[Command]]:
         gs: TetrisGame = TetrisGame.from_game_state(game_state)
         snapshot: Snapshot = BlockFish.to_snapshot(gs)
         res, stats = await self._analyze(snapshot)
         suggestion: Suggestion = res[0]
         rating: int = suggestion.rating
-        moves: List[str] = suggestion.inputs
-        moves: List[str] = format_moves(moves)
-        commands: List[Command] = [
+        moves: list[str] = suggestion.inputs
+        moves: list[str] = format_moves(moves)
+        commands: list[Command] = [
             Command(move)
             for move in moves
         ]
@@ -68,13 +68,13 @@ class BlockFish(Bot):
     def to_snapshot(gs: TetrisGame) -> Snapshot:
         pgs: GameState = gs.get_public_state()
         queue: str = pgs.current.piece + ''.join(pgs.queue[:6])
-        hold: Optional[str] = pgs.held
+        hold: str | None = pgs.held
         matrix: Board = pgs.board
         matrix = [''.join(['x' if j else '.' for j in i]) for i in pgs.board]
         return Snapshot(queue, hold, matrix)
 
 
-def format_moves(moves: List[str]) -> List[Command]:
+def format_moves(moves: list[str]) -> list[Command]:
     for i, move in enumerate(moves):
         if move == 'hd':
             return moves[:i]

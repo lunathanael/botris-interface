@@ -1,4 +1,3 @@
-
 from . import bots, engine, interface
 from .engine import TetrisGame
 from .interface import Interface, connect

@@ -23,7 +23,7 @@ class PlayerData(BaseModel):
     playing: bool
     info: PlayerInfo
     wins: int
-    gameState: Optional[GameState]
+    gameState: GameState | None
 
 class RoomData(BaseModel):
     id: str
@@ -37,11 +37,11 @@ class RoomData(BaseModel):
     maxPlayers: int
     gameOngoing: bool
     roundOngoing: bool
-    startedAt: Optional[int]
-    endedAt: Optional[int]
-    lastWinner: Optional[str]
-    players: List[PlayerData]
-    banned: List[PlayerInfo]
+    startedAt: int | None
+    endedAt: int | None
+    lastWinner: str | None
+    players: list[PlayerData]
+    banned: list[PlayerInfo]
 
 class PieceData(BaseModel):
     piece: Piece
@@ -54,9 +54,9 @@ class PublicGarbageLine(BaseModel):
 
 class GameState(BaseModel):
     board: Board
-    queue: List[Piece]
-    garbageQueued: List[PublicGarbageLine]
-    held: Optional[Piece]
+    queue: list[Piece]
+    garbageQueued: list[PublicGarbageLine]
+    held: Piece | None
     current: PieceData
     canHold: bool
     combo: int
@@ -85,7 +85,7 @@ class Command(str):
     def from_move(cls, move: Move) -> Command:
         return cls(move.value)
     
-COMMANDS: Tuple[Command] = ("hold", "move_left", "move_right", "sonic_left", "sonic_right", "rotate_cw", "rotate_ccw", "drop", "sonic_drop", "hard_drop")
+COMMANDS: tuple[Command] = ("hold", "move_left", "move_right", "sonic_left", "sonic_right", "rotate_cw", "rotate_ccw", "drop", "sonic_drop", "hard_drop")
 
 
 for value in COMMANDS:
