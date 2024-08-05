@@ -19,6 +19,8 @@ def generate_moves(board: Board, piece: Piece, alternative: Optional[Piece], boa
             return dijkstra_generate_moves(board, piece, alternative, board_height, board_width)
         case 'dijk-short':
             return dijkstra_generate_moves_short(board, piece, alternative, board_height, board_width)
+        case 'short':
+            return short_generate_moves(board, piece, alternative, board_height, board_width)
         case _:
             raise ValueError(f"Invalid algorithm: {algo}")
 
@@ -46,6 +48,20 @@ def bfs_generate_moves(board: Board, piece: Piece, alternative: Optional[Piece],
         alternative_piece: Optional[PieceData] = create_piece(alternative, board_height, board_width) if alternative else None
         if (alternative_piece is not None) and (not check_collision(board, alternative_piece, board_width)):
             bfs_generate_move_helper(board, alternative_piece, generated_moves, board_height, board_width, True)
+
+    generated_moves = {piece: [move.value for move in moves] for piece, moves in generated_moves.items()}
+    return generated_moves
+
+def short_generate_moves(board: Board, piece: Piece, alternative: Optional[Piece], board_height: int, board_width: int):
+
+    generated_moves: Dict[PieceData, Move] = dict()
+
+    current_piece: PieceData = create_piece(piece, board_height, board_width)
+    if not check_collision(board, current_piece, board_width):
+        short_generate_move_helper(board, current_piece, generated_moves, board_height, board_width, False)
+        alternative_piece: Optional[PieceData] = create_piece(alternative, board_height, board_width) if alternative else None
+        if (alternative_piece is not None) and (not check_collision(board, alternative_piece, board_width)):
+            short_generate_move_helper(board, alternative_piece, generated_moves, board_height, board_width, True)
 
     generated_moves = {piece: [move.value for move in moves] for piece, moves in generated_moves.items()}
     return generated_moves
@@ -86,11 +102,11 @@ def dfs_generate_move_helper(board: Board, current_piece: PieceData, generated_m
     
     visited.add(current_piece)
 
-    move_down_piece: Optional[PieceData] = move_drop(board, current_piece, board_width)
-    if move_down_piece is None:
+    move_drop_piece: Optional[PieceData] = move_drop(board, current_piece, board_width)
+    if move_drop_piece is None:
         add_move(board, generated_moves, current_piece, move, board_width)
     else:
-        dfs_generate_move_helper(board, move_down_piece, generated_moves, board_height, board_width, move + ['drop'], visited)
+        dfs_generate_move_helper(board, move_drop_piece, generated_moves, board_height, board_width, move + ['drop'], visited)
 
     move_left_piece: Optional[PieceData] = move_left(board, current_piece, board_width)
     if move_left_piece is not None:
@@ -119,11 +135,11 @@ def bfs_generate_move_helper(board: Board, current_piece: PieceData, generated_m
 
         visited.add(current_piece)
 
-        move_down_piece: Optional[PieceData] = move_drop(board, current_piece, board_width)
-        if move_down_piece is None:
+        move_drop_piece: Optional[PieceData] = move_drop(board, current_piece, board_width)
+        if move_drop_piece is None:
             add_move(board, generated_moves, current_piece, move, board_width)
         else:
-            queue.append((move_down_piece, move + [Move.drop]))
+            queue.append((move_drop_piece, move + [Move.drop]))
 
         move_left_piece: Optional[PieceData] = move_left(board, current_piece, board_width)
         if move_left_piece is not None:
@@ -153,12 +169,12 @@ def dijkstra_generate_move_helper(board: Board, current_piece: PieceData, genera
 
         visited.add(current_piece)
 
-        move_down_piece: Optional[PieceData] = move_drop(board, current_piece, board_width)
-        if move_down_piece is not None:
+        move_drop_piece: Optional[PieceData] = move_drop(board, current_piece, board_width)
+        if move_drop_piece is not None:
             new_distance = current_distance + 1
-            if move_down_piece not in distance or new_distance < distance[move_down_piece]:
-                distance[move_down_piece] = new_distance
-                heappush(priority_queue, (new_distance, move_down_piece, move + ['drop']))
+            if move_drop_piece not in distance or new_distance < distance[move_drop_piece]:
+                distance[move_drop_piece] = new_distance
+                heappush(priority_queue, (new_distance, move_drop_piece, move + ['drop']))
         else:
             add_move(board, generated_moves, current_piece, move, board_width)
 
@@ -204,29 +220,26 @@ def short_dijkstra_generate_move_helper(board: Board, current_piece: PieceData, 
             continue
 
         visited.add(current_piece)
-        add_move(board, generated_moves, current_piece, move, board_width)
+        add_move(board, generated_moves, sonic_drop(board, current_piece, board_width), move, board_width)
 
-        move_down_piece: Optional[PieceData] = move_drop(board, current_piece, board_width)
-        if move_down_piece is not None:
+        move_drop_piece: Optional[PieceData] = move_drop(board, current_piece, board_width)
+        if move_drop_piece is not None:
             new_distance = current_distance + 1
-            if move_down_piece not in distance or new_distance < distance[move_down_piece]:
-                distance[move_down_piece] = new_distance
-                heappush(priority_queue, (new_distance, move_down_piece, move + ['drop']))
 
-            sonic_down_piece: PieceData = sonic_drop(board, current_piece, board_width)
-            if sonic_down_piece is not None:
+            sonic_drop_piece: PieceData = sonic_drop(board, current_piece, board_width)
+            if sonic_drop_piece is not None:
                 new_distance = current_distance + 1
-                if sonic_down_piece not in distance or new_distance < distance[sonic_down_piece]:
-                    distance[sonic_down_piece] = new_distance
-                    heappush(priority_queue, (new_distance, sonic_down_piece, move + ['sonic_drop']))
+                if sonic_drop_piece not in distance or new_distance < distance[sonic_drop_piece]:
+                    distance[sonic_drop_piece] = new_distance
+                    heappush(priority_queue, (new_distance, sonic_drop_piece, move + ['sonic_drop']))
+
+            if move_drop_piece not in distance or new_distance < distance[move_drop_piece]:
+                distance[move_drop_piece] = new_distance
+                heappush(priority_queue, (new_distance, move_drop_piece, move + ['drop']))
 
         move_left_piece: Optional[PieceData] = move_left(board, current_piece, board_width)
         if move_left_piece is not None:
             new_distance = current_distance + 1
-            if move_left_piece not in distance or new_distance < distance[move_left_piece]:
-                distance[move_left_piece] = new_distance
-                heappush(priority_queue, (new_distance, move_left_piece, move + ['move_left']))
-
             sonic_left_piece: PieceData = sonic_left(board, current_piece, board_width)
             if sonic_left_piece is not None:
                 new_distance = current_distance + 1
@@ -234,12 +247,13 @@ def short_dijkstra_generate_move_helper(board: Board, current_piece: PieceData, 
                     distance[sonic_left_piece] = new_distance
                     heappush(priority_queue, (new_distance, sonic_left_piece, move + ['sonic_left']))
 
+            if move_left_piece not in distance or new_distance < distance[move_left_piece]:
+                distance[move_left_piece] = new_distance
+                heappush(priority_queue, (new_distance, move_left_piece, move + ['move_left']))
+
         move_right_piece: Optional[PieceData] = move_right(board, current_piece, board_width)
         if move_right_piece is not None:
             new_distance = current_distance + 1
-            if move_right_piece not in distance or new_distance < distance[move_right_piece]:
-                distance[move_right_piece] = new_distance
-                heappush(priority_queue, (new_distance, move_right_piece, move + ['move_right']))
 
             sonic_right_piece: PieceData = sonic_right(board, current_piece, board_width)
             if sonic_right_piece is not None:
@@ -247,6 +261,9 @@ def short_dijkstra_generate_move_helper(board: Board, current_piece: PieceData, 
                 if sonic_right_piece not in distance or new_distance < distance[sonic_right_piece]:
                     distance[sonic_right_piece] = new_distance
                     heappush(priority_queue, (new_distance, sonic_right_piece, move + ['sonic_right']))
+            if move_right_piece not in distance or new_distance < distance[move_right_piece]:
+                distance[move_right_piece] = new_distance
+                heappush(priority_queue, (new_distance, move_right_piece, move + ['move_right']))
 
         rotate_cw_piece: Optional[PieceData] = rotate_cw(board, current_piece, board_width)
         if rotate_cw_piece is not None:
@@ -261,3 +278,40 @@ def short_dijkstra_generate_move_helper(board: Board, current_piece: PieceData, 
             if rotate_ccw_piece not in distance or new_distance < distance[rotate_ccw_piece]:
                 distance[rotate_ccw_piece] = new_distance
                 heappush(priority_queue, (new_distance, rotate_ccw_piece, move + ['rotate_ccw']))
+
+
+def short_generate_move_helper(board: Board, current_piece: PieceData, generated_moves: Dict[PieceData, GameAction], board_height: int, board_width: int, held: bool=False):
+    queue: Deque[Tuple[PieceData, Move]] = [(current_piece, [Move.hold] if held else [])]
+    visited: Set[PieceData] = set()
+
+    while queue:
+        current_piece, move = queue.pop(0)
+
+        if current_piece in visited:
+            continue
+
+        visited.add(current_piece)
+
+        sonic_drop_piece: PieceData = sonic_drop(board, current_piece, board_width)
+        queue.append((sonic_drop_piece, move + [Move.sonic_drop]))
+
+        move_drop_piece: Optional[PieceData] = move_drop(board, current_piece, board_width)
+        if move_drop_piece is None:
+            add_move(board, generated_moves, current_piece, move, board_width)
+        else:
+            queue.append((move_drop_piece, move + [Move.drop]))
+
+        move_left_piece: Optional[PieceData] = move_left(board, current_piece, board_width)
+        if move_left_piece is not None:
+            queue.append((move_left_piece, move + [Move.move_left]))
+        move_right_piece: Optional[PieceData] = move_right(board, current_piece, board_width)
+        if move_right_piece is not None:
+            queue.append((move_right_piece, move + [Move.move_right]))
+
+        rotate_cw_piece: Optional[PieceData] = rotate_cw(board, current_piece, board_width)
+        if rotate_cw_piece is not None:
+            queue.append((rotate_cw_piece, move + [Move.rotate_cw]))
+
+        rotate_ccw_piece: Optional[PieceData] = rotate_ccw(board, current_piece, board_width)
+        if rotate_ccw_piece is not None:
+            queue.append((rotate_ccw_piece, move + [Move.rotate_ccw]))

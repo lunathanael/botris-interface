@@ -316,8 +316,8 @@ class TetrisGame:
 
         print(f'\nGarbage queued: {len(self.garbage_queue)}')
 
-    def generate_moves(self, include_held: bool=True, include_queue: bool=True) -> Dict[PieceData, List[Command]]:
+    def generate_moves(self, include_held: bool=True, include_queue: bool=True, algo: Literal['bfs', 'dfs', 'dijk', 'dijk-short']='bfs') -> Dict[PieceData, List[Command]]:
         held: Optional[Piece] = self.held if include_held else None
         first_piece: Optional[Piece] = self.queue[0] if include_queue else None
-        alternative: Optional[Piece] = first_place if held is None else held
-        return generate_moves(self.board, self.current.piece, alternative, self.options.board_height, self.options.board_width)
+        alternative: Optional[Piece] = first_piece if held is None else held
+        return generate_moves(self.board, self.current.piece, alternative, self.options.board_height, self.options.board_width, algo)
