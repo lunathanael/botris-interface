@@ -11,6 +11,8 @@ Piece = Literal['I', 'O', 'J', 'L', 'S', 'Z', 'T']
 Block = Optional[Literal['I', 'O', 'J', 'L', 'S', 'Z', 'T', 'G']]
 Board = List[List[Block]]
 
+SessionId = str
+
 class PlayerInfo(BaseModel):
     userId: str
     creator: str

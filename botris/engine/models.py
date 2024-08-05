@@ -16,7 +16,7 @@ class GarbageLine:
     def public(self):
         return dict(delay=self.delay)
 
-_Move = Literal['move_left', 'move_right', 'rotate_cw', 'rotate_ccw', 'drop', 'sonic_drop', 'sonic_left', 'sonic_right' 'hold', 'hard_drop']
+_Move = Literal['move_left', 'move_right', 'rotate_cw', 'rotate_ccw', 'drop', 'sonic_drop', 'sonic_left', 'sonic_right', 'hold', 'hard_drop']
 _MOVES: Tuple[_Move] = ('move_left', 'move_right', 'rotate_cw', 'rotate_ccw', 'drop', 'sonic_drop', 'sonic_left', 'sonic_right', 'hold', 'hard_drop')
 class Move:
     move_left: Move = None
@@ -30,13 +30,13 @@ class Move:
     hold: Move = None
     hard_drop: Move = None
 
-    def __init__(self, value: str, index: int):
-        self.value: str = intern(value)
-        self.index: int = index
+    def __init__(self, val: str, idx: int):
+        self.value: str = intern(val)
+        self.index: int = idx
 
     @classmethod
-    def from_str(cls, value: str) -> Move:
-        return getattr(cls, value)
+    def from_str(cls, move_str: str) -> Move:
+        return getattr(cls, move_str)
     
     @classmethod
     def from_command(cls, command: Command) -> Move:

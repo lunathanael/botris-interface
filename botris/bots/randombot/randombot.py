@@ -16,7 +16,7 @@ class RandomBot(Bot):
     async def start(self) -> Awaitable[None]:
         return
 
-    def shutdown(self) -> None:
+    async def shutdown(self) -> Awaitable[None]:
         return
 
     async def analyze(self, game_state: GameState, players: List[PlayerData]) -> Awaitable[List[Command]]:
