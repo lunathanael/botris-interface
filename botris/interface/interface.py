@@ -165,7 +165,7 @@ class Interface:
         Closes the WebSocket client and bot.
         """
         await self.client.close()
-        await self.bot.shutdown()
+        self.bot.shutdown()
 
     def __del__(self):
         del self.client

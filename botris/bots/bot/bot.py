@@ -15,7 +15,7 @@ class Bot:
     async def start(self) -> Awaitable[None]:
         raise NotImplementedError("Subclasses must implement this method")
 
-    async def shutdown(self) -> Awaitable[None]:
+    def shutdown(self) -> None:
         raise NotImplementedError("Subclasses must implement this method")
 
     def __del__(self):

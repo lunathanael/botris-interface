@@ -13,7 +13,7 @@ async def main():
         TOKEN,
         ROOM_KEY,
         botris.bots.RandomBot(),
-        tracking=True,
+        tracking=False,
         threading=True,
         daemon=True,
     )
@@ -21,7 +21,7 @@ async def main():
         TOKEN,
         ROOM_KEY,
         botris.bots.RandomBot(),
-        tracking=True,
+        tracking=False,
         threading=True,
         daemon=True,
     )

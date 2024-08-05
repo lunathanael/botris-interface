@@ -65,5 +65,8 @@ class WebSocketClient:
         self.authenticated.set()
 
     def __del__(self):
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(self.close())
+        try:
+            loop = asyncio.get_event_loop()
+            loop.run_until_complete(self.close())
+        except Exception:
+            asyncio.run(self.close())

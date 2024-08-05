@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "botris-interface"
-version = "0.1.0"
+version = "0.1.1"
 description = "A python interface library to easily create bots to connect to botrisbattle.com"
 authors = ["Nathanael Lu <info@lunathanael.dev>"]
 license = "MIT"
