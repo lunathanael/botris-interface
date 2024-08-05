@@ -39,6 +39,7 @@ class BlockFish(Bot):
     def __init__(self, node_limit: int = 10000, timeout: float | None = 1):
         self.node_limit: int = node_limit
         self.timeout: float | None = timeout
+        self.ai: Optional[AI] = None
         if timeout is not None:
             self.analyze = timeout_wrapper(self.analyze, timeout=timeout)
 
@@ -49,6 +50,7 @@ class BlockFish(Bot):
     def shutdown(self) -> None:
         if self.ai is not None:
             self.ai.shutdown()
+        self.ai = None
 
     async def _analyze(
         self, snapshot
