@@ -143,7 +143,7 @@ def calculate_score(
     all_spin: bool = False
 
     if lines_cleared == 0:
-        return ScoreData(score=0, b2b=False, combo=0, clear_name=None, all_spin=False)
+        return ScoreData(score=0, b2b=b2b, combo=0, clear_name=None, all_spin=False)
 
     new_combo: int = combo + 1
 
