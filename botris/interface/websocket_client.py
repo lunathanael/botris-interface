@@ -18,7 +18,7 @@ class WebSocketClient:
         self.authenticated = Event()
         self.session_id: Optional[SessionId] = None
         self.thread = None
-    
+
     def thread_connect(self) -> Awaitable[None]:
         asyncio.run(self.handle_connection())
 
@@ -44,7 +44,9 @@ class WebSocketClient:
 
                         if message_type == "authenticated":
                             self.session_id = SessionId(data["payload"]["sessionId"])
-                            print(f"Authenticated to WebSocket client with session ID: {self.session_id}")
+                            print(
+                                f"Authenticated to WebSocket client with session ID: {self.session_id}"
+                            )
                             self.authenticated.set()
                     await self.message_handler(message, self.websocket)
             except websockets.exceptions.ConnectionClosed:
@@ -58,7 +60,7 @@ class WebSocketClient:
 
     async def close(self):
         if self.websocket:
-            #await self.websocket.close()
+            # await self.websocket.close()
             self.websocket = None
         self.authenticated.set()
 

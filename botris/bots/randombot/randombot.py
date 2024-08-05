@@ -19,7 +19,9 @@ class RandomBot(Bot):
     async def shutdown(self) -> Awaitable[None]:
         return
 
-    async def analyze(self, game_state: GameState, players: list[PlayerData]) -> Awaitable[list[Command]]:
+    async def analyze(
+        self, game_state: GameState, players: list[PlayerData]
+    ) -> Awaitable[list[Command]]:
         gs: TetrisGame = TetrisGame.from_game_state(game_state)
         moves: dict[PieceData, list[Move]] = gs.generate_moves()
         if not moves:

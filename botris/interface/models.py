@@ -7,16 +7,18 @@ from pydantic import BaseModel, constr
 if TYPE_CHECKING:
     from botris.engine.models import Move
 
-Piece = Literal['I', 'O', 'J', 'L', 'S', 'Z', 'T']
-Block = Optional[Literal['I', 'O', 'J', 'L', 'S', 'Z', 'T', 'G']]
+Piece = Literal["I", "O", "J", "L", "S", "Z", "T"]
+Block = Optional[Literal["I", "O", "J", "L", "S", "Z", "T", "G"]]
 Board = List[List[Block]]
 
 SessionId = str
+
 
 class PlayerInfo(BaseModel):
     userId: str
     creator: str
     bot: str
+
 
 class PlayerData(BaseModel):
     sessionId: str
@@ -24,6 +26,7 @@ class PlayerData(BaseModel):
     info: PlayerInfo
     wins: int
     gameState: GameState | None
+
 
 class RoomData(BaseModel):
     id: str
@@ -43,14 +46,17 @@ class RoomData(BaseModel):
     players: list[PlayerData]
     banned: list[PlayerInfo]
 
+
 class PieceData(BaseModel):
     piece: Piece
     x: int
     y: int
     rotation: Literal[0, 1, 2, 3]
 
+
 class PublicGarbageLine(BaseModel):
     delay: int
+
 
 class GameState(BaseModel):
     board: Board
@@ -65,6 +71,7 @@ class GameState(BaseModel):
     piecesPlaced: int
     garbageCleared: int
     dead: bool
+
 
 class Command(str):
     hold: Command = None
@@ -84,8 +91,20 @@ class Command(str):
     @classmethod
     def from_move(cls, move: Move) -> Command:
         return cls(move.value)
-    
-COMMANDS: tuple[Command] = ("hold", "move_left", "move_right", "sonic_left", "sonic_right", "rotate_cw", "rotate_ccw", "drop", "sonic_drop", "hard_drop")
+
+
+COMMANDS: tuple[Command] = (
+    "hold",
+    "move_left",
+    "move_right",
+    "sonic_left",
+    "sonic_right",
+    "rotate_cw",
+    "rotate_ccw",
+    "drop",
+    "sonic_drop",
+    "hard_drop",
+)
 
 
 for value in COMMANDS:

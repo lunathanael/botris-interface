@@ -16,8 +16,33 @@ class GarbageLine:
     def public(self):
         return dict(delay=self.delay)
 
-_Move = Literal['move_left', 'move_right', 'rotate_cw', 'rotate_ccw', 'drop', 'sonic_drop', 'sonic_left', 'sonic_right', 'hold', 'hard_drop']
-_MOVES: Tuple[_Move] = ('move_left', 'move_right', 'rotate_cw', 'rotate_ccw', 'drop', 'sonic_drop', 'sonic_left', 'sonic_right', 'hold', 'hard_drop')
+
+_Move = Literal[
+    "move_left",
+    "move_right",
+    "rotate_cw",
+    "rotate_ccw",
+    "drop",
+    "sonic_drop",
+    "sonic_left",
+    "sonic_right",
+    "hold",
+    "hard_drop",
+]
+_MOVES: Tuple[_Move] = (
+    "move_left",
+    "move_right",
+    "rotate_cw",
+    "rotate_ccw",
+    "drop",
+    "sonic_drop",
+    "sonic_left",
+    "sonic_right",
+    "hold",
+    "hard_drop",
+)
+
+
 class Move:
     move_left: Move = None
     move_right: Move = None
@@ -37,34 +62,48 @@ class Move:
     @classmethod
     def from_str(cls, move_str: str) -> Move:
         return getattr(cls, move_str)
-    
+
     @classmethod
     def from_command(cls, command: Command) -> Move:
         return getattr(cls, command)
-    
+
     def __eq__(self, other):
         return self.index == other.index
-    
+
     def __hash__(self):
         return self.index
-    
+
     def __repr__(self):
         return self.value
-    
+
     def __str__(self):
         return self.value
-    
+
     def __lt__(self, other):
         return self.index < other.index
+
 
 for index, value in enumerate(_MOVES):
     setattr(Move, value, Move(value, index))
 
-MOVES: Tuple[Move] = (Move.move_left, Move.move_right, Move.rotate_cw, Move.rotate_ccw, Move.drop, Move.sonic_drop, Move.sonic_left, Move.sonic_right, Move.hold, Move.hard_drop)
+MOVES: Tuple[Move] = (
+    Move.move_left,
+    Move.move_right,
+    Move.rotate_cw,
+    Move.rotate_ccw,
+    Move.drop,
+    Move.sonic_drop,
+    Move.sonic_left,
+    Move.sonic_right,
+    Move.hold,
+    Move.hard_drop,
+)
 
 
-_Piece = Literal['I', 'O', 'J', 'L', 'S', 'Z', 'T']
-_PIECES: Tuple[_Piece] = ('I', 'O', 'J', 'L', 'S', 'Z', 'T')
+_Piece = Literal["I", "O", "J", "L", "S", "Z", "T"]
+_PIECES: Tuple[_Piece] = ("I", "O", "J", "L", "S", "Z", "T")
+
+
 class Piece:
 
     I: Piece = None
@@ -82,28 +121,30 @@ class Piece:
     @classmethod
     def from_str(cls, value: str) -> Piece:
         return getattr(cls, value.upper())
-    
+
     def __eq__(self, other):
         return self.index == other.index
-    
+
     def __hash__(self):
         return self.index
-    
+
     def __repr__(self):
         return self.value
-    
+
     def __str__(self):
         return self.value
-    
+
     def __lt__(self, other):
         return self.index < other.index
+
 
 for index, value in enumerate(_PIECES):
     setattr(Piece, value, Piece(value, index))
 
-Block = Optional[Literal['I', 'O', 'J', 'L', 'S', 'Z', 'T', 'G']]
+Block = Optional[Literal["I", "O", "J", "L", "S", "Z", "T", "G"]]
 PIECES: Tuple[Piece] = (Piece.I, Piece.O, Piece.J, Piece.L, Piece.S, Piece.Z, Piece.T)
 Board = List[List[Block]]
+
 
 @dataclass
 class PieceData:
@@ -114,21 +155,27 @@ class PieceData:
 
     def copy(self) -> PieceData:
         return PieceData(self.piece, self.x, self.y, self.rotation)
-    
-    def __lt__(self, nxt): 
+
+    def __lt__(self, nxt):
         """
         Arbitrary comparison function to allow for heapq of PieceData objects
         """
         return (self.y, self.x, self.rotation) < (nxt.y, nxt.x, nxt.rotation)
-    
+
     def __eq__(self, nxt):
-        return (self.piece, self.y, self.x, self.rotation) == (self.piece, nxt.y, nxt.x, nxt.rotation)
+        return (self.piece, self.y, self.x, self.rotation) == (
+            self.piece,
+            nxt.y,
+            nxt.x,
+            nxt.rotation,
+        )
 
     def __hash__(self):
         return hash((self.piece.index, self.x, self.y, self.rotation))
-    
+
     def public(self):
         return dict(piece=self.piece.value, x=self.x, y=self.y, rotation=self.rotation)
+
 
 @dataclass
 class AttackTable:
@@ -147,6 +194,7 @@ class AttackTable:
             if hasattr(self, key):
                 setattr(self, key, value)
 
+
 @dataclass
 class Options:
     board_width: int = 10
@@ -154,7 +202,9 @@ class Options:
     garbage_messiness: float = 0.05
     garbage_delay: int = 1
     attack_table: AttackTable = field(default_factory=AttackTable)
-    combo_table: List[int] = field(default_factory=lambda: [0, 0, 1, 1, 1, 2, 2, 3, 3, 4])
+    combo_table: List[int] = field(
+        default_factory=lambda: [0, 0, 1, 1, 1, 2, 2, 3, 3, 4]
+    )
 
     def __post_init__(self, **kwargs):
         if isinstance(self.attack_table, dict):
@@ -162,10 +212,12 @@ class Options:
         if not isinstance(self.attack_table, AttackTable):
             self.attack_table = AttackTable()
 
+
 @dataclass
 class ClearedLine:
     height: int
     blocks: List[Block]
+
 
 @dataclass
 class Event:
@@ -174,7 +226,8 @@ class Event:
     @property
     def payload(self) -> Dict[str, any]:
         attributes = asdict(self)
-        return {key: value for key, value in attributes.items() if key != 'type'}
+        return {key: value for key, value in attributes.items() if key != "type"}
+
 
 @dataclass
 class PiecePlacedEvent(Event):
@@ -182,16 +235,28 @@ class PiecePlacedEvent(Event):
     final: PieceData
 
     def __post_init__(self):
-        self.type = 'piece_placed'
+        self.type = "piece_placed"
+
 
 @dataclass
 class DamageTankedEvent(Event):
     holeIndices: List[int]
 
     def __post_init__(self):
-        self.type = 'damage_tanked'
+        self.type = "damage_tanked"
 
-ClearName = Literal['Single', 'Triple', 'Double', 'Quad', 'Perfect Clear', 'All-Spin Single', 'All-Spin Double', 'All-Spin Triple']
+
+ClearName = Literal[
+    "Single",
+    "Triple",
+    "Double",
+    "Quad",
+    "Perfect Clear",
+    "All-Spin Single",
+    "All-Spin Double",
+    "All-Spin Triple",
+]
+
 
 @dataclass
 class ClearEvent(Event):
@@ -206,13 +271,15 @@ class ClearEvent(Event):
     clearedLines: List[ClearedLine]
 
     def __post_init__(self):
-        self.type = 'clear'
+        self.type = "clear"
+
 
 @dataclass
 class GameOverEvent(Event):
 
     def __post_init__(self):
-        self.type = 'game_over'
+        self.type = "game_over"
+
 
 @dataclass
 class ScoreInfo:
@@ -222,6 +289,7 @@ class ScoreInfo:
     b2b: bool
     combo: int
 
+
 @dataclass
 class ScoreData:
     score: int
@@ -229,6 +297,7 @@ class ScoreData:
     combo: int
     clear_name: Optional[ClearName]
     all_spin: bool
+
 
 @dataclass
 class Statistics:

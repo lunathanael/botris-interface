@@ -2,15 +2,22 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Awaitable, Optional
 
-from .handlers import (construct_message_handler,
-                       tracker_construct_message_handler)
+from .handlers import construct_message_handler, tracker_construct_message_handler
 from .models import SessionId
 from .websocket_client import WebSocketClient
 
 if TYPE_CHECKING:
     from bots import Bot
 
-async def connect(token, room_key, bot: Bot, tracking: bool=False, threading: bool=False, daemon: bool=True) -> Awaitable[Interface]:
+
+async def connect(
+    token,
+    room_key,
+    bot: Bot,
+    tracking: bool = False,
+    threading: bool = False,
+    daemon: bool = True,
+) -> Awaitable[Interface]:
     """
     Connects to the interface using the provided token and room key.
 
@@ -37,6 +44,7 @@ async def connect(token, room_key, bot: Bot, tracking: bool=False, threading: bo
     itf: Interface = Interface.create(token, room_key, bot, tracking, threading, daemon)
     await itf.connect()
     return itf
+
 
 class Interface:
     """
@@ -70,6 +78,7 @@ class Interface:
     close(self) -> None:
         Closes the WebSocket client.
     """
+
     def __init__(self):
         """
         Factory method for creating an instance of the Interface class.
@@ -85,7 +94,15 @@ class Interface:
         self.session_id: SessionId = None
 
     @classmethod
-    def create(cls, token: str, room_key: str, bot: Bot, tracking: bool=False, threading: bool=False, daemon: bool=True) -> Interface:
+    def create(
+        cls,
+        token: str,
+        room_key: str,
+        bot: Bot,
+        tracking: bool = False,
+        threading: bool = False,
+        daemon: bool = True,
+    ) -> Interface:
         """
         Creates an instance of the Interface class.
 
@@ -123,7 +140,9 @@ class Interface:
         else:
             handle_message = construct_message_handler(self.bot.analyze)
 
-        self.client = WebSocketClient(self.url, handle_message, threading=self.threading, daemon=self.daemon)
+        self.client = WebSocketClient(
+            self.url, handle_message, threading=self.threading, daemon=self.daemon
+        )
         return self
 
     async def connect(self) -> Awaitable[None]:
@@ -137,7 +156,7 @@ class Interface:
         if session_id is None:
             self.status = "disconnected"
             raise Exception("Failed to connect to WebSocket client!")
-        
+
         self.status = "connected"
         self.session_id = session_id
 

@@ -1,14 +1,24 @@
 from . import models
 from .handlers import construct_message_handler
 from .interface import Interface, connect
-from .models import (Block, Board, Command, GameState, Piece, PieceData,
-                     PlayerData, PlayerInfo, PublicGarbageLine, RoomData)
+from .models import (
+    Block,
+    Board,
+    Command,
+    GameState,
+    Piece,
+    PieceData,
+    PlayerData,
+    PlayerInfo,
+    PublicGarbageLine,
+    RoomData,
+)
 from .websocket_client import WebSocketClient
 
 __all__ = [
     "Interface",
     "connect",
-    'models',
+    "models",
     "construct_message_handler",
     "WebSocketClient",
     "Piece",

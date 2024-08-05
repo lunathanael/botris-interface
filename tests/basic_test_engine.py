@@ -25,12 +25,12 @@ class TestTetrisGame(unittest.TestCase):
 
     def test_execute_command(self):
         game = TetrisGame()
-        events = game.execute_command('move_left')
+        events = game.execute_command("move_left")
         self.assertIsInstance(events, list)
 
     def test_execute_commands(self):
         game = TetrisGame()
-        commands = ['move_left', 'move_right']
+        commands = ["move_left", "move_right"]
         events = game.execute_commands(commands)
         self.assertIsInstance(events, list)
 
@@ -50,5 +50,6 @@ class TestTetrisGame(unittest.TestCase):
         moves = game.generate_moves()
         self.assertIsInstance(moves, dict)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

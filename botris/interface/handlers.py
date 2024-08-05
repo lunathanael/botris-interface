@@ -6,16 +6,19 @@ from websockets import WebSocketServerProtocol
 from .models import Command, GameState, PlayerData, PlayerInfo, RoomData
 
 
-def construct_message_handler(analyze_function: Callable[[GameState, List[PlayerData]], Awaitable[List[Command]]], verbose: bool=False) -> Callable[[str, WebSocketServerProtocol], Awaitable[None]]:
+def construct_message_handler(
+    analyze_function: Callable[[GameState, List[PlayerData]], Awaitable[List[Command]]],
+    verbose: bool = False,
+) -> Callable[[str, WebSocketServerProtocol], Awaitable[None]]:
     async def handle_message(message: str, websocket: WebSocketServerProtocol):
         data = json.loads(message)
         message_type = data.get("type")
-        if message_type != 'request_move':
+        if message_type != "request_move":
             return
         match message_type:
             case "request_move":
                 game_state = GameState(**data["payload"]["gameState"])
-                players = [] #[PlayerData(**p) for p in data["payload"]["players"]]
+                players = []  # [PlayerData(**p) for p in data["payload"]["players"]]
                 commands = await analyze_function(game_state, players)
                 await send_action(websocket, commands)
             case "room_data":
@@ -71,7 +74,7 @@ def construct_message_handler(analyze_function: Callable[[GameState, List[Player
                 winner_id = data["payload"]["winnerId"]
                 winner_info = PlayerInfo(**data["payload"]["winnerInfo"])
                 room_data = RoomData(**data["payload"]["roomData"])
-                
+
                 if verbose:
                     print("Round Over:", winner_id, winner_info, room_data)
             case "game_over":
@@ -84,15 +87,12 @@ def construct_message_handler(analyze_function: Callable[[GameState, List[Player
                 room_data = RoomData(**data["payload"]["roomData"])
                 if verbose:
                     print("Game Reset:", room_data)
+
     return handle_message
 
+
 async def send_action(websocket, commands):
-    action_message = {
-        "type": "action",
-        "payload": {
-            "commands": commands
-        }
-    }
+    action_message = {"type": "action", "payload": {"commands": commands}}
     await websocket.send(json.dumps(action_message))
 
 
@@ -112,22 +112,28 @@ class GameBuffer:
         self.num_games += 1
         self.trajectory_buffer.append([])
 
-def tracker_construct_message_handler(analyze_function: Callable[[GameState, List[PlayerData]], Awaitable[List[Command]]], verbose: bool=False) -> Callable[[str, WebSocketServerProtocol], Awaitable[None]]:
+
+def tracker_construct_message_handler(
+    analyze_function: Callable[[GameState, List[PlayerData]], Awaitable[List[Command]]],
+    verbose: bool = False,
+) -> Callable[[str, WebSocketServerProtocol], Awaitable[None]]:
     gb: GameBuffer = GameBuffer()
+
     async def handle_message(message: str, websocket: WebSocketServerProtocol):
         data = json.loads(message)
         message_type = data.get("type")
-        if message_type != 'request_move':
-            if message_type == 'round_over':
+        if message_type != "request_move":
+            if message_type == "round_over":
                 gb.new_game()
                 import pickle
-                with open('test.game_buffer', 'wb') as f:
+
+                with open("test.game_buffer", "wb") as f:
                     pickle.dump(gb, f)
             return
         match message_type:
             case "request_move":
                 game_state = GameState(**data["payload"]["gameState"])
-                players = [] #[PlayerData(**p) for p in data["payload"]["players"]]
+                players = []  # [PlayerData(**p) for p in data["payload"]["players"]]
                 commands = await analyze_function(game_state, players)
                 gb.add_frame(game_state, commands)
                 await send_action(websocket, commands)
@@ -184,7 +190,7 @@ def tracker_construct_message_handler(analyze_function: Callable[[GameState, Lis
                 winner_id = data["payload"]["winnerId"]
                 winner_info = PlayerInfo(**data["payload"]["winnerInfo"])
                 room_data = RoomData(**data["payload"]["roomData"])
-                
+
                 if verbose:
                     print("Round Over:", winner_id, winner_info, room_data)
             case "game_over":
@@ -197,4 +203,5 @@ def tracker_construct_message_handler(analyze_function: Callable[[GameState, Lis
                 room_data = RoomData(**data["payload"]["roomData"])
                 if verbose:
                     print("Game Reset:", room_data)
+
     return handle_message

@@ -9,7 +9,9 @@ from botris.interface import Command, GameState
 
 
 def cut_board(board: List[List[str]]) -> List[List[str]]:
-    new_board = [['G'] * 10 if any(cell == 'G' for cell in row) else row for row in board]
+    new_board = [
+        ["G"] * 10 if any(cell == "G" for cell in row) else row for row in board
+    ]
     return new_board
 
 
@@ -46,19 +48,26 @@ def check_gamestates(gs1: GameState, gs2: GameState) -> bool:
         print("Different piecesPlaced")
         return False
     if gs1.dead != gs2.dead:
-        print("Different dead") 
+        print("Different dead")
         return False
     return True
 
-def verify_game_state(prev_game_state: GameState, game_state: GameState, prev_commands: List[Command], commands: List[Command]) -> bool:
+
+def verify_game_state(
+    prev_game_state: GameState,
+    game_state: GameState,
+    prev_commands: List[Command],
+    commands: List[Command],
+) -> bool:
     gs = TetrisGame.from_game_state(prev_game_state)
     gs.execute_commands(prev_commands)
     predicted_gs = gs.get_public_state()
     if not check_gamestates(predicted_gs, game_state):
         print("Different game states")
-        print(f'pred Gamestates: {predicted_gs} \n\n actualgs: {game_state}\n\n')
+        print(f"pred Gamestates: {predicted_gs} \n\n actualgs: {game_state}\n\n")
         return False
     return True
+
 
 class GameBuffer:
     def __init__(self):
@@ -76,24 +85,31 @@ class GameBuffer:
         self.num_games += 1
         self.trajectory_buffer.append([])
 
+
 class TestGameState(unittest.TestCase):
 
     def test_buffer_gamestate(self):
         try:
-            with open('test.game_buffer', 'rb') as f:
+            with open("test.game_buffer", "rb") as f:
                 gb: GameBuffer = pickle.load(f)
 
-            print(f'Analyzing gamestate engine. Games to Analyze: {gb.num_games}, frames to analyze: {gb.total_frames}')
+            print(
+                f"Analyzing gamestate engine. Games to Analyze: {gb.num_games}, frames to analyze: {gb.total_frames}"
+            )
             for _, game in enumerate(gb.trajectory_buffer):
                 for idx, val in enumerate(game):
                     if idx == 0:
                         continue
                     commands, game_state = val
                     prev_commands, prev_game_state = game[idx - 1]
-                    if len(prev_commands) == 0 or prev_commands[-1] != 'hard_drop':
-                        prev_commands.append(Command('hard_drop'))
-                    if not verify_game_state(prev_game_state, game_state, prev_commands, commands):
-                        print(f'Found Error Game: {_}\nframe idx in game: {idx} \n\n prev gs: {prev_game_state} \n\n commands: {prev_commands} \n\n newgs: {game_state}')
+                    if len(prev_commands) == 0 or prev_commands[-1] != "hard_drop":
+                        prev_commands.append(Command("hard_drop"))
+                    if not verify_game_state(
+                        prev_game_state, game_state, prev_commands, commands
+                    ):
+                        print(
+                            f"Found Error Game: {_}\nframe idx in game: {idx} \n\n prev gs: {prev_game_state} \n\n commands: {prev_commands} \n\n newgs: {game_state}"
+                        )
                         self.fail("Game state verification failed")
         except FileNotFoundError:
             print("File not found")
@@ -107,17 +123,26 @@ class TestGameState(unittest.TestCase):
 
             move_lengths: int = 0
 
-            with open('test.game_buffer', 'rb') as f:
+            with open("test.game_buffer", "rb") as f:
                 gb: GameBuffer = pickle.load(f)
 
-            print(f'Analyzing movegen. Games to Analyze: {gb.num_games}, frames to analyze: {gb.total_frames}')
+            print(
+                f"Analyzing movegen. Games to Analyze: {gb.num_games}, frames to analyze: {gb.total_frames}"
+            )
             for game in gb.trajectory_buffer:
                 for trajectory in game:
                     prev_commands, prev_game_state = trajectory
 
                     gamestate = TetrisGame.from_game_state(prev_game_state)
                     start = timer()
-                    moves = generate_moves(gamestate.board, gamestate.current.piece, gamestate.held or gamestate.queue[0], gamestate.options.board_height, gamestate.options.board_width, 'bfs')
+                    moves = generate_moves(
+                        gamestate.board,
+                        gamestate.current.piece,
+                        gamestate.held or gamestate.queue[0],
+                        gamestate.options.board_height,
+                        gamestate.options.board_width,
+                        "bfs",
+                    )
                     end = timer()
                     searches += 1
 
@@ -126,10 +151,10 @@ class TestGameState(unittest.TestCase):
                     move_lengths += sum([len(move) for move in moves.values()])
 
                     for command in prev_commands:
-                        if command == 'hard_drop':
+                        if command == "hard_drop":
                             break
                         gamestate.execute_command(command)
-                    gamestate.execute_command('sonic_drop')
+                    gamestate.execute_command("sonic_drop")
                     if gamestate.current not in moves:
                         print(prev_game_state)
                         TetrisGame.from_game_state(prev_game_state).render_board()
@@ -138,11 +163,13 @@ class TestGameState(unittest.TestCase):
                         self.assertIn(gamestate.current, moves.keys())
                         print("HUH!")
                         self.fail("SOMETHING REALLY BAD HAPPENED")
-            print(f"All Moves were found.\nTotal moves found: {moves_found}\nTotal time taken: {cum_time}\tAverage search time: {cum_time / searches}\nAverage moves per search: {moves_found / searches}\nAverage Move Length: {move_lengths / moves_found}")
+            print(
+                f"All Moves were found.\nTotal moves found: {moves_found}\nTotal time taken: {cum_time}\tAverage search time: {cum_time / searches}\nAverage moves per search: {moves_found / searches}\nAverage Move Length: {move_lengths / moves_found}"
+            )
         except FileNotFoundError:
             print("File not found")
             self.fail("File not found")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -10,7 +10,7 @@ from . import blockfish_pb2 as protos
 
 class IPC:
 
-    DEFAULT_BLOCKFISH_PATH = os.path.join(os.path.dirname(__file__), 'blockfish.exe')
+    DEFAULT_BLOCKFISH_PATH = os.path.join(os.path.dirname(__file__), "blockfish.exe")
 
     def __init__(self, process):
         self._sp = process
@@ -28,25 +28,25 @@ class IPC:
             await self._sp.wait()
 
 
-async def create_subprocess_ipc(program = IPC.DEFAULT_BLOCKFISH_PATH):
+async def create_subprocess_ipc(program=IPC.DEFAULT_BLOCKFISH_PATH):
     sp = await asyncio.create_subprocess_exec(
-        program = program,
-        stdout = subprocess.PIPE,
-        stdin = subprocess.PIPE,
+        program=program,
+        stdout=subprocess.PIPE,
+        stdin=subprocess.PIPE,
     )
     return IPC(sp)
 
 
 async def read_varint(stream):
     buf = bytearray()
-    bs = b''
+    bs = b""
     while not any(x & 0x80 == 0 for x in bs):
-        bs = await stream.read(n = 1)
+        bs = await stream.read(n=1)
         if len(bs) == 0:
             raise EOFError
         buf += bs
     varint, pos = _DecodeVarint32(buf, 0)
-    assert(pos == len(buf))
+    assert pos == len(buf)
     return varint
 
 
