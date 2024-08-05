@@ -444,7 +444,8 @@ def dijkstra_generate_move_helper(
             ):
                 distance[move_left_piece] = new_distance
                 heappush(
-                    priority_queue, (new_distance, move_left_piece, move + [Move.move_left])
+                    priority_queue,
+                    (new_distance, move_left_piece, move + [Move.move_left]),
                 )
 
         move_right_piece: Optional[PieceData] = move_right(

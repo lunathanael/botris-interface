@@ -29,7 +29,7 @@ _Move = Literal[
     "hold",
     "hard_drop",
 ]
-_MOVES: Tuple[_Move] = (
+_MOVES: tuple[_Move] = (
     "move_left",
     "move_right",
     "rotate_cw",
@@ -86,7 +86,7 @@ class Move:
 for index, value in enumerate(_MOVES):
     setattr(Move, value, Move(value, index))
 
-MOVES: Tuple[Move] = (
+MOVES: tuple[Move] = (
     Move.move_left,
     Move.move_right,
     Move.rotate_cw,
@@ -101,7 +101,7 @@ MOVES: Tuple[Move] = (
 
 
 _Piece = Literal["I", "O", "J", "L", "S", "Z", "T"]
-_PIECES: Tuple[_Piece] = ("I", "O", "J", "L", "S", "Z", "T")
+_PIECES: tuple[_Piece] = ("I", "O", "J", "L", "S", "Z", "T")
 
 
 class Piece:
@@ -142,7 +142,7 @@ for index, value in enumerate(_PIECES):
     setattr(Piece, value, Piece(value, index))
 
 Block = Optional[Literal["I", "O", "J", "L", "S", "Z", "T", "G"]]
-PIECES: Tuple[Piece] = (Piece.I, Piece.O, Piece.J, Piece.L, Piece.S, Piece.Z, Piece.T)
+PIECES: tuple[Piece] = (Piece.I, Piece.O, Piece.J, Piece.L, Piece.S, Piece.Z, Piece.T)
 Board = List[List[Block]]
 
 
@@ -194,6 +194,19 @@ class AttackTable:
             if hasattr(self, key):
                 setattr(self, key, value)
 
+    def dict(self) -> dict[str, int]:
+        return {
+            "single": self.single,
+            "double": self.double,
+            "triple": self.triple,
+            "quad": self.quad,
+            "ass": self.ass,
+            "asd": self.asd,
+            "ast": self.ast,
+            "pc": self.pc,
+            "b2b": self.b2b,
+        }
+
 
 @dataclass
 class Options:
@@ -202,7 +215,7 @@ class Options:
     garbage_messiness: float = 0.05
     garbage_delay: int = 1
     attack_table: AttackTable = field(default_factory=AttackTable)
-    combo_table: List[int] = field(
+    combo_table: list[int] = field(
         default_factory=lambda: [0, 0, 1, 1, 1, 2, 2, 3, 3, 4]
     )
 
@@ -212,11 +225,21 @@ class Options:
         if not isinstance(self.attack_table, AttackTable):
             self.attack_table = AttackTable()
 
+    def dict(self) -> dict[str, int | list[int] | dict[str, int]]:
+        return {
+            "board_width": self.board_width,
+            "board_height": self.board_height,
+            "garbage_messiness": self.garbage_messiness,
+            "garbage_delay": self.garbage_delay,
+            "attack_table": self.attack_table.dict(),
+            "combo_table": self.combo_table,
+        }
+
 
 @dataclass
 class ClearedLine:
     height: int
-    blocks: List[Block]
+    blocks: list[Block]
 
 
 @dataclass
@@ -224,7 +247,7 @@ class Event:
     type: str = field(init=False)
 
     @property
-    def payload(self) -> Dict[str, any]:
+    def payload(self) -> dict[str, any]:
         attributes = asdict(self)
         return {key: value for key, value in attributes.items() if key != "type"}
 
@@ -240,7 +263,7 @@ class PiecePlacedEvent(Event):
 
 @dataclass
 class DamageTankedEvent(Event):
-    holeIndices: List[int]
+    holeIndices: list[int]
 
     def __post_init__(self):
         self.type = "damage_tanked"
@@ -268,7 +291,7 @@ class ClearEvent(Event):
     attack: int
     cancelled: int
     piece: PieceData
-    clearedLines: List[ClearedLine]
+    clearedLines: list[ClearedLine]
 
     def __post_init__(self):
         self.type = "clear"
@@ -295,12 +318,12 @@ class ScoreData:
     score: int
     b2b: bool
     combo: int
-    clear_name: Optional[ClearName]
+    clear_name: ClearName | None
     all_spin: bool
 
 
 @dataclass
 class Statistics:
-    heights: List[int]
+    heights: list[int]
     bumpiness: int
     avg_height: float

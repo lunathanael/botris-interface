@@ -707,7 +707,7 @@ class TetrisGame:
             self.options.board_width,
             algo,
         )
-    
+
     @property
     def game_over(self):
         return self.dead
