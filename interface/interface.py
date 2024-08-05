@@ -39,6 +39,7 @@ class Interface:
     async def connect(self):
         await self.bot.start()
         await self.client.connect()
+        print("connected")
     
     def __del__(self):
         del self.client

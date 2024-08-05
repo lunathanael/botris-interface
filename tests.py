@@ -1,10 +1,10 @@
 import pickle
 import unittest
-from typing import TYPE_CHECKING, List, Tuple
+from typing import TYPE_CHECKING, List, Tuple, Deque
 
 from engine import TetrisGame
 from engine.utils import generate_garbage
-from interface.models import Command, GameState
+from interface.models import Command, GameState, PublicGarbageLine
 from engine.move_generator import generate_moves
 from engine.pieces import Piece
 from timeit import default_timer as timer
@@ -140,11 +140,32 @@ class TestTetrisGame(unittest.TestCase):
 
     def test_add_garbage(self):
         game = TetrisGame()
-        garbage_indices = generate_garbage(4, game.options.garbage_messiness, game.options.board_width)
-        game.queue_garbage(garbage_indices)
+        public_garbage_lines = [
+            PublicGarbageLine(delay=dly)
+            for dly in [0, 0, 1, 2]
+        ]
+        garbage_lines = generate_garbage(public_garbage_lines, game.options.garbage_messiness, game.options.board_width)
+        game.queue_garbage_lines(garbage_lines)
         self.assertFalse(any('G' in row for row in game.board))
+        game.queue.appendleft(Piece.I)
+        game.current = game.spawn_piece()
         game.execute_command('hard_drop')
         self.assertTrue('G' in game.board[0])
+        self.assertTrue('G' in game.board[1])
+        self.assertFalse(len(game.board) >= 3 and 'G' in game.board[2])
+        game.queue.appendleft(Piece.I)
+        game.current = game.spawn_piece()
+        game.execute_command('hard_drop')
+        self.assertTrue('G' in game.board[0])
+        self.assertTrue('G' in game.board[1])
+        self.assertTrue('G' in game.board[2])
+        self.assertFalse(len(game.board) >= 4 and 'G' in game.board[3])
+        game.queue.appendleft(Piece.I)
+        game.current = game.spawn_piece()
+        game.execute_command('hard_drop')
+        self.assertTrue('G' in game.board[0])
+        self.assertTrue('G' in game.board[1])
+        self.assertTrue('G' in game.board[2])
         self.assertTrue('G' in game.board[3])
 
     def test_single_clear(self):
@@ -294,8 +315,9 @@ class TestTetrisGame(unittest.TestCase):
         self.assertEqual(clear_event.payload['clearName'], 'All-Spin Triple')
 
 def cut_board(board: List[List[str]]) -> List[List[str]]:
-    new_board = [row for row in board if any(cell != 'G' and cell is not None for cell in row)]
+    new_board = [['G'] * 10 if any(cell == 'G' for cell in row) else row for row in board]
     return new_board
+
 
 def check_gamestates(gs1: GameState, gs2: GameState) -> bool:
     b1 = cut_board(gs1.board)

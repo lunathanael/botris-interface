@@ -1,11 +1,12 @@
 import copy
 import math
 import random
-from typing import Dict, List, Optional, Tuple, Literal
+from typing import Dict, List, Optional, Tuple, Literal, Deque
 
 from .models import (AttackTable, Block, Board, ClearName, PieceData,
-                     ScoreData, ScoreInfo, Piece, Command, GameAction, Move)
+                     ScoreData, ScoreInfo, Piece, Command, GameAction, Move, GarbageLine)
 from .pieces import PieceMatrix, get_piece_matrix, get_piece_mask, get_piece_border, WALLKICKS, I_WALLKICKS
+from interface.models import PublicGarbageLine as PublicGarbageLine
 
 
 def get_subgrid_mask(board: Board, start_x: int, start_y: int, board_width: int, board_height: int) -> int:
@@ -137,24 +138,42 @@ def calculate_score(score_info: ScoreInfo, attack_table: AttackTable, combo_tabl
 
     return ScoreData(score=score, b2b=is_b2b_clear, combo=new_combo, clear_name=clear_name, all_spin=all_spin)
 
-def generate_garbage(damage: int, garbage_messiness: float, board_width: int) -> List[int]:
-    hole_indices: List[int] = []
+def generate_garbage(garbage_queue: List[PublicGarbageLine], garbage_messiness: float, board_width: int) -> List[PublicGarbageLine]:
+    garbage: List[PublicGarbageLine] = []
     hole_index: Optional[int] = None
 
-    for _ in range(damage):
+    for garbage_line in garbage_queue:
         if hole_index is None or random.random() < garbage_messiness:
             hole_index = math.floor(random.random() * board_width)
-        hole_indices.append(hole_index)
+        garbage.append(PublicGarbageLine(delay=garbage_line.delay, index=hole_index))
 
-    return hole_indices
+    return garbage
 
-def add_garbage(board: Board, hole_indices: List[int], board_width: int) -> Board:
+def process_garbage(board: Board, garbage_queue: Deque[PublicGarbageLine], board_width: int) -> Tuple[Board, List[int]]:
     new_board: Board = copy.deepcopy(board)
-    for hole_index in hole_indices:
+    expired_indices: List[int] = []
+
+    garbage_length: int = len(garbage_queue)
+    for _ in range(garbage_length):
+        garbage_line: PublicGarbageLine = garbage_queue.popleft()
+        if garbage_line.delay <= 0:
+            expired_indices.append(garbage_line.index)
+            continue
+        garbage_line.delay -= 1
+        garbage_queue.append(garbage_line)
+    
+    new_board = _add_garbage(new_board, expired_indices, board_width)
+    return new_board, expired_indices
+
+def _add_garbage(board: Board, garbage_indices: List[int], board_width: int) -> Board:
+    lines: List[List[Block]] = []
+    for hold_index in reversed(garbage_indices):
         line: List[Block] = ['G'] * board_width
-        line[hole_index] = None
-        new_board.insert(0, line)
-    return new_board
+        line[hold_index] = None
+        lines.append(line)
+
+    return lines + board
+
 
 def get_board_heights(board: Board, board_width: int) -> List[int]:
     if not board:

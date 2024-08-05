@@ -44,10 +44,13 @@ class PieceData(BaseModel):
     y: int
     rotation: Literal[0, 1, 2, 3]
 
+class PublicGarbageLine(BaseModel):
+    delay: int
+
 class GameState(BaseModel):
     board: Board
     queue: List[Piece]
-    garbageQueued: int
+    garbageQueued: List[PublicGarbageLine]
     held: Optional[Piece]
     current: PieceData
     canHold: bool
@@ -55,6 +58,7 @@ class GameState(BaseModel):
     b2b: bool
     score: int
     piecesPlaced: int
+    garbageCleared: int
     dead: bool
 
 class Command(str):

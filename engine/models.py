@@ -4,6 +4,14 @@ from dataclasses import asdict, dataclass, field
 from typing import Dict, List, Literal, Optional, Tuple
 from sys import intern
 
+@dataclass
+class GarbageLine:
+    delay: int
+    index: int
+
+    def public(self):
+        return dict(delay=self.delay)
+
 _Move = Literal['move_left', 'move_right', 'rotate_cw', 'rotate_ccw', 'drop', 'sonic_drop', 'hold']
 _MOVES: Tuple[_Move] = ('move_left', 'move_right', 'rotate_cw', 'rotate_ccw', 'drop', 'sonic_drop', 'hold')
 class Move:
@@ -108,7 +116,7 @@ class PieceData:
     def __hash__(self):
         return hash((self.piece.index, self.x, self.y, self.rotation))
     
-    def __dict__(self):
+    def public(self):
         return dict(piece=self.piece.value, x=self.x, y=self.y, rotation=self.rotation)
 
 @dataclass
@@ -133,6 +141,7 @@ class Options:
     board_width: int = 10
     board_height: int = 20
     garbage_messiness: float = 0.05
+    garbage_delay: int = 1
     attack_table: AttackTable = field(default_factory=AttackTable)
     combo_table: List[int] = field(default_factory=lambda: [0, 0, 1, 1, 1, 2, 2, 3, 3, 4])
 

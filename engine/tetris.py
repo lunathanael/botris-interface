@@ -11,9 +11,9 @@ from interface.models import GameState
 
 from .models import (Board, ClearEvent, Command, DamageTankedEvent, Event,
                      GameOverEvent, Options, Piece, PieceData,
-                     PiecePlacedEvent, ScoreData, ScoreInfo, Statistics)
+                     PiecePlacedEvent, ScoreData, ScoreInfo, Statistics, GarbageLine)
 from .pieces import I_WALLKICKS, WALLKICKS, generate_bag, get_piece_matrix
-from .utils import (add_garbage, calculate_score, check_collision, _check_collision,
+from .utils import (process_garbage, calculate_score, check_collision, _check_collision,
                     check_immobile, check_pc, clear_lines, generate_garbage,
                     get_board_avg_height, get_board_bumpiness,
                     get_board_heights, place_piece, create_piece, move_left, move_right, move_drop, sonic_left, sonic_right, sonic_drop, rotate_cw, rotate_ccw)
@@ -26,7 +26,7 @@ class TetrisGame:
         
         self.board: Board = None
         self.queue: Deque[Piece] = None
-        self.garbage_queue: List[int] = None
+        self.garbage_queue: Deque[GarbageLine] = None
         self.held: Optional[Piece] = None
         self.current: PieceData = None
         self.is_immobile: bool = None
@@ -35,6 +35,7 @@ class TetrisGame:
         self.b2b: bool = None
         self.score: int = None
         self.pieces_placed: int = None
+        self.garbage_cleared: int = None
         self.dead: bool = None
 
         self.reset()
@@ -46,7 +47,7 @@ class TetrisGame:
         self.board = game_state.board
         # convert 'I' to Piece.I, and etc for queue
         self.queue = deque([Piece.from_str(piece) for piece in game_state.queue])
-        self.garbage_queue = generate_garbage(game_state.garbageQueued, self.options.garbage_messiness, self.options.board_width)
+        self.garbage_queue = deque(generate_garbage(game_state.garbageQueued, self.options.garbage_messiness, self.options.board_width))
         self.held = Piece.from_str(game_state.held) if game_state.held else None
         self.current = PieceData(
             piece=Piece.from_str(game_state.current.piece),
@@ -61,6 +62,7 @@ class TetrisGame:
         self.b2b = game_state.b2b
         self.score = game_state.score
         self.pieces_placed = game_state.piecesPlaced
+        self.garbage_cleared = game_state.garbageCleared
         self.dead = game_state.dead
 
         if len(self.queue) < 6:
@@ -71,7 +73,7 @@ class TetrisGame:
     def reset(self) -> None:
         self.board = []
         self.queue = deque(generate_bag())
-        self.garbage_queue = []
+        self.garbage_queue = deque([])
         self.held = None
         self.current = self.spawn_piece()
         self.is_immobile = False
@@ -80,6 +82,7 @@ class TetrisGame:
         self.b2b = False
         self.score = 0
         self.pieces_placed = 0
+        self.garbage_cleared = 0
         self.dead = False
 
     def spawn_piece(self) -> PieceData:
@@ -92,14 +95,15 @@ class TetrisGame:
         return GameState(
             board=self.board,
             queue=[piece.value for piece in list(self.queue)][:6],
-            garbageQueued=len(self.garbage_queue),
+            garbageQueued=[garbage.public() for garbage in list(self.garbage_queue)],
             held=self.held.value if self.held else None,
-            current=self.current.__dict__(),
+            current=self.current.public(),
             canHold=self.can_hold,
             combo=self.combo,
             b2b=self.b2b,
             score=self.score,
             piecesPlaced=self.pieces_placed,
+            garbageCleared=self.garbage_cleared,
             dead=self.dead,
         )
 
@@ -183,6 +187,12 @@ class TetrisGame:
 
                 self.board = place_piece(self.board, self.current, self.options.board_width)
                 self.board, cleared_lines = clear_lines(self.board)
+                cleared: int = len(cleared_lines)
+                for line in cleared_lines:
+                    if 'G' in line['blocks']:
+                        self.garbage_cleared += 1
+
+
                 pc = check_pc(self.board)
 
                 score_info = ScoreInfo(
@@ -200,18 +210,16 @@ class TetrisGame:
 
                 self.score += score_data.score
                 self.pieces_placed += 1
-
+                
                 attack = score_data.score
                 cancelled: int = min(len(self.garbage_queue), attack)
-                self.garbage_queue = self.garbage_queue[cancelled:]
+                for _ in range(cancelled):
+                    self.garbage_queue.popleft()
                 attack -= cancelled
 
                 tanked_lines: List[int] = []
-                if not cleared_lines:
-                    hole_indices: List[int] = self.garbage_queue
-                    self.board = add_garbage(self.board, hole_indices, self.options.board_width)
-                    tanked_lines = hole_indices
-                    self.garbage_queue = []
+                if cleared == 0:
+                    self.board, tanked_lines = process_garbage(self.board, self.garbage_queue, self.options.board_width)
 
                 events.append(PiecePlacedEvent(initial=initial_piece_state, final=final_piece_state))
 
@@ -244,7 +252,10 @@ class TetrisGame:
         return events
 
     def queue_garbage(self, hole_indices: List[int]) -> None:
-        self.garbage_queue.extend(hole_indices)
+        self.garbage_queue.extend([GarbageLine(delay=self.options.garbage_delay, index=i) for i in hole_indices])
+
+    def queue_garbage_lines(self, garbage_lines: List[GarbageLine]) -> None:
+        self.garbage_queue.extend(garbage_lines)
 
     def __str__(self) -> str:
         representation: str = ''
