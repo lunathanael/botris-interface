@@ -183,7 +183,7 @@ def bfs_generate_move_helper(board: Board, current_piece: PieceData, generated_m
         visited.add(current_piece)
 
         move_down_piece: Optional[PieceData] = move_down(board, current_piece, board_width)
-        if move_down_piece is not None:
+        if move_down_piece is None:
             add_move(board, generated_moves, current_piece, move, board_width)
         else:
             queue.append((move_down_piece, move + [Move.drop]))
