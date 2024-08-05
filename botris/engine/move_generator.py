@@ -24,6 +24,31 @@ def generate_moves(
     board_width: int,
     algo: Literal["bfs", "dfs", "dijk", "dijk-short"] = "bfs",
 ) -> Dict[PieceData, List[Move]]:
+    """
+    Generate all possible moves for the current piece and the alternative piece
+    using the specified algorithm.
+
+    Parameters:
+    ----------
+    board : Board
+        The current board state.
+    piece : Piece
+        The current piece.
+    alternative : Optional[Piece]
+        The alternative piece.
+    board_height : int
+        The height of the board.
+    board_width : int
+        The width of the board.
+    algo : Literal["bfs", "dfs", "dijk", "dijk-short"]
+        The algorithm to use for generating moves.
+
+    Returns:
+    -------
+    Dict[PieceData, List[Move]]
+        A dictionary mapping each piece to the list of moves that can be made
+        to reach
+    """
     match algo:
         case "bfs":
             return bfs_generate_moves(
@@ -273,7 +298,7 @@ def dfs_generate_move_helper(
             generated_moves,
             board_height,
             board_width,
-            move + [Move.left],
+            move + [Move.move_left],
             visited,
         )
     move_right_piece: Optional[PieceData] = move_right(
@@ -286,7 +311,7 @@ def dfs_generate_move_helper(
             generated_moves,
             board_height,
             board_width,
-            move + [Move.right],
+            move + [Move.move_right],
             visited,
         )
 
@@ -419,7 +444,7 @@ def dijkstra_generate_move_helper(
             ):
                 distance[move_left_piece] = new_distance
                 heappush(
-                    priority_queue, (new_distance, move_left_piece, move + [Move.left])
+                    priority_queue, (new_distance, move_left_piece, move + [Move.move_left])
                 )
 
         move_right_piece: Optional[PieceData] = move_right(
@@ -434,7 +459,7 @@ def dijkstra_generate_move_helper(
                 distance[move_right_piece] = new_distance
                 heappush(
                     priority_queue,
-                    (new_distance, move_right_piece, move + [Move.right]),
+                    (new_distance, move_right_piece, move + [Move.move_right]),
                 )
 
         rotate_cw_piece: Optional[PieceData] = rotate_cw(
@@ -636,7 +661,7 @@ def short_generate_move_helper(
             board, current_piece, board_width
         )
         if move_drop_piece is None:
-            add_move(board, generated_moves, current_piece, move, board_width)
+            add_move(generated_moves, current_piece, move)
         else:
             queue.append((move_drop_piece, move + [Move.drop]))
 

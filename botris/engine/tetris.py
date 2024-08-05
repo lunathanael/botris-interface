@@ -159,6 +159,37 @@ class TetrisGame:
         self.reset()
 
     @classmethod
+    def copy(cls, other: TetrisGame) -> TetrisGame:
+        """
+        Creates a copy of the given Tetris game instance.
+
+        Parameters:
+        -----------
+        other : TetrisGame
+            The Tetris game instance to copy.
+
+        Returns:
+        --------
+        TetrisGame
+            A new instance of TetrisGame copied from the given instance.
+        """
+        self: TetrisGame = cls(other.options.dict())
+        self.board = [row.copy() for row in other.board]
+        self.queue = deque([piece for piece in other.queue])
+        self.garbage_queue = deque([garbage.copy() for garbage in other.garbage_queue])
+        self.held = other.held
+        self.current = other.current.copy()
+        self.is_immobile = other.is_immobile
+        self.can_hold = other.can_hold
+        self.combo = other.combo
+        self.b2b = other.b2b
+        self.score = other.score
+        self.pieces_placed = other.pieces_placed
+        self.garbage_cleared = other.garbage_cleared
+        self.dead = other.dead
+        return self
+
+    @classmethod
     def from_game_state(
         cls, game_state: GameState, options: dict[str, Any] | None = None
     ) -> TetrisGame:
@@ -676,3 +707,7 @@ class TetrisGame:
             self.options.board_width,
             algo,
         )
+    
+    @property
+    def game_over(self):
+        return self.dead
