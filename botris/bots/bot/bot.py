@@ -10,13 +10,13 @@ class Bot:
     async def analyze(
         self, game_state: GameState, players: List[PlayerData]
     ) -> Awaitable[List[Command]]:
-        raise NotImplementedError("Subclasses must implement this method")
+        raise NotImplementedError("Analyze method must be implemented for bot")
 
     async def start(self) -> Awaitable[None]:
-        raise NotImplementedError("Subclasses must implement this method")
+        return None
 
     def shutdown(self) -> None:
-        raise NotImplementedError("Subclasses must implement this method")
+        return None
 
     def __del__(self):
         self.shutdown()
