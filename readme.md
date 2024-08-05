@@ -22,7 +22,7 @@ pip install botris-interface
 To create a bot, you need to implement the `Bot` interface provided by the library. Here is an example:
 
 ```python
-from botris_interface import Bot
+from botris.bots import Bot
 
 class CoolBot(Bot):
     async def analyze(
