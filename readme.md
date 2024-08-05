@@ -55,7 +55,7 @@ from botris import Interface
 async def main():
     bot = MyBot()
     itf = Interface.create(TOKEN, ROOM_KEY, bot)
-    await client.connect()
+    await itf.connect()
 
 asyncio.run(main())
 ```
