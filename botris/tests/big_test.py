@@ -1,13 +1,13 @@
 import pickle
 import unittest
-from typing import TYPE_CHECKING, List, Tuple, Deque
+from timeit import default_timer as timer
+from typing import TYPE_CHECKING, Deque, List, Tuple
 
 from engine import TetrisGame
-from engine.utils import generate_garbage
-from interface.models import Command, GameState, PublicGarbageLine
 from engine.move_generator import generate_moves
 from engine.pieces import Piece
-from timeit import default_timer as timer
+from engine.utils import generate_garbage
+from interface.models import Command, GameState, PublicGarbageLine
 
 if TYPE_CHECKING:
     from engine.models import Event

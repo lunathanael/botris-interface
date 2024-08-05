@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
-from typing import Dict, List, Literal, Optional, Tuple
 from sys import intern
+from typing import Dict, List, Literal, Optional, Tuple
+
 
 @dataclass
 class GarbageLine:

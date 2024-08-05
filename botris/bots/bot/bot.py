@@ -1,6 +1,6 @@
 from typing import List
 
-from interface.models import Command, GameState, PlayerData
+from botris.interface import Command, GameState, PlayerData
 
 
 class Bot:

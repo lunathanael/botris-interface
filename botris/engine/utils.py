@@ -1,12 +1,14 @@
 import copy
 import math
 import random
-from typing import Dict, List, Optional, Tuple, Literal, Deque
+from typing import Deque, Dict, List, Literal, Optional, Tuple
 
-from .models import (AttackTable, Block, Board, ClearName, PieceData,
-                     ScoreData, ScoreInfo, Piece, Command, GameAction, Move, GarbageLine)
-from .pieces import PieceMatrix, get_piece_matrix, get_piece_mask, get_piece_border, WALLKICKS, I_WALLKICKS
-from interface.models import PublicGarbageLine as PublicGarbageLine
+from botris.interface.models import PublicGarbageLine as PublicGarbageLine
+
+from .models import (AttackTable, Block, Board, ClearName, Piece, PieceData,
+                     ScoreData, ScoreInfo)
+from .pieces import (I_WALLKICKS, WALLKICKS, PieceMatrix, get_piece_border,
+                     get_piece_mask, get_piece_matrix)
 
 
 def get_subgrid_mask(board: Board, start_x: int, start_y: int, board_width: int, board_height: int) -> int:

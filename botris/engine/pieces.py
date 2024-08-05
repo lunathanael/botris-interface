@@ -1,8 +1,8 @@
 import random
-from typing import Dict, List, Literal, Optional, Tuple
 from itertools import product
+from typing import Dict, List, Literal, Optional, Tuple
 
-from .models import  _Piece,  PIECES, Block, Piece
+from .models import PIECES, Piece, _Piece
 
 PieceMatrix = Tuple[Tuple[Optional[Piece]]]
 

@@ -1,12 +1,10 @@
-from typing import Optional, List, Dict, Literal, Set, Tuple, Deque, Literal
-
 from heapq import heappop, heappush
-from collections import deque
+from typing import Deque, Dict, List, Literal, Optional, Set, Tuple
 
-
-from .pieces import I_WALLKICKS, WALLKICKS
-from .models import Board, Piece, PieceData, Command, GameAction, Move
-from .utils import check_collision, create_piece, _check_collision, move_left, move_right, move_drop, sonic_left, sonic_right, sonic_drop, rotate_ccw, rotate_cw
+from .models import Board, Command, GameAction, Move, Piece, PieceData
+from .utils import (check_collision, create_piece, move_drop, move_left,
+                    move_right, rotate_ccw, rotate_cw, sonic_drop, sonic_left,
+                    sonic_right)
 
 
 def generate_moves(board: Board, piece: Piece, alternative: Optional[Piece], board_height: int, board_width: int, algo: Literal['bfs', 'dfs', 'dijk', 'dijk-short']='bfs') -> Dict[PieceData, GameAction]:

@@ -1,23 +1,25 @@
 from __future__ import annotations
 
 from collections import deque
-from typing import (TYPE_CHECKING, Any, Deque, Dict, List, Literal, Optional,
-                    TypedDict)
+from typing import Any, Deque, Dict, List, Literal, Optional
 
 import colorama
 from colorama import Back, Fore, Style
 
-from interface.models import GameState
+from botris.interface import GameState
 
 from .models import (Board, ClearEvent, Command, DamageTankedEvent, Event,
-                     GameOverEvent, Options, Piece, PieceData,
-                     PiecePlacedEvent, ScoreData, ScoreInfo, Statistics, GarbageLine)
-from .pieces import I_WALLKICKS, WALLKICKS, generate_bag, get_piece_matrix
-from .utils import (process_garbage, calculate_score, check_collision, _check_collision,
-                    check_immobile, check_pc, clear_lines, generate_garbage,
-                    get_board_avg_height, get_board_bumpiness,
-                    get_board_heights, place_piece, create_piece, move_left, move_right, move_drop, sonic_left, sonic_right, sonic_drop, rotate_cw, rotate_ccw)
+                     GameOverEvent, GarbageLine, Move, Options, Piece,
+                     PieceData, PiecePlacedEvent, ScoreData, ScoreInfo,
+                     Statistics)
 from .move_generator import generate_moves
+from .pieces import generate_bag, get_piece_matrix
+from .utils import (_check_collision, calculate_score, check_collision,
+                    check_immobile, check_pc, clear_lines, create_piece,
+                    generate_garbage, get_board_avg_height,
+                    get_board_bumpiness, get_board_heights, move_drop,
+                    move_left, move_right, place_piece, process_garbage,
+                    rotate_ccw, rotate_cw, sonic_drop, sonic_left, sonic_right)
 
 
 class TetrisGame:
@@ -106,6 +108,13 @@ class TetrisGame:
             garbageCleared=self.garbage_cleared,
             dead=self.dead,
         )
+    
+    def execute_move(self, move: Move) -> List[Event]:
+        return self.execute_command(move.value)
+    
+    def execute_moves(self, moves: List[Move]) -> List[Event]:
+        commands: List[Command] = [move.value for move in moves]
+        return self.execute_commands(commands)
 
     def execute_commands(self, commands: List[Command]) -> List[Event]:
         """
