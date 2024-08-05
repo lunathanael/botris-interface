@@ -56,7 +56,7 @@ class Move:
     
     def __lt__(self, other):
         return self.index < other.index
-    
+
 for index, value in enumerate(_MOVES):
     setattr(Move, value, Move(value, index))
 

@@ -5,8 +5,8 @@ from typing import Deque, Dict, List, Literal, Optional, Tuple
 
 from botris.interface.models import PublicGarbageLine as PublicGarbageLine
 
-from .models import (AttackTable, Block, Board, ClearName, GarbageLine, Piece, PieceData,
-                     ScoreData, ScoreInfo)
+from .models import (AttackTable, Block, Board, ClearName, GarbageLine, Piece,
+                     PieceData, ScoreData, ScoreInfo)
 from .pieces import (I_WALLKICKS, WALLKICKS, PieceMatrix, get_piece_border,
                      get_piece_mask, get_piece_matrix)
 

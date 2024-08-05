@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Literal, Optional
+from typing import TYPE_CHECKING, List, Literal, Optional, Tuple
 
 from pydantic import BaseModel, constr
 
@@ -65,8 +65,16 @@ class GameState(BaseModel):
     dead: bool
 
 class Command(str):
-    def __new__(cls, command: str):
-        return str.__new__(cls, command)
+    hold: Command = None
+    move_left: Command = None
+    move_right: Command = None
+    sonic_left: Command = None
+    sonic_right: Command = None
+    rotate_cw: Command = None
+    rotate_ccw: Command = None
+    drop: Command = None
+    sonic_drop: Command = None
+    hard_drop: Command = None
 
     def __init__(self, command: str):
         super().__init__()
@@ -74,3 +82,9 @@ class Command(str):
     @classmethod
     def from_move(cls, move: Move) -> Command:
         return cls(move.value)
+    
+COMMANDS: Tuple[Command] = ("hold", "move_left", "move_right", "sonic_left", "sonic_right", "rotate_cw", "rotate_ccw", "drop", "sonic_drop", "hard_drop")
+
+
+for value in COMMANDS:
+    setattr(Command, value, Command(value))

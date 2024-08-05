@@ -64,6 +64,42 @@ class TetrisGame:
     
     from_game_state(cls, game_state: GameState, options: Optional[Dict[str, Any]]=None) -> TetrisGame:
         Creates a Tetris game instance from a given game state.
+
+    reset(self) -> None:
+        Resets the state of the Tetris game.
+    
+    spawn_piece(self) -> PieceData:
+        Spawns a new piece on the game board.
+
+    get_public_state(self) -> GameState:
+        Returns the public state of the game.
+
+    execute_command(self, command: Command) -> List[Event]:
+        Executes a command and returns a list of events.
+
+    execute_commands(self, commands: List[Command]) -> List[Event]:
+        Executes a list of commands and returns a list of events.
+
+    execute_moves(self, moves: List[Move]) -> List[Event]:
+        Executes a list of moves and returns a list of events.
+
+    execute_move(self, move: Move) -> List[Event]:
+        Executes the specified move and returns a list of events.
+
+    queue_garbage(self, hole_indices: List[int]) -> None:
+        Queue garbage lines to be sent to the player.
+
+    queue_garbage_lines(self, garbage_lines: List[GarbageLine]) -> None:
+        Queue the given garbage lines to be sent to the player.
+
+    get_board_stats(self) -> Statistics:
+        Calculates and returns the statistics of the game board.
+
+    render_board(self, render_current: bool=True) -> None:
+        Renders the game board and displays relevant information.
+
+    generate_moves(self, include_held: bool=True, include_queue: bool=True, algo: Literal['bfs', 'dfs', 'dijk', 'dijk-short']='bfs') -> Dict[PieceData, List[Move]]:
+        Generate a dictionary of possible moves.
     """
 
     def __init__(self, options: Optional[Dict[str, Any]]=None):
@@ -246,7 +282,7 @@ class TetrisGame:
             events.extend(new_events)
             if move == Move.hard_drop:
                 break
-        return
+        return events
 
     def execute_move(self, move: Move) -> List[Event]:
         """
@@ -512,7 +548,7 @@ class TetrisGame:
 
     def generate_moves(self, include_held: bool=True, include_queue: bool=True, algo: Literal['bfs', 'dfs', 'dijk', 'dijk-short']='bfs') -> Dict[PieceData, List[Move]]:
         """
-        Generate a dictionary of possible moves for each piece.
+        Generate a dictionary of possible moves.
 
         Parameters:
         --------
