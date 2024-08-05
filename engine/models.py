@@ -7,42 +7,41 @@ from sys import intern
 _Move = Literal['move_left', 'move_right', 'rotate_cw', 'rotate_ccw', 'drop', 'sonic_drop', 'hold']
 _MOVES: Tuple[_Move] = ('move_left', 'move_right', 'rotate_cw', 'rotate_ccw', 'drop', 'sonic_drop', 'hold')
 class Move:
+    move_left: Move = None
+    move_right: Move = None
+    rotate_cw: Move = None
+    rotate_ccw: Move = None
+    drop: Move = None
+    sonic_drop: Move = None
+    hold: Move = None
+
+    def __init__(self, value: str, index: int):
+        self.value: str = intern(value)
+        self.index: int = index
+
+    @classmethod
+    def from_str(cls, value: str) -> Move:
+        return getattr(cls, value)
     
-        move_left: Move = None
-        move_right: Move = None
-        rotate_cw: Move = None
-        rotate_ccw: Move = None
-        drop: Move = None
-        sonic_drop: Move = None
-        hold: Move = None
+    def __eq__(self, other):
+        return self.index == other.index
     
-        def __init__(self, value: str, index: int):
-            self.value: str = intern(value)
-            self.index: int = index
+    def __hash__(self):
+        return self.index
     
-        @classmethod
-        def from_str(cls, value: str) -> Move:
-            return getattr(cls, value)
-        
-        def __eq__(self, other):
-            return self.index == other.index
-        
-        def __hash__(self):
-            return self.index
-        
-        def __repr__(self):
-            return self.value
-        
-        def __str__(self):
-            return self.value
-        
-        def __lt__(self, other):
-            return self.index < other.index
-        
+    def __repr__(self):
+        return self.value
+    
+    def __str__(self):
+        return self.value
+    
+    def __lt__(self, other):
+        return self.index < other.index
+    
 for index, value in enumerate(_MOVES):
     setattr(Move, value, Move(value, index))
 
-MOVES = (Move.move_left, Move.move_right, Move.rotate_cw, Move.rotate_ccw, Move.drop, Move.sonic_drop, Move.hold)
+MOVES: Tuple[Move] = (Move.move_left, Move.move_right, Move.rotate_cw, Move.rotate_ccw, Move.drop, Move.sonic_drop, Move.hold)
 
 
 _Piece = Literal['I', 'O', 'J', 'L', 'S', 'Z', 'T']

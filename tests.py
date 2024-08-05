@@ -197,7 +197,7 @@ class TestTetrisGame(unittest.TestCase):
         triple_clear_setup.reverse()
         game.board = triple_clear_setup
 
-        game.queue.appendleft('L')
+        game.queue.appendleft(Piece.L)
         game.current = game.spawn_piece()
         game.execute_command('rotate_ccw')
         game.execute_command('sonic_right')

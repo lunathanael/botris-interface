@@ -5,21 +5,22 @@ from typing import Dict, List, Optional, Tuple
 
 from .models import (AttackTable, Block, Board, ClearName, PieceData,
                      ScoreData, ScoreInfo, Piece, Command)
-from .pieces import PieceMatrix, get_piece_matrix, get_piece_mask, get_matrix_mask, get_piece_border
+from .pieces import PieceMatrix, get_piece_matrix, get_piece_mask, get_piece_border
 
 
-def get_subgrid(board: Board, start_x: int, start_y: int, board_width: int, board_height: int) -> Tuple[Tuple[bool, bool, bool, bool], ...]:
+def get_subgrid_mask(board: Board, start_x: int, start_y: int, board_width: int, board_height: int) -> int:
     x_max = min(start_x + 4, board_width)
     y_min = max(start_y - 3, 0)
     y_max = min(start_y + 1, board_height)
     
-    subgrid = [[False] * 4 for _ in range(4)]
+    subgrid_mask: int = 0
 
     for y in range(y_min, y_max):
         for x in range(start_x, x_max):
-            subgrid[y - (start_y - 3)][x - start_x] = bool(board[y][x])
+            if board[y][x]:
+                subgrid_mask += 1 << ((y - y_min) * 4 + x - start_x)
     
-    return tuple(tuple(row) for row in subgrid)
+    return subgrid_mask
 
 def check_collision(board: Board, piece_data: PieceData, board_width: int) -> bool:
     piece_x = piece_data.x
@@ -33,8 +34,7 @@ def check_collision(board: Board, piece_data: PieceData, board_width: int) -> bo
     if piece_y - 3 >= board_height:
         return False
 
-    subgrid = get_subgrid(board, piece_x, piece_y, board_width, board_height)
-    board_mask = get_matrix_mask(subgrid)
+    board_mask = get_subgrid_mask(board, piece_x, piece_y, board_width, board_height)
     piece_mask = get_piece_mask(piece_data.piece, piece_data.rotation)
         
     if piece_mask & board_mask:

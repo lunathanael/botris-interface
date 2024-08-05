@@ -83,27 +83,6 @@ def _get_piece_mask(piece_index: int, rotation: Literal[0, 1, 2, 3]) -> int:
                 board_y = 3 - piece_y
                 mask |= 1 << (board_y * 4 + board_x)
     return mask
-    
-def _generate_all_4x4_masks() -> Dict[Tuple[Tuple[bool]], int]:
-    all_combinations = product([False, True], repeat=16)
-    
-    mask_dict: Dict[Tuple[Tuple[bool]], int] = {}
-    
-    for combo in all_combinations:
-        board = tuple(
-            tuple(combo[i * 4:(i + 1) * 4])
-            for i in range(4)
-        )
-        mask = _get_matrix_mask(board)
-        
-        mask_dict[board] = mask
-        
-    return mask_dict
-
-FAST_MATRIX_MASKS: Dict[Tuple[Tuple[bool]], int] = _generate_all_4x4_masks()
-
-def get_matrix_mask(board: Tuple[Tuple[bool]]) -> int:
-    return FAST_MATRIX_MASKS[board]
 
 FAST_PIECE_MASKS: Tuple[Tuple[int]] = tuple(
     tuple(
