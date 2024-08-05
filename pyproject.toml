@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "botris-interface"
-version = "0.1.19"
+version = "0.1.10"
 description = "A performant library designed for creating and managing bots in a Tetris-like game environment. This library offers various tools and features to build, test, and deploy bots efficiently to Botris."
 authors = ["Nathanael Lu <info@lunathanael.dev>"]
 license = "MIT"
