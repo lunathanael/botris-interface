@@ -1,8 +1,11 @@
 from __future__ import annotations
 
-from typing import List, Literal, Optional, Union
+from typing import TYPE_CHECKING, List, Literal, Optional
 
 from pydantic import BaseModel, constr
+
+if TYPE_CHECKING:
+    from botris.engine.models import Move
 
 Piece = Literal['I', 'O', 'J', 'L', 'S', 'Z', 'T']
 Block = Optional[Literal['I', 'O', 'J', 'L', 'S', 'Z', 'T', 'G']]
@@ -67,3 +70,7 @@ class Command(str):
 
     def __init__(self, command: str):
         super().__init__()
+
+    @classmethod
+    def from_move(cls, move: Move) -> Command:
+        return cls(move.value)

@@ -5,7 +5,7 @@ from typing import Deque, Dict, List, Literal, Optional, Tuple
 
 from botris.interface.models import PublicGarbageLine as PublicGarbageLine
 
-from .models import (AttackTable, Block, Board, ClearName, Piece, PieceData,
+from .models import (AttackTable, Block, Board, ClearName, GarbageLine, Piece, PieceData,
                      ScoreData, ScoreInfo)
 from .pieces import (I_WALLKICKS, WALLKICKS, PieceMatrix, get_piece_border,
                      get_piece_mask, get_piece_matrix)
@@ -140,14 +140,14 @@ def calculate_score(score_info: ScoreInfo, attack_table: AttackTable, combo_tabl
 
     return ScoreData(score=score, b2b=is_b2b_clear, combo=new_combo, clear_name=clear_name, all_spin=all_spin)
 
-def generate_garbage(garbage_queue: List[PublicGarbageLine], garbage_messiness: float, board_width: int) -> List[PublicGarbageLine]:
-    garbage: List[PublicGarbageLine] = []
+def generate_garbage(garbage_queue: List[PublicGarbageLine], garbage_messiness: float, board_width: int) -> List[GarbageLine]:
+    garbage: List[GarbageLine] = []
     hole_index: Optional[int] = None
 
     for garbage_line in garbage_queue:
         if hole_index is None or random.random() < garbage_messiness:
             hole_index = math.floor(random.random() * board_width)
-        garbage.append(PublicGarbageLine(delay=garbage_line.delay, index=hole_index))
+        garbage.append(GarbageLine(delay=garbage_line.delay, index=hole_index))
 
     return garbage
 

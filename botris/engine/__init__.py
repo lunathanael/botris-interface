@@ -1,8 +1,8 @@
 from . import models, pieces, utils
 from .models import (MOVES, PIECES, AttackTable, Block, Board, ClearedLine,
-                     ClearEvent, ClearName, Command, DamageTankedEvent, Event,
-                     GameAction, GameOverEvent, GarbageLine, Move, Options,
-                     Piece, PieceData, PiecePlacedEvent, ScoreData, ScoreInfo,
+                     ClearEvent, ClearName, DamageTankedEvent, Event,
+                     GameOverEvent, GarbageLine, Move, Options, Piece,
+                     PieceData, PiecePlacedEvent, ScoreData, ScoreInfo,
                      Statistics)
 from .move_generator import generate_moves
 from .pieces import (FAST_PIECE_MASKS, FAST_PIECE_MATRICES, PIECE_BORDERS,

@@ -6,9 +6,9 @@ from typing import Any, Deque, Dict, List, Literal, Optional
 import colorama
 from colorama import Back, Fore, Style
 
-from botris.interface import GameState
+from botris.interface import Command, GameState
 
-from .models import (Board, ClearEvent, Command, DamageTankedEvent, Event,
+from .models import (Board, ClearEvent, DamageTankedEvent, Event,
                      GameOverEvent, GarbageLine, Move, Options, Piece,
                      PieceData, PiecePlacedEvent, ScoreData, ScoreInfo,
                      Statistics)
@@ -47,7 +47,6 @@ class TetrisGame:
         self = cls(options)
         
         self.board = game_state.board
-        # convert 'I' to Piece.I, and etc for queue
         self.queue = deque([Piece.from_str(piece) for piece in game_state.queue])
         self.garbage_queue = deque(generate_garbage(game_state.garbageQueued, self.options.garbage_messiness, self.options.board_width))
         self.held = Piece.from_str(game_state.held) if game_state.held else None
@@ -109,68 +108,68 @@ class TetrisGame:
             dead=self.dead,
         )
     
-    def execute_move(self, move: Move) -> List[Event]:
-        return self.execute_command(move.value)
+    def execute_command(self, command: Command) -> List[Event]:
+        return self.execute_move(Move.from_command(command))
     
-    def execute_moves(self, moves: List[Move]) -> List[Event]:
-        commands: List[Command] = [move.value for move in moves]
-        return self.execute_commands(commands)
-
     def execute_commands(self, commands: List[Command]) -> List[Event]:
+        moves: List[Move] = [Move.from_command(command) for command in commands]
+        return self.execute_moves(moves)
+
+    def execute_moves(self, moves: List[Move]) -> List[Event]:
         """
-        Execute List of commands until harddrop
+        Execute List of moves until harddrop
         """
         events: List[Event] = []
 
-        commands.append('hard_drop')
-        for command in commands:
+        moves.append(Move.hard_drop)
+        for move in moves:
             if self.dead:
                 break
-            new_events = self.execute_command(command)
+            new_events = self.execute_move(move)
             events.extend(new_events)
-            if command in ['hard_drop', 'hard_down']:
+            if move == Move.hard_drop:
                 break
         return
 
-    def execute_command(self, command: Command) -> List[Event]:
+    def execute_move(self, move: Move) -> List[Event]:
         if self.dead:
             raise ValueError("Cannot act when dead")
 
         events: List[Event] = []
 
-        match command:
-            case 'move_left':
+        match move:
+            case Move.move_left:
                 test_piece: Optional[PieceData] = move_left(self.board, self.current, self.options.board_width)
                 if test_piece is not None:
                     self.current = test_piece
-            case 'move_right':
+            case Move.move_right:
                 test_piece: Optional[PieceData] = move_right(self.board, self.current, self.options.board_width)
                 if test_piece is not None:
                     self.current = test_piece
-            case 'drop':
+            case Move.drop:
                 test_piece: Optional[PieceData] = move_drop(self.board, self.current, self.options.board_width)
                 if test_piece is not None:
                     self.current = test_piece
-            case 'sonic_left':
+            case Move.sonic_left:
                 test_piece: PieceData = sonic_left(self.board, self.current, self.options.board_width)
                 self.current = test_piece
-            case 'sonic_right':
+            case Move.sonic_right:
                 test_piece: PieceData = sonic_right(self.board, self.current, self.options.board_width)
                 self.current = test_piece
-            case 'sonic_drop':
+            case Move.sonic_drop:
                 test_piece: PieceData = sonic_drop(self.board, self.current, self.options.board_width)
                 self.current = test_piece
-            case 'rotate_cw':
+            case Move.rotate_cw:
                 test_piece: Optional[PieceData] = rotate_cw(self.board, self.current, self.options.board_width)
                 if test_piece is not None:
                     self.current = test_piece
                     self.is_immobile = check_immobile(self.board, self.current, self.options.board_width)
-            case 'rotate_ccw':
+            case Move.rotate_ccw:
                 test_piece: Optional[PieceData] = rotate_ccw(self.board, self.current, self.options.board_width)
                 if test_piece is not None:
                     self.current = test_piece
                     self.is_immobile = check_immobile(self.board, self.current, self.options.board_width)
-            case 'hold':
+            case Move.hold:
                 if not self.can_hold:
                     return events
 
@@ -187,7 +186,7 @@ class TetrisGame:
                 if _check_collision(self.board, self.current.piece, self.current.x, self.current.y, self.current.rotation, self.options.board_width):
                     self.dead = True
                     events.append(GameOverEvent())
-            case 'hard_drop':
+            case Move.hard_drop:
                 initial_piece_state: PieceData = self.current.copy()
                 
                 self.current: PieceData = sonic_drop(self.board, self.current, self.options.board_width)
@@ -256,7 +255,7 @@ class TetrisGame:
                     self.dead = True
                     events.append(GameOverEvent())
             case _:
-                raise ValueError(f"Invalid command: {command}")
+                raise ValueError(f"Invalid move: {move}")
 
         return events
 
@@ -336,7 +335,7 @@ class TetrisGame:
 
         print(f'\nGarbage queued: {len(self.garbage_queue)}')
 
-    def generate_moves(self, include_held: bool=True, include_queue: bool=True, algo: Literal['bfs', 'dfs', 'dijk', 'dijk-short']='bfs') -> Dict[PieceData, List[Command]]:
+    def generate_moves(self, include_held: bool=True, include_queue: bool=True, algo: Literal['bfs', 'dfs', 'dijk', 'dijk-short']='bfs') -> Dict[PieceData, List[Move]]:
         held: Optional[Piece] = self.held if include_held else None
         first_piece: Optional[Piece] = self.queue[0] if include_queue else None
         alternative: Optional[Piece] = first_piece if held is None else held

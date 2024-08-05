@@ -2,7 +2,10 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
 from sys import intern
-from typing import Dict, List, Literal, Optional, Tuple
+from typing import TYPE_CHECKING, Dict, List, Literal, Optional, Tuple
+
+if TYPE_CHECKING:
+    from botris.interface.models import Command
 
 
 @dataclass
@@ -13,8 +16,8 @@ class GarbageLine:
     def public(self):
         return dict(delay=self.delay)
 
-_Move = Literal['move_left', 'move_right', 'rotate_cw', 'rotate_ccw', 'drop', 'sonic_drop', 'hold']
-_MOVES: Tuple[_Move] = ('move_left', 'move_right', 'rotate_cw', 'rotate_ccw', 'drop', 'sonic_drop', 'hold')
+_Move = Literal['move_left', 'move_right', 'rotate_cw', 'rotate_ccw', 'drop', 'sonic_drop', 'sonic_left', 'sonic_right' 'hold', 'hard_drop']
+_MOVES: Tuple[_Move] = ('move_left', 'move_right', 'rotate_cw', 'rotate_ccw', 'drop', 'sonic_drop', 'sonic_left', 'sonic_right', 'hold', 'hard_drop')
 class Move:
     move_left: Move = None
     move_right: Move = None
@@ -22,7 +25,10 @@ class Move:
     rotate_ccw: Move = None
     drop: Move = None
     sonic_drop: Move = None
+    sonic_left: Move = None
+    sonic_right: Move = None
     hold: Move = None
+    hard_drop: Move = None
 
     def __init__(self, value: str, index: int):
         self.value: str = intern(value)
@@ -31,6 +37,10 @@ class Move:
     @classmethod
     def from_str(cls, value: str) -> Move:
         return getattr(cls, value)
+    
+    @classmethod
+    def from_command(cls, command: Command) -> Move:
+        return getattr(cls, command)
     
     def __eq__(self, other):
         return self.index == other.index
@@ -50,7 +60,7 @@ class Move:
 for index, value in enumerate(_MOVES):
     setattr(Move, value, Move(value, index))
 
-MOVES: Tuple[Move] = (Move.move_left, Move.move_right, Move.rotate_cw, Move.rotate_ccw, Move.drop, Move.sonic_drop, Move.hold)
+MOVES: Tuple[Move] = (Move.move_left, Move.move_right, Move.rotate_cw, Move.rotate_ccw, Move.drop, Move.sonic_drop, Move.sonic_left, Move.sonic_right, Move.hold, Move.hard_drop)
 
 
 _Piece = Literal['I', 'O', 'J', 'L', 'S', 'Z', 'T']
@@ -151,9 +161,6 @@ class Options:
             self.attack_table = AttackTable(**self.attack_table)
         if not isinstance(self.attack_table, AttackTable):
             self.attack_table = AttackTable()
-
-Command = Literal['hold', 'move_left', 'move_right', 'rotate_cw', 'rotate_ccw', 'drop', 'sonic_drop']
-GameAction = List[Command]
 
 @dataclass
 class ClearedLine:
