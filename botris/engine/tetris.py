@@ -289,10 +289,11 @@ class TetrisGame:
         PieceData
             The newly spawned piece.
         """
-        piece = self.queue.popleft()
+        piece: Piece = self.queue.popleft()
         if len(self.queue) < 6:
             self.queue.extend(generate_bag())
-        return create_piece(piece, self.options.board_height, self.options.board_width)
+        self.current = create_piece(piece, self.options.board_height, self.options.board_width)
+        return self.current
 
     def get_public_state(self) -> GameState:
         return GameState(
