@@ -67,6 +67,10 @@ class Move:
         return getattr(cls, move_str)
 
     @classmethod
+    def from_index(cls, index: int) -> Move:
+        return getattr(cls, _MOVES[index])
+
+    @classmethod
     def from_command(cls, command: Command) -> Move:
         return getattr(cls, command)
 
@@ -124,6 +128,10 @@ class Piece:
     @classmethod
     def from_str(cls, value: str) -> Piece:
         return getattr(cls, value.upper())
+
+    @classmethod
+    def from_index(cls, index: int) -> Piece:
+        return getattr(cls, _PIECES[index])
 
     def __eq__(self, other):
         return self.index == other.index
