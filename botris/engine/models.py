@@ -175,7 +175,7 @@ class PieceData:
 
     def __eq__(self, nxt):
         return (self.piece, self.y, self.x, self.rotation) == (
-            self.piece,
+            nxt.piece,
             nxt.y,
             nxt.x,
             nxt.rotation,
