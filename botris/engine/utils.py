@@ -107,8 +107,8 @@ def _place_piece(board: Board, piece_data: PieceData, board_width: int) -> Board
 
 
 def place_piece(board: Board, piece_data: PieceData, board_width: int) -> Board:
-    new_board: Board = copy.deepcopy(board)
-    new_board = _place_piece(new_board, piece_data, board_width)
+    new_board: Board = [row.copy() for row in board]
+    _place_piece(new_board, piece_data, board_width)
     return new_board
 
 
@@ -216,7 +216,6 @@ def generate_garbage(
 def process_garbage(
     board: Board, garbage_queue: Deque[PublicGarbageLine], board_width: int
 ) -> Tuple[Board, List[int]]:
-    new_board: Board = copy.deepcopy(board)
     expired_indices: List[int] = []
 
     garbage_length: int = len(garbage_queue)
@@ -228,8 +227,8 @@ def process_garbage(
         garbage_line.delay -= 1
         garbage_queue.append(garbage_line)
 
-    new_board = _add_garbage(new_board, expired_indices, board_width)
-    return new_board, expired_indices
+    board = _add_garbage(board, expired_indices, board_width)
+    return board, expired_indices
 
 
 def _add_garbage(board: Board, garbage_indices: List[int], board_width: int) -> Board:

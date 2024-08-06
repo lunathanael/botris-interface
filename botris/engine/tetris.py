@@ -28,8 +28,8 @@ from .move_generator import generate_moves
 from .pieces import generate_bag, get_piece_matrix
 from .utils import (
     _check_collision,
+    _place_piece,
     calculate_score,
-    check_collision,
     check_immobile,
     check_pc,
     clear_lines,
@@ -158,36 +158,30 @@ class TetrisGame:
 
         self.reset()
 
-    @classmethod
-    def copy(cls, other: TetrisGame) -> TetrisGame:
+    def copy(self) -> TetrisGame:
         """
         Creates a copy of the given Tetris game instance.
-
-        Parameters:
-        -----------
-        other : TetrisGame
-            The Tetris game instance to copy.
 
         Returns:
         --------
         TetrisGame
             A new instance of TetrisGame copied from the given instance.
         """
-        self: TetrisGame = cls(other.options.dict())
-        self.board = [row.copy() for row in other.board]
-        self.queue = deque([piece for piece in other.queue])
-        self.garbage_queue = deque([garbage.copy() for garbage in other.garbage_queue])
-        self.held = other.held
-        self.current = other.current.copy()
-        self.is_immobile = other.is_immobile
-        self.can_hold = other.can_hold
-        self.combo = other.combo
-        self.b2b = other.b2b
-        self.score = other.score
-        self.pieces_placed = other.pieces_placed
-        self.garbage_cleared = other.garbage_cleared
-        self.dead = other.dead
-        return self
+        tgs: TetrisGame = TetrisGame(self.options.dict())
+        tgs.board = [row.copy() for row in self.board]
+        tgs.queue = deque([piece for piece in list(self.queue)])
+        tgs.garbage_queue = deque([garbage.copy() for garbage in self.garbage_queue])
+        tgs.held = self.held
+        tgs.current = self.current.copy()
+        tgs.is_immobile = self.is_immobile
+        tgs.can_hold = self.can_hold
+        tgs.combo = self.combo
+        tgs.b2b = self.b2b
+        tgs.score = self.score
+        tgs.pieces_placed = self.pieces_placed
+        tgs.garbage_cleared = self.garbage_cleared
+        tgs.dead = self.dead
+        return tgs
 
     @classmethod
     def from_game_state(
@@ -277,7 +271,7 @@ class TetrisGame:
         Board
             The updated game board with the piece placed.
         """
-        self.board = place_piece(self.board, piece_data, self.options.board_width)
+        _place_piece(self.board, piece_data, self.options.board_width)
         return self.board
 
     def next_piece(self) -> PieceData:
@@ -292,7 +286,7 @@ class TetrisGame:
         piece: Piece = self.queue.popleft()
         if len(self.queue) < 6:
             self.queue.extend(generate_bag())
-        return = create_piece(piece, self.options.board_height, self.options.board_width)
+        return create_piece(piece, self.options.board_height, self.options.board_width)
 
     def get_public_state(self) -> GameState:
         return GameState(
@@ -480,7 +474,7 @@ class TetrisGame:
 
                 final_piece_state: PieceData = self.current.copy()
 
-                self.board = place_piece(
+                self.board = _place_piece(
                     self.board, self.current, self.options.board_width
                 )
                 self.board, cleared_lines = clear_lines(self.board)
@@ -551,7 +545,14 @@ class TetrisGame:
                     self.board, self.current, self.options.board_width
                 )
 
-                if check_collision(self.board, self.current, self.options.board_width):
+                if _check_collision(
+                    self.board,
+                    self.current.piece,
+                    self.current.x,
+                    self.current.y,
+                    self.current.rotation,
+                    self.options.board_width,
+                ):
                     self.dead = True
                     events.append(GameOverEvent())
             case _:
@@ -594,7 +595,9 @@ class TetrisGame:
             self.current = self.next_piece()
 
             if self.current.piece != piece_data.piece:
-                raise ValueError("Neither Current nor Held/Next piece does not match piece data")
+                raise ValueError(
+                    "Neither Current nor Held/Next piece does not match piece data"
+                )
 
             self.held = new_held
             self.can_hold = False
@@ -620,9 +623,7 @@ class TetrisGame:
 
         final_piece_state: PieceData = self.current.copy()
 
-        self.board = place_piece(
-            self.board, self.current, self.options.board_width
-        )
+        self.board = _place_piece(self.board, self.current, self.options.board_width)
         self.board, cleared_lines = clear_lines(self.board)
         cleared: int = len(cleared_lines)
         for line in cleared_lines:
@@ -662,9 +663,7 @@ class TetrisGame:
             )
 
         events.append(
-            PiecePlacedEvent(
-                initial=initial_piece_state, final=final_piece_state
-            )
+            PiecePlacedEvent(initial=initial_piece_state, final=final_piece_state)
         )
 
         if score_data.clear_name:
@@ -691,10 +690,17 @@ class TetrisGame:
             self.board, self.current, self.options.board_width
         )
 
-        if check_collision(self.board, self.current, self.options.board_width):
+        if _check_collision(
+            self.board,
+            self.current.piece,
+            self.current.x,
+            self.current.y,
+            self.current.rotation,
+            self.options.board_width,
+        ):
             self.dead = True
             events.append(GameOverEvent())
-        
+
         return events
 
     def queue_garbage(self, hole_indices: list[int]) -> None:
