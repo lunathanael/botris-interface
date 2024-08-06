@@ -271,15 +271,13 @@ class TetrisGame:
         --------
         piece_data : PieceData
             The piece data to place on the game board.
-        
+
         Returns:
         --------
         Board
             The updated game board with the piece placed.
         """
-        self.board = place_piece(
-            self.board, piece_data, self.options.board_width
-        )
+        self.board = place_piece(self.board, piece_data, self.options.board_width)
         return self.board
 
     def next_piece(self) -> PieceData:

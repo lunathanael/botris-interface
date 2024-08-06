@@ -396,3 +396,90 @@ def rotate_ccw(
             )
 
     return None
+
+
+def get_board_hole_count(board: Board, board_width: int) -> int:
+    """
+    Calculate the number of holes in the given game board.
+
+    Parameters:
+    ----------
+    board : Board
+        The game board represented as a 2D list.
+    board_width : int
+        The width of the game board.
+
+    Returns:
+    ----------
+    int:
+    The number of holes in the game board.
+    """
+    hole_count: int = 0
+    for i, row in enumerate(board):
+        for j, cell in enumerate(row):
+            if cell is None:
+                if (
+                    (i == 0 or board[i - 1][j] is not None)
+                    and (j == 0 or board[i][j - 1] is not None)
+                    and (j == board_width - 1 or board[i][j + 1] is not None)
+                    and (i == len(board) - 1 or board[i + 1][j] is not None)
+                ):
+                    hole_count += 1
+    return hole_count
+
+
+def get_board_ledge_count(board: Board) -> int:
+    """
+    Calculate the number of ledges in the given game board.
+
+    Parameters:
+    ----------
+    board : Board
+        The game board represented as a 2D list.
+
+    Returns:
+    ----------
+    int:
+        The number of ledges in the game board.
+    """
+    ledge_count: int = 0
+
+    for i, row in enumerate(board):
+        for j, cell in enumerate(row):
+            if cell is None:
+                if i != len(board) - 1 and board[i + 1][j] is not None:
+                    ledge_count += 1
+    return ledge_count
+
+
+def get_board_hole_and_ledge_count(board: Board, board_width: int) -> Tuple[int, int]:
+    """
+    Calculate the number of holes and ledges in the given game board.
+
+    Parameters:
+    ----------
+    board : Board
+        The game board represented as a 2D list.
+    board_width : int
+        The width of the game board.
+
+    Returns:
+    ----------
+    Tuple[int, int]:
+        The number of holes and ledges in the game board.
+    """
+    hole_count: int = 0
+    ledge_count: int = 0
+    for i, row in enumerate(board):
+        for j, cell in enumerate(row):
+            if cell is None:
+                if (
+                    (i == 0 or board[i - 1][j] is not None)
+                    and (j == 0 or board[i][j - 1] is not None)
+                    and (j == board_width - 1 or board[i][j + 1] is not None)
+                    and (i == len(board) - 1 or board[i + 1][j] is not None)
+                ):
+                    hole_count += 1
+                elif i != len(board) - 1 and board[i + 1][j] is not None:
+                    ledge_count += 1
+    return hole_count, ledge_count
