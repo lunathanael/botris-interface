@@ -5,6 +5,7 @@ from typing import Any, Deque, Dict, List, Literal, Optional
 
 import colorama
 from colorama import Back, Fore, Style
+from PIL import Image
 
 from botris.interface import Command, GameState
 
@@ -795,7 +796,7 @@ class TetrisGame:
             if i > 0:
                 piece_info.append("")
             piece_matrix = get_piece_matrix(piece, 0)
-            for row in piece_matrix[:-1]:
+            for row in piece_matrix[::-1]:
                 piece_info.append(
                     "    "
                     + "".join(
@@ -868,6 +869,97 @@ class TetrisGame:
             self.options.board_width,
             algo,
         )
+
+    def draw_board(self) -> Image:
+        """
+        Draws the game board as an image.
+
+        Returns:
+        --------
+        Image
+            The image of the game board.
+        """
+        color_map = {
+            "I": (0, 255, 255),
+            "O": (255, 255, 0),
+            "T": (255, 0, 255),
+            "S": (0, 255, 0),
+            "Z": (255, 0, 0),
+            "J": (0, 0, 255),
+            "L": (255, 255, 255),
+            "G": (0, 0, 0),
+        }
+
+        queue_width: int = 25
+
+        img: Image = Image.new(
+            "RGB",
+            (
+                self.options.board_width * 10 + queue_width,
+                self.options.board_height * 10,
+            ),
+            color=(0, 0, 0),
+        )
+        pixels = img.load()
+
+        for y in range(self.options.board_height):
+            if y >= len(self.board):
+                break
+            for x in range(self.options.board_width):
+                if self.board[y][x] is not None:
+                    color = color_map[self.board[y][x]]
+                    actual_y = self.options.board_height - y - 1
+                    for i in range(10):
+                        for j in range(10):
+                            pixels[x * 10 + i, actual_y * 10 + j] = color
+
+        rows_above = 0
+        for piece in reversed(list(self.queue)[:6]):
+            piece_matrix = get_piece_matrix(piece, 0)
+            y_margin = rows_above * 5
+            color = color_map[piece.value]
+            for y, row in enumerate(piece_matrix[::-1]):
+                for x, cell in enumerate(row):
+                    if cell:
+                        for i in range(5):
+                            for j in range(5):
+                                pixels[
+                                    self.options.board_width * 10 + i + x * 5,
+                                    y_margin + y * 5 + j,
+                                ] = color
+            rows_above += len(piece_matrix)
+
+        rows_above += 3
+        current_piece = self.current.piece
+        piece_matrix = get_piece_matrix(current_piece, 0)
+        y_margin = rows_above * 5
+        color = color_map[current_piece.value]
+        for y, row in enumerate(piece_matrix[::-1]):
+            for x, cell in enumerate(row):
+                if cell:
+                    for i in range(5):
+                        for j in range(5):
+                            pixels[
+                                self.options.board_width * 10 + i + x * 5,
+                                y_margin + y * 5 + j,
+                            ] = color
+
+        rows_above += len(piece_matrix) + 2
+        held_piece = self.held
+        if held_piece:
+            piece_matrix = get_piece_matrix(held_piece, 0)
+            y_margin = rows_above * 5
+            color = color_map[held_piece.value]
+            for y, row in enumerate(piece_matrix[::-1]):
+                for x, cell in enumerate(row):
+                    if cell:
+                        for i in range(5):
+                            for j in range(5):
+                                pixels[
+                                    self.options.board_width * 10 + i + x * 5,
+                                    y_margin + y * 5 + j,
+                                ] = color
+        return img
 
     @property
     def game_over(self):
