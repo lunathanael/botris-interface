@@ -5,7 +5,7 @@ from typing import Any, Deque, Dict, List, Literal, Optional
 
 import colorama
 from colorama import Back, Fore, Style
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 
 from botris.interface import Command, GameState
 
@@ -882,25 +882,28 @@ class TetrisGame:
         color_map = {
             "I": (0, 255, 255),
             "O": (255, 255, 0),
-            "T": (255, 0, 255),
-            "S": (0, 255, 0),
+            "T": (128, 0, 128),
+            "S": (0, 128, 0),
             "Z": (255, 0, 0),
             "J": (0, 0, 255),
             "L": (255, 255, 255),
             "G": (0, 0, 0),
         }
 
-        queue_width: int = 25
+        queue_width: int = 40
+        block_size: int = 10
+        border_width: int = 2
+        font_size: int = 8
 
-        img: Image = Image.new(
-            "RGB",
-            (
-                self.options.board_width * 10 + queue_width,
-                self.options.board_height * 10,
-            ),
-            color=(0, 0, 0),
-        )
-        pixels = img.load()
+        board_width_px = self.options.board_width * block_size
+        board_height_px = self.options.board_height * block_size
+
+        img_width = board_width_px + queue_width
+        img_height = board_height_px
+
+        img = Image.new("RGB", (img_width, img_height), color=(0, 0, 0))
+        draw = ImageDraw.Draw(img)
+        draw.fontmode = "L"
 
         for y in range(self.options.board_height):
             if y >= len(self.board):
@@ -908,57 +911,105 @@ class TetrisGame:
             for x in range(self.options.board_width):
                 if self.board[y][x] is not None:
                     color = color_map[self.board[y][x]]
-                    actual_y = self.options.board_height - y - 1
-                    for i in range(10):
-                        for j in range(10):
-                            pixels[x * 10 + i, actual_y * 10 + j] = color
+                    block_x = x * block_size
+                    block_y = (self.options.board_height - y - 1) * block_size
+                    block_rect = (
+                        block_x + border_width,
+                        block_y + border_width,
+                        block_x + block_size - border_width,
+                        block_y + block_size - border_width,
+                    )
+                    draw.rectangle(block_rect, fill=color)
 
-        rows_above = 0
+        queue_x = board_width_px
+        queue_y = 0
+        queue_width_px = queue_width - border_width
+        queue_height_px = border_width + font_size + 10 + block_size * 12
+        queue_rect = (
+            queue_x + border_width,
+            queue_y + border_width,
+            queue_x + queue_width_px,
+            queue_y + queue_height_px,
+        )
+        draw.rectangle(queue_rect, fill=(64, 64, 64))
+
+        queue_text_x = queue_x + border_width + 5
+        queue_text_y = queue_y + border_width + 5
+        queue_text = "Queue:"
+        font = ImageFont.truetype("arial.ttf", font_size)
+        draw.text((queue_text_x, queue_text_y), queue_text, fill=(255, 255, 255), font=font)
+
+        queue_block_size = block_size // 2
+        queue_block_x = queue_x + border_width + 5
+        queue_block_y = queue_text_y + font_size + 5
         for piece in reversed(list(self.queue)[:6]):
             piece_matrix = get_piece_matrix(piece, 0)
-            y_margin = rows_above * 5
-            color = color_map[piece.value]
             for y, row in enumerate(piece_matrix[::-1]):
                 for x, cell in enumerate(row):
                     if cell:
-                        for i in range(5):
-                            for j in range(5):
-                                pixels[
-                                    self.options.board_width * 10 + i + x * 5,
-                                    y_margin + y * 5 + j,
-                                ] = color
-            rows_above += len(piece_matrix)
+                        color = color_map[piece.value]
+                        block_x = queue_block_x + x * queue_block_size
+                        block_y = queue_block_y + y * queue_block_size
+                        block_rect = (
+                            block_x + border_width,
+                            block_y + border_width,
+                            block_x + queue_block_size - border_width,
+                            block_y + queue_block_size - border_width,
+                        )
+                        draw.rectangle(block_rect, fill=color)
+            queue_block_y += queue_block_size * 4
 
-        rows_above += 3
-        current_piece = self.current.piece
-        piece_matrix = get_piece_matrix(current_piece, 0)
-        y_margin = rows_above * 5
-        color = color_map[current_piece.value]
-        for y, row in enumerate(piece_matrix[::-1]):
+        held_x = board_width_px
+        held_y = queue_height_px
+        held_width_px = queue_width_px
+        held_height_px = board_height_px - queue_height_px
+        held_rect = (
+            held_x + border_width,
+            held_y + border_width,
+            held_x + held_width_px,
+            held_y + held_height_px,
+        )
+        draw.rectangle(held_rect, fill=(32, 32, 32))
+        held_x = queue_x + border_width + 5
+        held_y = queue_block_y + 5
+        held_text = "Hold:"
+        draw.text((held_x, held_y), held_text, fill=(255, 255, 255), font=font)
+
+        if self.held:
+            held_block_x = held_x
+            held_block_y = held_y + font_size + 5
+            held_piece_matrix = get_piece_matrix(self.held, 0)
+            for y, row in enumerate(held_piece_matrix[::-1]):
+                for x, cell in enumerate(row):
+                    if cell:
+                        color = color_map[self.held.value]
+                        block_x = held_block_x + x * queue_block_size
+                        block_y = held_block_y + y * queue_block_size
+                        block_rect = (
+                            block_x + border_width,
+                            block_y + border_width,
+                            block_x + queue_block_size - border_width,
+                            block_y + queue_block_size - border_width,
+                        )
+                        draw.rectangle(block_rect, fill=color)
+
+        current_x = self.current.x * block_size
+        current_y = (self.options.board_height - self.current.y - 1) * block_size
+        current_piece_matrix = get_piece_matrix(self.current.piece, self.current.rotation)
+        for y, row in enumerate(current_piece_matrix[::-1]):
             for x, cell in enumerate(row):
                 if cell:
-                    for i in range(5):
-                        for j in range(5):
-                            pixels[
-                                self.options.board_width * 10 + i + x * 5,
-                                y_margin + y * 5 + j,
-                            ] = color
+                    color = color_map[self.current.piece.value]
+                    block_x = current_x + x * block_size
+                    block_y = current_y + y * block_size
+                    block_rect = (
+                        block_x + border_width,
+                        block_y + border_width,
+                        block_x + block_size - border_width,
+                        block_y + block_size - border_width,
+                    )
+                    draw.rectangle(block_rect, fill=color)
 
-        rows_above += len(piece_matrix) + 2
-        held_piece = self.held
-        if held_piece:
-            piece_matrix = get_piece_matrix(held_piece, 0)
-            y_margin = rows_above * 5
-            color = color_map[held_piece.value]
-            for y, row in enumerate(piece_matrix[::-1]):
-                for x, cell in enumerate(row):
-                    if cell:
-                        for i in range(5):
-                            for j in range(5):
-                                pixels[
-                                    self.options.board_width * 10 + i + x * 5,
-                                    y_margin + y * 5 + j,
-                                ] = color
         return img
 
     @property
