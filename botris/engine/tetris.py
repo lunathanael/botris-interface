@@ -937,7 +937,9 @@ class TetrisGame:
         queue_text_y = queue_y + border_width + 5
         queue_text = "Queue:"
         font = ImageFont.truetype("arial.ttf", font_size)
-        draw.text((queue_text_x, queue_text_y), queue_text, fill=(255, 255, 255), font=font)
+        draw.text(
+            (queue_text_x, queue_text_y), queue_text, fill=(255, 255, 255), font=font
+        )
 
         queue_block_size = block_size // 2
         queue_block_x = queue_x + border_width + 5
@@ -995,7 +997,9 @@ class TetrisGame:
 
         current_x = self.current.x * block_size
         current_y = (self.options.board_height - self.current.y - 1) * block_size
-        current_piece_matrix = get_piece_matrix(self.current.piece, self.current.rotation)
+        current_piece_matrix = get_piece_matrix(
+            self.current.piece, self.current.rotation
+        )
         for y, row in enumerate(current_piece_matrix[::-1]):
             for x, cell in enumerate(row):
                 if cell:
