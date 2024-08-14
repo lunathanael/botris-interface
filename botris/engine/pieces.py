@@ -6,7 +6,7 @@ from .models import PIECES, Piece, _Piece
 
 PieceMatrix = Tuple[Tuple[Optional[Piece]]]
 
-_PIECE_MATRICES: Dict[_Piece, PieceMatrix] = {
+PIECE_MATRICES: Dict[_Piece, PieceMatrix] = {
     "Z": (("Z", "Z", None), (None, "Z", "Z"), (None, None, None)),
     "L": ((None, None, "L"), ("L", "L", "L"), (None, None, None)),
     "O": (("O", "O"), ("O", "O")),
@@ -29,7 +29,7 @@ def rotate_matrix(matrix: PieceMatrix, rotation: Literal[0, 1, 2, 3]) -> PieceMa
 
 
 def _get_piece_matrix(piece: Piece, rotation: Literal[0, 1, 2, 3]) -> PieceMatrix:
-    return rotate_matrix(_PIECE_MATRICES[piece.value], rotation)
+    return rotate_matrix(PIECE_MATRICES[piece.value], rotation)
 
 
 FAST_PIECE_MATRICES: Tuple[Tuple[PieceMatrix]] = tuple(
