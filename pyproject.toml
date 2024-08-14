@@ -1,11 +1,14 @@
 [tool.poetry]
 name = "botris-interface"
-version = "0.1.20"
+version = "0.1.21"
 description = "A performant library designed for creating and managing bots in a Tetris-like game environment. This library offers various tools and features to build, test, and deploy bots efficiently to Botris."
 authors = ["Nathanael Lu <info@lunathanael.dev>"]
 license = "MIT"
 readme = "README.md"
 packages = [{ include = "botris" }]
+
+[project.urls]
+"Repository" = "https://github.com/lunathanael/botris-interface"
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -14,6 +17,8 @@ protobuf = "^5.27.3"
 websockets = "^12.0"
 pydantic = "^2.8.2"
 pillow = "^10.4.0"
+setuptools = "60.0.0"
+pybind11 = "^2.13.3"
 
 [tool.poetry.group.dev.dependencies]
 isort = "^5.13.2"
@@ -21,9 +26,10 @@ build = "^1.2.1"
 packaging = "^24.1"
 typing-extensions = "^4.12.2"
 
-[project.urls]
-"Repository" = "https://github.com/lunathanael/botris-interface"
+[tool.poetry.build]
+generate-setup-file = true
+script = "build.py"
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core", "pybind11", "setuptools"]
 build-backend = "poetry.core.masonry.api"
