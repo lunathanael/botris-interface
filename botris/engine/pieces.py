@@ -2,6 +2,9 @@ import random
 from itertools import product
 from typing import Dict, List, Literal, Optional, Tuple
 
+import numpy as np
+from numba import jit, uint8
+
 from .models import PIECES, Piece, _Piece
 
 PieceMatrix = Tuple[Tuple[Optional[Piece]]]
@@ -21,122 +24,110 @@ _PIECE_MATRICES: Dict[_Piece, PieceMatrix] = {
     "T": ((None, "T", None), ("T", "T", "T"), (None, None, None)),
 }
 
+PIECE_MATRICES = np.array([
+    [[1, 1, 0, 0], [0, 1, 1, 0], [0, 0, 0, 0], [0, 0, 0, 0]],  # Z
+    [[0, 0, 1, 0], [1, 1, 1, 0], [0, 0, 0, 0], [0, 0, 0, 0]],  # L
+    [[1, 1, 0, 0], [1, 1, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]],  # O
+    [[0, 1, 1, 0], [1, 1, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]],  # S
+    [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]],  # I
+    [[1, 0, 0, 0], [1, 1, 1, 0], [0, 0, 0, 0], [0, 0, 0, 0]],  # J
+    [[0, 1, 0, 0], [1, 1, 1, 0], [0, 0, 0, 0], [0, 0, 0, 0]],  # T
+], dtype=np.uint8)
 
-def rotate_matrix(matrix: PieceMatrix, rotation: Literal[0, 1, 2, 3]) -> PieceMatrix:
+
+@jit(uint8[:,:](uint8[:,:], uint8), nopython=True)
+def rotate_matrix(matrix, rotation):
     for _ in range(rotation):
-        matrix = list(zip(*matrix[::-1]))
-    return tuple(tuple(row) for row in matrix)
+        matrix = np.rot90(matrix, k=3)  # Rotate counterclockwise
+    return matrix
 
-
-def _get_piece_matrix(piece: Piece, rotation: Literal[0, 1, 2, 3]) -> PieceMatrix:
-    return rotate_matrix(_PIECE_MATRICES[piece.value], rotation)
-
-
-FAST_PIECE_MATRICES: Tuple[Tuple[PieceMatrix]] = tuple(
-    tuple(_get_piece_matrix(piece, rotation) for rotation in range(4))
-    for piece in PIECES
-)
-
-
-def _get_matrix_mask(board: Tuple[Tuple[bool]]) -> int:
-    return sum(1 << (y * 4 + x) for y in range(4) for x in range(4) if board[y][x])
-
-
-def _get_piece_mask(piece_index: int, rotation: Literal[0, 1, 2, 3]) -> int:
-    mask: int = 0
-
-    piece_matrix: PieceMatrix = FAST_PIECE_MATRICES[piece_index][rotation]
-    for piece_y, row in enumerate(piece_matrix):
-        for piece_x, cell in enumerate(row):
-            if cell is not None:
-                board_x = 0 + piece_x
-                board_y = 3 - piece_y
-                mask |= 1 << (board_y * 4 + board_x)
+@jit(uint8(uint8[:,:]), nopython=True)
+def get_matrix_mask(board):
+    mask = 0
+    for y in range(4):
+        for x in range(4):
+            if board[y, x]:
+                mask |= 1 << (y * 4 + x)
     return mask
 
+@jit(uint8(uint8, uint8), nopython=True)
+def get_piece_mask(piece_index, rotation):
+    piece_matrix = rotate_matrix(PIECE_MATRICES[piece_index], rotation)
+    mask = 0
+    for y in range(4):
+        for x in range(4):
+            if piece_matrix[y, x]:
+                board_y = 3 - y
+                mask |= 1 << (board_y * 4 + x)
+    return mask
 
-FAST_PIECE_MASKS: Tuple[Tuple[int]] = tuple(
-    tuple(_get_piece_mask(piece_index, rotation) for rotation in range(4))
-    for piece_index, _ in enumerate(PIECES)
-)
+@jit(uint8[:](uint8, uint8), nopython=True)
+def get_piece_border(piece_index, rotation):
+    piece_matrix = rotate_matrix(PIECE_MATRICES[piece_index], rotation)
+    lowest_x, highest_x, lowest_y, highest_y = 3, 0, 3, 0
+    for y in range(4):
+        for x in range(4):
+            if piece_matrix[y, x]:
+                lowest_x = min(lowest_x, x)
+                highest_x = max(highest_x, x)
+                lowest_y = min(lowest_y, y)
+                highest_y = max(highest_y, y)
+    return np.array([lowest_x, highest_x, lowest_y, highest_y], dtype=np.uint8)
 
+FAST_PIECE_MASKS = np.array([[get_piece_mask(p.value, r) for r in range(4)] for p in PIECES], dtype=np.uint8)
+PIECE_BORDERS = np.array([[get_piece_border(p.value, r) for r in range(4)] for p in PIECES], dtype=np.uint8)
 
-def _get_piece_border(
-    piece_index: int, rotation: Literal[0, 1, 2, 3]
-) -> Tuple[Tuple[int]]:
-    lowest_x = 3
-    highest_x = 0
-    lowest_y = 3
-    highest_y = 0
+WALLKICKS = np.array([
+    [[(0, 0), (-1, 0), (-1, 1), (0, -2), (-1, -2)],
+     None,
+     [(0, 0), (1, 0), (1, -1), (0, 2), (1, 2)],
+     None],
+    [None,
+     [(0, 0), (1, 0), (1, -1), (0, 2), (1, 2)],
+     None,
+     [(0, 0), (-1, 0), (-1, -1), (0, 2), (-1, 2)]],
+    [[(0, 0), (-1, 0), (-1, 1), (0, -2), (-1, -2)],
+     None,
+     [(0, 0), (1, 0), (1, 1), (0, -2), (1, -2)],
+     None],
+    [None,
+     [(0, 0), (-1, 0), (-1, -1), (0, 2), (-1, 2)],
+     None,
+     [(0, 0), (1, 0), (1, 1), (0, -2), (1, -2)]]
+], dtype=object)
 
-    piece_matrix: PieceMatrix = FAST_PIECE_MATRICES[piece_index][rotation]
-    for piece_y, row in enumerate(piece_matrix):
-        for piece_x, cell in enumerate(row):
-            if cell is not None:
-                lowest_x = min(lowest_x, piece_x)
-                highest_x = max(highest_x, piece_x)
-                lowest_y = min(lowest_y, piece_y)
-                highest_y = max(highest_y, piece_y)
-
-    return lowest_x, highest_x, lowest_y, highest_y
-
-
-PIECE_BORDERS: Tuple[Tuple[Tuple[int]]] = tuple(
-    tuple(_get_piece_border(piece_index, rotation) for rotation in range(4))
-    for piece_index, _ in enumerate(PIECES)
-)
-
-WALLKICK = Tuple[Tuple[int, int]]
-
-
-_WALLKICKS: Dict[str, WALLKICK] = {
-    "0-1": ((0, 0), (-1, 0), (-1, 1), (0, -2), (-1, -2)),
-    "1-0": ((0, 0), (1, 0), (1, -1), (0, 2), (1, 2)),
-    "1-2": ((0, 0), (1, 0), (1, -1), (0, 2), (1, 2)),
-    "2-1": ((0, 0), (-1, 0), (-1, 1), (0, -2), (-1, -2)),
-    "2-3": ((0, 0), (1, 0), (1, 1), (0, -2), (1, -2)),
-    "3-2": ((0, 0), (-1, 0), (-1, -1), (0, 2), (-1, 2)),
-    "3-0": ((0, 0), (-1, 0), (-1, -1), (0, 2), (-1, 2)),
-    "0-3": ((0, 0), (1, 0), (1, 1), (0, -2), (1, -2)),
-}
-
-_I_WALLKICKS: Dict[str, WALLKICK] = {
-    "0-1": ((0, 0), (-2, 0), (1, 0), (-2, -1), (1, 2)),
-    "1-0": ((0, 0), (2, 0), (-1, 0), (2, 1), (-1, -2)),
-    "1-2": ((0, 0), (-1, 0), (2, 0), (-1, 2), (2, -1)),
-    "2-1": ((0, 0), (1, 0), (-2, 0), (1, -2), (-2, 1)),
-    "2-3": ((0, 0), (2, 0), (-1, 0), (2, 1), (-1, -2)),
-    "3-2": ((0, 0), (-2, 0), (1, 0), (-2, -1), (1, 2)),
-    "3-0": ((0, 0), (1, 0), (-2, 0), (1, -2), (-2, 1)),
-    "0-3": ((0, 0), (-1, 0), (2, 0), (-1, 2), (2, -1)),
-}
-
-WALLKICKS: Tuple[Tuple[Optional[WALLKICK]]] = tuple(
-    tuple(_WALLKICKS[f"{i}-{j}"] if (i + j) % 2 == 1 else None for j in range(4))
-    for i in range(4)
-)
-
-I_WALLKICKS: Tuple[Tuple[Optional[WALLKICK]]] = tuple(
-    tuple(_I_WALLKICKS[f"{i}-{j}"] if (i + j) % 2 == 1 else None for j in range(4))
-    for i in range(4)
-)
-
+I_WALLKICKS = np.array([
+    [[(0, 0), (-2, 0), (1, 0), (-2, -1), (1, 2)],
+     None,
+     [(0, 0), (-1, 0), (2, 0), (-1, 2), (2, -1)],
+     None],
+    [None,
+     [(0, 0), (-1, 0), (2, 0), (-1, 2), (2, -1)],
+     None,
+     [(0, 0), (2, 0), (-1, 0), (2, 1), (-1, -2)]],
+    [[(0, 0), (2, 0), (-1, 0), (2, 1), (-1, -2)],
+     None,
+     [(0, 0), (1, 0), (-2, 0), (1, -2), (-2, 1)],
+     None],
+    [None,
+     [(0, 0), (1, 0), (-2, 0), (1, -2), (-2, 1)],
+     None,
+     [(0, 0), (-2, 0), (1, 0), (-2, -1), (1, 2)]]
+], dtype=object)
 
 def generate_bag() -> List[Piece]:
     bag = list(PIECES)
-    random.shuffle(bag)
+    np.random.shuffle(bag)
     return bag
 
+@jit(np.uint8[:,:](uint8, uint8), nopython=True)
+def get_piece_matrix(piece_index, rotation):
+    return rotate_matrix(PIECE_MATRICES[piece_index], rotation)
 
-def get_piece_matrix(piece: Piece, rotation: Literal[0, 1, 2, 3]) -> PieceMatrix:
-    return FAST_PIECE_MATRICES[piece.index][rotation]
+@jit(uint8(uint8, uint8), nopython=True)
+def get_piece_mask(piece_index, rotation):
+    return FAST_PIECE_MASKS[piece_index, rotation]
 
-
-def get_piece_mask(piece: Piece, rotation: Literal[0, 1, 2, 3]) -> int:
-    return FAST_PIECE_MASKS[piece.index][rotation]
-
-
-def get_piece_border(
-    piece: Piece, rotation: Literal[0, 1, 2, 3]
-) -> Tuple[int, int, int, int]:
-    return PIECE_BORDERS[piece.index][rotation]
+@jit(uint8[:](uint8, uint8), nopython=True)
+def get_piece_border(piece_index, rotation):
+    return PIECE_BORDERS[piece_index, rotation]
