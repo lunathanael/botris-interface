@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.15...3.27)
 
+set(BOTRIS_CORE_DIR "botris/_core")
+
 project(botris
   VERSION ${SKBUILD_PROJECT_VERSION}
   LANGUAGES CXX
@@ -49,7 +51,7 @@ execute_process(
 find_package(nanobind CONFIG REQUIRED)
 
 add_library(ops
-  botris/_core_src/multiply.cpp
+  ${BOTRIS_CORE_DIR}/multiply.cpp
 )
 
 nanobind_add_module(
@@ -65,7 +67,7 @@ nanobind_add_module(
   STABLE_ABI
 
   # Source code goes here
-  botris/_core_src/pext.cpp
+  ${BOTRIS_CORE_DIR}/pext.cpp
 )
 
 target_compile_features(ops PUBLIC cxx_std_20)
@@ -74,6 +76,10 @@ target_compile_definitions(_core PRIVATE VERSION_INFO=${PROJECT_VERSION})
 target_include_directories(_core PUBLIC)
 target_include_directories(ops PUBLIC)
 
+add_subdirectory(${BOTRIS_CORE_DIR}/ShakTrisLib)
+
 target_link_libraries(_core PRIVATE ops)
+target_link_libraries(_core PRIVATE ShakTris)
+
 
 install(TARGETS _core DESTINATION .)

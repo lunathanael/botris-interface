@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <climits>
 #include "multiply.hpp"
+#include "engine/Game.hpp"
 
 template <typename T>
 T pext_impl(const T src, const T mask) {
