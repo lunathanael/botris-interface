@@ -1,9 +1,7 @@
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <nanobind/nanobind.h>
 #include <cstdint>
 #include <climits>
-
-namespace py = pybind11;
+#include "multiply.hpp"
 
 template <typename T>
 T pext_impl(const T src, const T mask) {
@@ -39,7 +37,7 @@ uint64_t pext_u64(uint64_t src, uint64_t mask) {
 }
 #endif
 
-PYBIND11_MODULE(pext, m) {
+NB_MODULE(_core, m) {
     m.doc() = R"pbdoc(
         Pext extension module
         -----------------------
@@ -50,4 +48,5 @@ PYBIND11_MODULE(pext, m) {
 
     m.def("pext_u32", &pext_u32, "Extract bits from a 32-bit integer");
     m.def("pext_u64", &pext_u64, "Extract bits from a 64-bit integer");
+    m.def("multiply", &multiply, "Multiply two integers");
 }
