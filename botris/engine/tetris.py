@@ -116,6 +116,12 @@ class TetrisGame:
     execute_move(self, move: Move) -> List[Event]:
         Executes the specified move and returns a list of events.
 
+    dangerously_drop_piece(self, piece_data: PieceData) -> List[Event]:
+        Drops a piece on the board without checking for collisions.
+
+    queue_attack(self, attack: int) -> None:
+        Queue an attack to be sent to the player.
+
     queue_garbage(self, hole_indices: List[int]) -> None:
         Queue garbage lines to be sent to the player.
 
@@ -127,6 +133,9 @@ class TetrisGame:
 
     render_board(self, render_current: bool=True) -> None:
         Renders the game board and displays relevant information.
+
+    draw_board(self, render_current: bool=True) -> Image:
+        Draws the game board and returns an image.
 
     generate_moves(self, include_held: bool=True, include_queue: bool=True, algo: Literal['bfs', 'dfs', 'dijk', 'dijk-short']='bfs') -> Dict[PieceData, List[Move]]:
         Generate a dictionary of possible moves.
