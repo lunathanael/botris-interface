@@ -7,6 +7,11 @@ project(botris
   LANGUAGES CXX
 )
 
+# Specify the C++ compiler
+if(NOT CMAKE_CXX_COMPILER)
+  set(CMAKE_CXX_COMPILER g++-13)
+endif()
+
 # Warn if the user invokes CMake directly
 if (NOT SKBUILD)
   message(WARNING "\
@@ -50,10 +55,6 @@ execute_process(
   OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE nanobind_ROOT)
 find_package(nanobind CONFIG REQUIRED)
 
-add_library(ops
-  ${BOTRIS_CORE_DIR}/multiply.cpp
-)
-
 nanobind_add_module(
   # Name of the extension
   _core
@@ -67,19 +68,24 @@ nanobind_add_module(
   STABLE_ABI
 
   # Source code goes here
-  ${BOTRIS_CORE_DIR}/pext.cpp
+  ${BOTRIS_CORE_DIR}/main_module.cpp
+  ${BOTRIS_CORE_DIR}/piece.cpp
+  ${BOTRIS_CORE_DIR}/game.cpp
+  ${BOTRIS_CORE_DIR}/board.cpp
+  ${BOTRIS_CORE_DIR}/mode.cpp
+  ${BOTRIS_CORE_DIR}/constants.cpp
 )
 
-target_compile_features(ops PUBLIC cxx_std_20)
+# Use C++20 standard
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 target_compile_features(_core PUBLIC cxx_std_20)
 target_compile_definitions(_core PRIVATE VERSION_INFO=${PROJECT_VERSION})
 target_include_directories(_core PUBLIC)
-target_include_directories(ops PUBLIC)
 
 add_subdirectory(${BOTRIS_CORE_DIR}/ShakTrisLib)
 
-target_link_libraries(_core PRIVATE ops)
 target_link_libraries(_core PRIVATE ShakTris)
-
 
 install(TARGETS _core DESTINATION .)

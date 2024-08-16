@@ -1,4 +1,7 @@
 #include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+#include <nanobind/stl/variant.h>
+#include <nanobind/stl/array.h>
 #include "engine/Game.hpp"
 #include "engine/Piece.hpp"
 #include "engine/MoveGen.hpp"
@@ -9,8 +12,9 @@
 namespace nb = nanobind;
 
 void bind_game(nb::module_ &m) {
-    // Bind the Game class
     nb::class_<Game>(m, "Game")
+        .def_ro_static("QUEUE_SIZE", &QUEUE_SIZE)
+
         .def(nb::init<>())
         .def("place_piece", nb::overload_cast<>(&Game::place_piece))
         .def("place_piece", nb::overload_cast<const Piece&>(&Game::place_piece))
@@ -26,5 +30,10 @@ void bind_game(nb::module_ &m) {
         .def_rw("b2b", &Game::b2b)
         .def_rw("combo", &Game::combo)
         .def_rw("queue", &Game::queue)
-        .def_rw("mode", &Game::mode);
+        .def_rw("mode", &Game::mode)
+
+        .def("copy", [](const Game &self) {
+            Game copy = self;
+            return copy;
+        });
 }

@@ -1,14 +1,13 @@
-from . import bots, engine, interface
+from . import bots, core, engine, interface
 from .engine import TetrisGame
 from .interface import Interface, connect
-import botris._core as CXX
 
 __all__ = [
     "bots",
-    "interface",
+    "core",
     "engine",
+    "interface",
     "Interface",
     "connect",
     "TetrisGame",
-    "CXX",
 ]

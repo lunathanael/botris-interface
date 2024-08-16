@@ -10,6 +10,7 @@ void bind_piece(nb::module_ &m) {
         .def(nb::init<PieceType, RotationDirection>())
         .def(nb::init<PieceType, RotationDirection, Coord>())
         .def(nb::init<PieceType, RotationDirection, Coord, spinType>())
+
         .def("rotate", &Piece::rotate)
         .def("calculate_rotate", &Piece::calculate_rotate)
         .def("hash", &Piece::hash)
@@ -20,5 +21,5 @@ void bind_piece(nb::module_ &m) {
         .def_rw("type", &Piece::type)
         .def_rw("spin", &Piece::spin);
 
-    nb::bind_vector<std::vector<Piece>>(m, "Piece");
+    nb::bind_vector<std::vector<Piece>>(m, "VectorPiece");
 }

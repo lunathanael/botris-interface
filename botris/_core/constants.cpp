@@ -1,7 +1,5 @@
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/array.h>
-#include <nanobind/stl/vector.h>
-#include <nanobind/stl/string.h>
 #include "engine/ShaktrisConstants.hpp"
 
 namespace nb = nanobind;
@@ -10,7 +8,6 @@ using namespace nb::literals;
 void bind_constants(nb::module_ &m) {
     nb::module_ constants = m.def_submodule("constants", "Group of constants and enums");
 
-    // Bind enum classes
     nb::enum_<spinType>(constants, "spinType")
         .value("null", spinType::null)
         .value("mini", spinType::mini)
@@ -65,13 +62,10 @@ void bind_constants(nb::module_ &m) {
         .export_values();
 
     nb::class_<Coord>(constants, "Coord")
-        .def(nb::init<>())  // Default constructor
-        .def(nb::init<i8, i8>(), "x"_a, "y"_a)  // Constructor with parameters
-        .def_rw("x", &Coord::x)  // Access x and y as attributes
-        .def_rw("y", &Coord::y)
-        .def("__repr__", [](const Coord &c) {
-            return "<Coord x=" + std::to_string(c.x) + ", y=" + std::to_string(c.y) + ">";
-        });
+        .def(nb::init<>())
+        .def(nb::init<i8, i8>(), "x"_a, "y"_a)
+        .def_rw("x", &Coord::x)
+        .def_rw("y", &Coord::y);
 
     constants.attr("n_minos") = n_minos;
 
