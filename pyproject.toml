@@ -71,18 +71,9 @@ musllinux-aarch64-image = "quay.io/pypa/musllinux_1_2_aarch64:latest"
 musllinux-ppc64le-image = "quay.io/pypa/musllinux_1_2_ppc64le:latest"
 musllinux-s390x-image = "quay.io/pypa/musllinux_1_2_s390x:latest"
 
-build = [
-    "*-manylinux_x86_64",
-    "*-manylinux_aarch64",
-    "*-manylinux_ppc64le",
-    "*-manylinux_s390x",
-    "*-manylinux_pypy_x86_64",
-    "*-manylinux_pypy_aarch64",
-    "*-musllinux_x86_64",
-    "*-musllinux_i686",
-    "*-musllinux_aarch64",
-    "*-musllinux_ppc64le",
-    "*-musllinux_s390x",
+skip = [
+    "*-manylinux_i686",
+    "*-manylinux_pypy_i686",
 ]
 
 
