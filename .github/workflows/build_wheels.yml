@@ -95,4 +95,4 @@ jobs:
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
-        packages-dir: dist/dist/
+        packages-dir: dist/
