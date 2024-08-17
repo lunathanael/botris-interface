@@ -1,20 +1,19 @@
----
 name: Feature request
-about: Suggest an idea for this project
-title: ''
-labels: ''
-assignees: ''
+description: Check instructions for submitting your idea first.
+title: "ENH: <Please write a comprehensive title after the 'ENH: ' prefix>"
 
----
+body:
+- type: markdown
+  attributes:
+    value: >
+      If you're looking to request a new feature or change in functionality,
+      including adding or changing the meaning of arguments to an existing
+      function, please post your idea on the
+      [discord](https://discord.gg/NUSgpfT5eH)
+      to explain your reasoning in addition to opening an issue or pull request.
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
-
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
-
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
-
-**Additional context**
-Add any other context or screenshots about the feature request here.
+- type: textarea
+  attributes:
+    label: "Proposed new feature or change:"
+  validations:
+    required: true
