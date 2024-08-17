@@ -1,0 +1,7 @@
+contact_links:
+  - name: Question/Help/Support
+    url: https://discord.gg/NUSgpfT5eH
+    about: "If you have a question, please join the discord."
+  - name: Development-related matters
+    url: https://github.com/lunathanael/botris-interface/issues
+    about: "If you would like to discuss development-related matters or need help from our \"team\", create an issue."
