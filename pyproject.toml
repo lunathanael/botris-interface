@@ -53,3 +53,16 @@ wheel.install-dir = "botris"
 
 [tool.setuptools_scm]
 write_to = "botris/_version.py"
+
+[tool.cibuildwheel]
+# Necessary to see build output from the actual compilation
+build-verbosity = 1
+skip = ["cp38-*", "pp38-*", "cp39-*", "pp39-*"] # Skip CPython and PyPy 3.8, 3.9
+
+# run pytest to ensure that the package was correctly built
+test-command = "pytest /tests"
+test-requires = "pytest"
+
+# Needed for full C++17 support on macOS
+[tool.cibuildwheel.macos.environment]
+MACOSX_DEPLOYMENT_TARGET = "10.14"

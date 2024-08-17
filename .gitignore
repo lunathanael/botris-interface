@@ -163,3 +163,4 @@ cython_debug/
 
 *.game_buffer
 .vscode/
+botris/_version.py
