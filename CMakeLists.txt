@@ -78,6 +78,9 @@ target_include_directories(_core PUBLIC)
 add_subdirectory(${BOTRIS_CORE_DIR}/ShakTrisLib)
 
 target_compile_features(ShakTris PUBLIC cxx_std_20)
+set_property(TARGET ShakTris PROPERTY CXX_STANDARD_REQUIRED ON)
+set_property(TARGET ShakTris PROPERTY CXX_STANDARD 20)
+
 target_link_libraries(_core PRIVATE ShakTris)
 
 set_property(TARGET _core PROPERTY CXX_STANDARD_REQUIRED ON)
