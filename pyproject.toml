@@ -80,7 +80,3 @@ skip = [
 # run pytest to ensure that the package was correctly built
 test-command = "pytest {project}/tests"
 test-requires = "pytest"
-
-# Needed for full C++17 support on macOS
-[tool.cibuildwheel.macos.environment]
-MACOSX_DEPLOYMENT_TARGET = "10.14"
