@@ -39,7 +39,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, windows-latest
 
     steps:
     - uses: actions/checkout@v4
@@ -89,7 +89,10 @@ jobs:
 
     - uses: actions/download-artifact@v4
       with:
-        path: dist/dist/
+        name: dist
+        path: dist
 
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        packages-dir: dist/dist/

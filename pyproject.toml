@@ -74,6 +74,9 @@ musllinux-s390x-image = "quay.io/pypa/musllinux_1_2_s390x:latest"
 # skip incompatible many_linux images, GCC<12
 skip = [
     "*_i686",
+    "cp310-*",
+    "cp311-*",
+    "*linux*",
 ]
 
 
