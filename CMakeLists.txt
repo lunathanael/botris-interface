@@ -7,76 +7,6 @@ project(botris
   LANGUAGES CXX
 )
 
-# Use C++20 standard
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# Specify the C++ compiler
-if(NOT CMAKE_CXX_COMPILER)
-  message(FATAL_ERROR "No C++ compiler specified. A version of GCC >= 13 is recommended. Aborting.")
-endif()
-
-# Check the compiler ID and issue warnings if necessary
-if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
-    execute_process(
-        COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-    message(STATUS "Using GCC version ${GCC_VERSION}.")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
-
-elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-    execute_process(
-        COMMAND ${CMAKE_CXX_COMPILER} --version OUTPUT_VARIABLE CLANG_VERSION_STRING)
-    string(REGEX MATCH "[0-9]+\\.[0-9]+\\.[0-9]+" CLANG_VERSION ${CLANG_VERSION_STRING})
-    message(WARNING "It is recommended to use GCC for this project.")
-    message(STATUS "Using Clang version ${CLANG_VERSION}.")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
-
-elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
-    message(WARNING "It is recommended to use GCC for this project.")
-    message(STATUS "Using MSVC version ${MSVC_VERSION}.")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++20")
-
-else ()
-    message(WARNING "You are using an unrecognized compiler (${CMAKE_CXX_COMPILER_ID}). Ensure it is C++20 compliant.")
-endif()
-
-# Check if the compiler supports C++20
-include(CheckCXXCompilerFlag)
-
-if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
-    CHECK_CXX_COMPILER_FLAG("/std:c++20" CXX20_SUPPORTED)
-else ()
-    CHECK_CXX_COMPILER_FLAG("-std=c++20" CXX20_SUPPORTED)
-endif()
-
-if (NOT CXX20_SUPPORTED)
-    message(WARNING "${PROJECT_NAME} requires a C++20-compliant compiler. The selected compiler (${CMAKE_CXX_COMPILER_ID}) does not support C++20.")
-
-    set(POTENTIAL_GCC_VERSIONS 15 13)
-    foreach(VERSION IN LISTS POTENTIAL_GCC_VERSIONS)
-        find_program(CANDIDATE_GCC_COMPILER NAMES g++-${VERSION} PATHS ENV PATH NO_DEFAULT_PATH)
-        if (CANDIDATE_GCC_COMPILER)
-            message(STATUS "Found GCC version ${VERSION}. Attempting to switch to ${CANDIDATE_GCC_COMPILER}.")
-            set(CMAKE_CXX_COMPILER ${CANDIDATE_GCC_COMPILER} CACHE STRING "C++ compiler" FORCE)
-
-            execute_process(
-                COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-            if (GCC_VERSION VERSION_GREATER_EQUAL 13)
-                message(STATUS "Successfully switched to GCC version ${GCC_VERSION}.")
-                break()
-            else()
-                message(STATUS "Failed to switch to GCC version ${VERSION}.")
-            endif ()
-        endif ()
-    endforeach()
-
-    CHECK_CXX_COMPILER_FLAG("-std=c++20" CXX20_SUPPORTED)
-
-    if (NOT (GCC_VERSION VERSION_GREATER_EQUAL 13 AND CXX20_SUPPORTED))
-        message(FATAL_ERROR "${PROJECT_NAME} requires a C++20-compliant compiler. Failed to find a suitable version of GCC. GCC 13 or greater is recommended.")
-    endif ()
-endif()
-
 # Warn if the user invokes CMake directly
 if (NOT SKBUILD)
   message(WARNING "\
@@ -149,5 +79,8 @@ add_subdirectory(${BOTRIS_CORE_DIR}/ShakTrisLib)
 
 target_compile_features(ShakTris PUBLIC cxx_std_20)
 target_link_libraries(_core PRIVATE ShakTris)
+
+set_property(TARGET _core PROPERTY CXX_STANDARD_REQUIRED ON)
+set_property(TARGET _core PROPERTY CXX_STANDARD 20)
 
 install(TARGETS _core DESTINATION .)
