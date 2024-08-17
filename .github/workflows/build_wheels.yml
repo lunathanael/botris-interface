@@ -15,13 +15,11 @@ jobs:
     name: Add tag
     runs-on: ubuntu-latest
     steps:
-    - run:
-      name: install autotag binary
-      command: |
+    - name: install autotag binary
+      run: |
         curl -sL https://git.io/autotag-install | sudo sh -s -- -b /usr/bin
-    - run:
-      name: increment version
-      command: |
+    - name: increment version
+      run: |
         autotag
 
         
