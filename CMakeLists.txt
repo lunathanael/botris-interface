@@ -7,6 +7,10 @@ project(botris
   LANGUAGES CXX
 )
 
+# Use CXX20 Standard
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 20)
+
 # Warn if the user invokes CMake directly
 if (NOT SKBUILD)
   message(WARNING "\
@@ -71,19 +75,18 @@ nanobind_add_module(
   ${BOTRIS_CORE_DIR}/constants.cpp
 )
 
-target_compile_features(_core PUBLIC cxx_std_20)
+set_property(TARGET _core PROPERTY CXX_STANDARD_REQUIRED ON)
+set_property(TARGET _core PROPERTY CXX_STANDARD 20)
+
 target_compile_definitions(_core PRIVATE VERSION_INFO=${PROJECT_VERSION})
 target_include_directories(_core PUBLIC)
 
 add_subdirectory(${BOTRIS_CORE_DIR}/ShakTrisLib)
 
-target_compile_features(ShakTris PUBLIC cxx_std_20)
 set_property(TARGET ShakTris PROPERTY CXX_STANDARD_REQUIRED ON)
 set_property(TARGET ShakTris PROPERTY CXX_STANDARD 20)
 
 target_link_libraries(_core PRIVATE ShakTris)
 
-set_property(TARGET _core PROPERTY CXX_STANDARD_REQUIRED ON)
-set_property(TARGET _core PROPERTY CXX_STANDARD 20)
 
 install(TARGETS _core DESTINATION .)

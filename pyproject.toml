@@ -60,7 +60,7 @@ build-verbosity = 1
 skip = ["cp38-*", "pp38-*", "cp39-*", "pp39-*"] # Skip CPython and PyPy 3.8, 3.9
 
 # run pytest to ensure that the package was correctly built
-test-command = "pytest /tests"
+test-command = "pytest botris-interface/tests"
 test-requires = "pytest"
 
 # Needed for full C++17 support on macOS
