@@ -1,38 +1,59 @@
----
 name: Bug report
-about: Create a report to help us improve
-title: ''
-labels: ''
-assignees: ''
+description: Report a bug. For security vulnerabilities see Report a security vulnerability in the templates.
+title: "BUG: <Please write a comprehensive title after the 'BUG: ' prefix>"
+labels: [00 - Bug]
 
----
+body:
+- type: markdown
+  attributes:
+    value: >
+      Thank you for taking the time to file a bug report. Before creating a new
+      issue, please make sure to take a few minutes to check the issue tracker
+      for existing issues about the bug.
+    
+- type: textarea
+  attributes: 
+    label: "Describe the issue:"
+  validations:
+    required: true
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+- type: textarea
+  attributes:
+    label: "Reproduce the code example:"
+    description: >
+      A short code example that reproduces the problem/missing feature. It
+      should be self-contained, i.e., can be copy-pasted into the Python
+      interpreter or run as-is via `python myproblem.py`.
+    placeholder: |
+      import botris
+      << your code here >>
+    render: python
+  validations:
+    required: true
+  
+- type: textarea
+  attributes:
+    label: "Error message:"
+    description: >
+      Please include full error message, if any.
+    placeholder: |
+      << Full traceback starting from `Traceback: ...` >>
+    render: shell
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+- type: textarea
+  attributes:
+    label: "Python and botris Versions:"
+    description: >
+      Output from `import sys, botris; print(botris.__version__); print(sys.version)`.
+  validations:
+    required: true
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
-
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
-
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
-
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
-
-**Additional context**
-Add any other context about the problem here.
+- type: textarea
+  attributes:
+    label: "Context for the issue:"
+    description: |
+      Please explain how this issue affects your work or why it should be prioritized.
+    placeholder: |
+      << your explanation here >>
+  validations:
+    required: false
