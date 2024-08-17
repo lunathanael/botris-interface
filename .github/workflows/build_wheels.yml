@@ -87,7 +87,7 @@ jobs:
 
     - uses: actions/download-artifact@v4
       with:
-        path: dist
+        path: dist/dist
 
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
