@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15...3.27)
 
-set(BOTRIS_CORE_DIR "botris/_core")
+set(BOTRIS_CORE_DIR "src/botris/_core")
 
 project(botris
   VERSION ${SKBUILD_PROJECT_VERSION}
@@ -85,6 +85,7 @@ add_subdirectory(${BOTRIS_CORE_DIR}/ShakTrisLib)
 
 set_property(TARGET ShakTris PROPERTY CXX_STANDARD_REQUIRED ON)
 set_property(TARGET ShakTris PROPERTY CXX_STANDARD 20)
+set_target_properties(ShakTris PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 target_link_libraries(_core PRIVATE ShakTris)
 
