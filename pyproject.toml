@@ -71,6 +71,7 @@ musllinux-aarch64-image = "quay.io/pypa/musllinux_1_2_aarch64:latest"
 musllinux-ppc64le-image = "quay.io/pypa/musllinux_1_2_ppc64le:latest"
 musllinux-s390x-image = "quay.io/pypa/musllinux_1_2_s390x:latest"
 
+# skip incompatible many_linux images, GCC<12
 skip = [
     "*-manylinux_i686",
     "*-manylinux_pypy_i686",
