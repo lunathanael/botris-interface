@@ -59,13 +59,31 @@ write_to = "src/botris/_version.py"
 build-verbosity = 1
 
 manylinux-x86_64-image = "quay.io/pypa/manylinux_2_28_x86_64:latest"
-manylinux-i686-image = "quay.io/pypa/manylinux2014_i686:latest"
 manylinux-aarch64-image = "quay.io/pypa/manylinux_2_28_aarch64:latest"
 manylinux-ppc64le-image = "quay.io/pypa/manylinux_2_28_ppc64le:latest"
 manylinux-s390x-image = "quay.io/pypa/manylinux_2_28_s390x:latest"
 manylinux-pypy_x86_64-image = "quay.io/pypa/manylinux_2_28_x86_64:latest"
-manylinux-pypy_i686-image = "quay.io/pypa/manylinux2014_i686:latest"
 manylinux-pypy_aarch64-image = "quay.io/pypa/manylinux_2_28_aarch64:latest"
+
+musllinux-x86_64-image = "quay.io/pypa/musllinux_1_2_x86_64:latest"
+musllinux-i686-image = "quay.io/pypa/musllinux_1_2_i686:latest"
+musllinux-aarch64-image = "quay.io/pypa/musllinux_1_2_aarch64:latest"
+musllinux-ppc64le-image = "quay.io/pypa/musllinux_1_2_ppc64le:latest"
+musllinux-s390x-image = "quay.io/pypa/musllinux_1_2_s390x:latest"
+
+build = [
+    "*manylinux_2_28_x86_64",
+    "*manylinux_2_28_aarch64",
+    "*manylinux_2_28_ppc64le",
+    "*manylinux_2_28_s390x",
+    "*manylinux_2_28_x86_64",
+    "*manylinux_2_28_aarch64",
+    "*musllinux_1_2_x86_64",
+    "*musllinux_1_2_i686",
+    "*musllinux_1_2_aarch64",
+    "*musllinux_1_2_ppc64le",
+    "*musllinux_1_2_s390x",
+]
 
 
 # run pytest to ensure that the package was correctly built
