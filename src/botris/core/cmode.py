@@ -65,3 +65,6 @@ class CBotris:
             The number of points earned.
         """
         pass
+
+if not TYPE_CHECKING:
+    CBotris = Botris
