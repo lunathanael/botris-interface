@@ -278,7 +278,7 @@ class CPiece:
             A copy of the piece.
         """
         pass
-cp = CPiece()
+
 if not TYPE_CHECKING:
     from botris._core import Piece
     CPiece = Piece
