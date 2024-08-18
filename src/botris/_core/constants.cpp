@@ -18,8 +18,7 @@ void bind_constants(nb::module_ &m) {
         .value("East", RotationDirection::East)
         .value("South", RotationDirection::South)
         .value("West", RotationDirection::West)
-        .value("RotationDirections_N", RotationDirection::RotationDirections_N)
-        .export_values();
+        .value("RotationDirections_N", RotationDirection::RotationDirections_N);
 
     nb::enum_<ColorType>(constants, "ColorType")
         .value("S", ColorType::S)
@@ -32,8 +31,7 @@ void bind_constants(nb::module_ &m) {
         .value("Empty", ColorType::Empty)
         .value("LineClear", ColorType::LineClear)
         .value("Garbage", ColorType::Garbage)
-        .value("ColorTypes_N", ColorType::ColorTypes_N)
-        .export_values();
+        .value("ColorTypes_N", ColorType::ColorTypes_N);
 
     nb::enum_<PieceType>(constants, "PieceType")
         .value("S", PieceType::S)
@@ -44,21 +42,18 @@ void bind_constants(nb::module_ &m) {
         .value("O", PieceType::O)
         .value("I", PieceType::I)
         .value("Empty", PieceType::Empty)
-        .value("PieceTypes_N", PieceType::PieceTypes_N)
-        .export_values();
+        .value("PieceTypes_N", PieceType::PieceTypes_N);
 
     nb::enum_<TurnDirection>(constants, "TurnDirection")
         .value("Left", TurnDirection::Left)
-        .value("Right", TurnDirection::Right)
-        .export_values();
+        .value("Right", TurnDirection::Right);
 
     nb::enum_<Movement>(constants, "Movement")
         .value("Left", Movement::Left)
         .value("Right", Movement::Right)
         .value("RotateClockwise", Movement::RotateClockwise)
         .value("RotateCounterClockwise", Movement::RotateCounterClockwise)
-        .value("SonicDrop", Movement::SonicDrop)
-        .export_values();
+        .value("SonicDrop", Movement::SonicDrop);
 
     nb::class_<Coord>(constants, "Coord")
         .def(nb::init<>())

@@ -29,6 +29,33 @@ class CBoard:
     visual_height: int = Board.visual_height
     height: int = Board.height
 
+    @property
+    def board(self) -> list[int]:
+        """
+        Get the board data.
+
+        Returns:
+        --------
+        List[int] (array<u32, CBoard.width>)
+            The board data.
+        """
+        pass
+
+    @board.setter
+    def board(self, value: list[int]) -> None:
+        """
+        Set the board data.
+
+        Note that when setting the board data, indexing is not allowed.
+        Instead, the entire board data must be set at once.
+
+        Parameters:
+        -----------
+        value : List[int] (array<u32, CBoard.width>)
+            The board data.
+        """
+        pass
+
     def __init__(self):
         """
         Initialize the board by calling the base class constructor.
