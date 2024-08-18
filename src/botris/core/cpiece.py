@@ -60,7 +60,7 @@ class CPiece:
         """
         pass
 
-    @property.setter
+    @minos.setter
     def minos(self, value: list[CCoord]) -> None:
         """
         Set the minos of the piece.
