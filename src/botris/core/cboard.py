@@ -34,6 +34,9 @@ class CBoard:
         """
         Get the board data.
 
+        Note that when setting the board data, indexing is not allowed.
+        Instead, the entire board data must be set at once.
+
         Returns:
         --------
         List[int] (array<u32, CBoard.width>)
@@ -45,9 +48,6 @@ class CBoard:
     def board(self, value: list[int]) -> None:
         """
         Set the board data.
-
-        Note that when setting the board data, indexing is not allowed.
-        Instead, the entire board data must be set at once.
 
         Parameters:
         -----------

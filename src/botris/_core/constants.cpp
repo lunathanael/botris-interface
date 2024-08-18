@@ -59,7 +59,11 @@ void bind_constants(nb::module_ &m) {
         .def(nb::init<>())
         .def(nb::init<i8, i8>(), "x"_a, "y"_a)
         .def_rw("x", &Coord::x)
-        .def_rw("y", &Coord::y);
+        .def_rw("y", &Coord::y)
+        
+        .def("__eq__", [](const Coord &self, const Coord &other) {
+            return self.x == other.x && self.y == other.y;
+        })
 
     constants.attr("n_minos") = n_minos;
 

@@ -23,9 +23,68 @@ class CCoord:
     y : int (i8)
         The y-coordinate.
     """
-    pass
+    def __init__(self, x: int, y: int):
+        """
+        Initialize the coordinate.
 
-class RotateDirection(IntEnum):
+        Parameters:
+        -----------
+        x : int (i8)
+            The x-coordinate.
+        y : int (i8)
+            The y-coordinate.
+        """
+        pass
+
+    @property
+    def x(self) -> int:
+        """
+        Get the x-coordinate.
+
+        Returns:
+        --------
+        int (i8)
+            The x-coordinate.
+        """
+        pass
+
+    @x.setter
+    def x(self, value: int) -> None:
+        """
+        Set the x-coordinate.
+
+        Parameters:
+        -----------
+        value : int (i8)
+            The x-coordinate.
+        """
+        pass
+
+    @property
+    def y(self) -> int:
+        """
+        Get the y-coordinate.
+
+        Returns:
+        --------
+        int (i8)
+            The y-coordinate.
+        """
+        pass
+
+    @y.setter
+    def y(self, value: int) -> None:
+        """
+        Set the y-coordinate.
+
+        Parameters:
+        -----------
+        value : int (i8)
+            The y-coordinate.
+        """
+        pass
+
+class CRotateDirection(IntEnum):
     """
     An enumeration of the rotation directions.
     """
@@ -93,7 +152,7 @@ piece_spawn_height: int = piece_spawn_height
 if not TYPE_CHECKING:
     from botris._core.constants import spinType, RotationDirection, ColorType, PieceType, TurnDirection, Movement, Coord
     CspinType = spinType
-    RotateDirection = RotationDirection
+    CRotateDirection = RotationDirection
     CColorType = ColorType
     CPieceType = PieceType
     CTurnDirection = TurnDirection

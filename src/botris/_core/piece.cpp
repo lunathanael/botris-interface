@@ -21,5 +21,10 @@ void bind_piece(nb::module_ &m) {
         .def_rw("type", &Piece::type)
         .def_rw("spin", &Piece::spin);
 
+        .def("copy", [](const Piece &self) {
+            Piece copy = self;
+            return copy;
+        });
+
     nb::bind_vector<std::vector<Piece>>(m, "VectorPiece");
 }
