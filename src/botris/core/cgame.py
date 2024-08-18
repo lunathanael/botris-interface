@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import List, Optional, TYPE_CHECKING
 
 from botris._core import Game, Piece, Board, Botris
 from botris._core.constants import spinType, Movement, PieceType
 
-class CGame(Game):
+class CGame:
     """
     A Python wrapper for the C++ Game class, where each method calls the corresponding 
     method in the base class.
@@ -13,11 +13,11 @@ class CGame(Game):
 
     def __init__(self):
         """Initialize the game by calling the base class constructor."""
-        super().__init__()
+        pass
 
     def place_piece(self) -> None:
         """Place the current piece on the board."""
-        super().place_piece()
+        pass
 
     def place_piece(self, piece: Piece) -> bool:
         """
@@ -33,11 +33,11 @@ class CGame(Game):
         bool
             True if it's the first hold, False otherwise.
         """
-        return super().place_piece(piece)
+        pass
 
     def do_hold(self) -> None:
         """Perform a hold action, swapping the current piece with the held piece."""
-        super().do_hold()
+        pass
 
     def add_garbage(self, lines: int, location: int) -> None:
         """
@@ -50,7 +50,7 @@ class CGame(Game):
         location : int
             The column where the hole in the garbage lines will be placed.
         """
-        super().add_garbage(lines, location)
+        pass
 
     def damage_sent(self, linesCleared: int, spinType: spinType, pc: bool) -> int:
         """
@@ -70,7 +70,7 @@ class CGame(Game):
         int
             The damage to be sent to the opponent.
         """
-        return super().damage_sent(linesCleared, spinType, pc)
+        pass
 
     def process_movement(self, piece: Piece, movement: Movement) -> None:
         """
@@ -83,7 +83,7 @@ class CGame(Game):
         movement : Movement
             The movement to apply to the piece.
         """
-        super().process_movement(piece, movement)
+        pass
 
     def get_possible_piece_placements(self) -> List[Piece]:
         """
@@ -94,79 +94,47 @@ class CGame(Game):
         List[Piece]
             A list of all valid piece placements.
         """
-        return super().get_possible_piece_placements()
+        pass
 
     @property
     def board(self) -> Board:
         """Get or set the current game board."""
-        return super().board
-
-    @board.setter
-    def board(self, value: Board) -> None:
-        super().board.set(self, value)
+        pass
 
     @property
     def current_piece(self) -> Piece:
         """Get or set the current piece."""
-        return super().current_piece
-
-    @current_piece.setter
-    def current_piece(self, value: Piece) -> None:
-        super().current_piece.set(self, value)
+        pass
 
     @property
     def hold(self) -> Optional[PieceType]:
         """Get or set the held piece."""
-        return super().hold
-
-    @hold.setter
-    def hold(self, value: Optional[PieceType]) -> None:
-        super().hold.set(self, value)
+        pass
 
     @property
     def garbage_meter(self) -> int:
         """Get or set the garbage meter."""
-        return super().garbage_meter
-
-    @garbage_meter.setter
-    def garbage_meter(self, value: int) -> None:
-        super().garbage_meter.set(self, value)
+        pass
 
     @property
     def b2b(self) -> int:
         """Get or set the back-to-back counter."""
-        return super().b2b
-
-    @b2b.setter
-    def b2b(self, value: int) -> None:
-        super(CGame, CGame).b2b.__set__(self, value)
+        pass
 
     @property
     def combo(self) -> int:
         """Get or set the combo counter."""
-        return super().combo
-
-    @combo.setter
-    def combo(self, value: int) -> None:
-        super().combo.set(self, value)
+        pass
 
     @property
     def queue(self) -> List[PieceType]:
         """Get or set the piece queue."""
-        return super().queue
-
-    @queue.setter
-    def queue(self, value: List[PieceType]) -> None:
-        super().queue.set(self, value)
+        pass
 
     @property
     def mode(self) -> Botris:
         """Get or set the current game mode."""
-        return super().mode
-
-    @mode.setter
-    def mode(self, value: Botris) -> None:
-        super().mode.set(self, value)
+        pass
 
     def copy(self) -> CGame:
         """
@@ -177,4 +145,7 @@ class CGame(Game):
         Game
             A new instance of the game with the same state as the current game.
         """
-        return super().copy()
+        pass
+
+if not TYPE_CHECKING:
+    CGame = Game

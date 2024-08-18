@@ -11,10 +11,11 @@ void bind_board(nb::module_ &m) {
         .def_ro_static("height", &Board::height)
 
         .def(nb::init<>())
+        .def(nb::init<Board>())
         .def("get", &Board::get)
         .def("get_column", &Board::get_column)
         .def("set", nb::overload_cast<size_t, size_t>(&Board::set))
-        .def("set_piece", nb::overload_cast<const Piece&>(&Board::set))
+        .def("set", nb::overload_cast<const Piece&>(&Board::set))
         .def("unset", &Board::unset)
         .def("clearLines", &Board::clearLines)
         .def("filledRows", &Board::filledRows)
@@ -26,5 +27,6 @@ void bind_board(nb::module_ &m) {
         .def("empty_cells", &Board::empty_cells)
         .def("is_convex", &Board::is_convex)
         .def("get_garbage_height", &Board::get_garbage_height)
+        .def("is_low", &Board::is_low)
         .def_rw("board", &Board::board);
 }
