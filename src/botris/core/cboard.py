@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from botris._core import Board, Piece
+from botris._core import Board
+from .cpiece import CPiece
 
 
 class CBoard:
@@ -12,17 +13,53 @@ class CBoard:
 
     Attributes:
     -----------
-    board : List[int] (array<u32, CBoard.width>)
-        The board data. A 1D list of integers representing the board.
     width : int (size_t)
         The width of the board.
     visual_height : int (size_t)
         The visual height of the board.
     height : int (size_t)
         The height of the board.
+    board : List[int] (array<u32, CBoard.width>)
+        The board data. A 1D list of integers representing the board.
 
     Methods:
     --------
+    __init__(self)
+        Initialize the board.
+    get(self, x: int, y: int) -> int (u32)
+        Get the value at a specific coordinate on the board.
+    get_column(self, x: int) -> int (u32)
+        Get the value of a specific column on the board.
+    set(self, x: int, y: int) -> None
+        Set the value at a specific coordinate on the board.
+    set(self, piece: CPiece) -> None
+        Set the piece on the board.
+    unset(self, x: int, y: int) -> None
+        Unset the value at a specific coordinate on the board.
+    clearLines(self) -> int
+        Clear any full lines on the board.
+    filledRows(self) -> int
+        Get the number of filled rows on the board.
+    is_empty(self) -> bool
+        Check if the board is empty.
+    bounded(self, height: int) -> int (u32)
+        Returns something, this is used with NANA.
+    not_empty(self, height: int) -> int (u32)
+        Get the number of non-empty rows on the board.
+    full(self, height: int) -> int (u32)
+        Get the number of rows that are matching the height.
+    has_imbalanced_split(self, height: int) -> bool
+        Check if the board has an imbalanced split.
+    empty_cells(self, height: int) -> int (u32)
+        Get the number of empty cells on the board.
+    is_convex(self) -> bool
+        Check if the board is convex.
+    get_garbage_height(self) -> int
+        Get the height of the garbage on the board.
+    is_low(self) -> bool
+        Check if the board is low.
+    copy(self) -> CBoard
+        Copy the board.
     """
 
     width: int = Board.width
@@ -61,17 +98,6 @@ class CBoard:
         Initialize the board by calling the base class constructor.
         This will fill the board with zeros.
 
-        """
-        pass
-
-    def copy(self) -> CBoard:
-        """
-        Copy the board.
-
-        Returns:
-        --------
-        CBoard
-            A copy of the board.
         """
         pass
 
@@ -122,7 +148,7 @@ class CBoard:
         """
         pass
 
-    def set(self, piece: Piece) -> None:
+    def set(self, piece: CPiece) -> None:
         """
         Set the piece on the board.
 
@@ -290,6 +316,17 @@ class CBoard:
         --------
         bool
             True if the board is low, False otherwise.
+        """
+        pass
+
+    def copy(self) -> CBoard:
+        """
+        Copy the board.
+
+        Returns:
+        --------
+        CBoard
+            A copy of the board.
         """
         pass
 

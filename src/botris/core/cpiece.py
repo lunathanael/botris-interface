@@ -25,6 +25,14 @@ class CPiece:
 
     Methods:
     --------
+    __init__(self, type: CPieceType)
+        Initialize the piece.
+    __init__(self, type: CPieceType, dir: CRotateDirection)
+        Initialize the piece.
+    __init__(self, type: CPieceType, dir: CRotateDirection, pos: CCoord)
+        Initialize the piece.
+    __init__(self, type: CPieceType, dir: CRotateDirection, pos: CCoord, spn: CspinType)
+        Initialize the piece.
     rotate(direction: CTurnDirection) -> None
         Rotate the piece.
     calculate_rotate(direction: CTurnDirection) -> None
@@ -270,7 +278,7 @@ class CPiece:
             A copy of the piece.
         """
         pass
-
+cp = CPiece()
 if not TYPE_CHECKING:
     from botris._core import Piece
     CPiece = Piece
