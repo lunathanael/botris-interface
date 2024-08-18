@@ -282,3 +282,7 @@ class CPiece:
 if not TYPE_CHECKING:
     from botris._core import Piece
     CPiece = Piece
+
+__all__ = [
+    "CPiece",
+]

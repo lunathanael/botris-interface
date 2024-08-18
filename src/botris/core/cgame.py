@@ -340,7 +340,8 @@ class CGame:
         Returns:
         --------
         List[Piece]
-            A list of all valid piece placements.
+            A list of all valid piece placements. This is actually of type `VectorPiece`,
+            although implementation is similar to `List[Piece]`.
         """
         pass
 
@@ -357,3 +358,7 @@ class CGame:
 
 if not TYPE_CHECKING:
     CGame = Game
+
+__all__ = [
+    "CGame"
+]

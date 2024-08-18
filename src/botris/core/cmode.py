@@ -25,7 +25,7 @@ class CBotris:
     --------
     __init__(self)
         Initialize the Botris class.
-    points(self, lines: int, spin: CspinType, pc: bool, combo: int, b2b: int) -> int
+    points(self, linesCleared: int, spin: CspinType, pc: bool, combo: int, b2b: int) -> int
         Calculate the points based on the number of lines cleared, spin type, and other factors.
     """
 
@@ -48,7 +48,7 @@ class CBotris:
 
         Parameters:
         -----------
-        lines : int
+        linesCleared : int
             The number of lines cleared.
         spin : CspinType
             The spin type.
@@ -68,3 +68,7 @@ class CBotris:
 
 if not TYPE_CHECKING:
     CBotris = Botris
+
+__all__ = [
+    "CBotris"
+]

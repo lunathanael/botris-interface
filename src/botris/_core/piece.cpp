@@ -8,13 +8,13 @@ namespace nb = nanobind;
 
 void bind_piece(nb::module_ &m) {
     nb::class_<Piece>(m, "Piece")
-        .def(nb::init<PieceType>())
-        .def(nb::init<PieceType, RotationDirection>())
-        .def(nb::init<PieceType, RotationDirection, Coord>())
-        .def(nb::init<PieceType, RotationDirection, Coord, spinType>())
+        .def(nb::init<PieceType>(), "type"_a)
+        .def(nb::init<PieceType, RotationDirection>(), "type"_a, "dir"_a)
+        .def(nb::init<PieceType, RotationDirection, Coord>(), "type"_a, "dir"_a, "pos"_a)
+        .def(nb::init<PieceType, RotationDirection, Coord, spinType>(), "type"_a, "dir"_a, "pos"_a, "spn"_a)
 
-        .def("rotate", &Piece::rotate)
-        .def("calculate_rotate", &Piece::calculate_rotate)
+        .def("rotate", &Piece::rotate, "direction"_a)
+        .def("calculate_rotate", &Piece::calculate_rotate, "direction"_a)
         .def("hash", &Piece::hash)
         .def("compact_hash", &Piece::compact_hash)
         .def_rw("minos", &Piece::minos)

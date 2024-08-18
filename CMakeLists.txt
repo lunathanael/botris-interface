@@ -73,6 +73,7 @@ nanobind_add_module(
   ${BOTRIS_CORE_DIR}/board.cpp
   ${BOTRIS_CORE_DIR}/mode.cpp
   ${BOTRIS_CORE_DIR}/constants.cpp
+  ${BOTRIS_CORE_DIR}/movegen.cpp
 )
 
 set_property(TARGET _core PROPERTY CXX_STANDARD_REQUIRED ON)

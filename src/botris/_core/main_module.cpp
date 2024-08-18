@@ -14,4 +14,5 @@ NB_MODULE(_core, m) {
     bind_game(m);
     bind_modes(m);
     bind_constants(m);
+    bind_movegen(m);
 }

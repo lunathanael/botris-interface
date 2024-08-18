@@ -332,3 +332,7 @@ class CBoard:
 
 if not TYPE_CHECKING:
     CBoard = Board
+
+__all__ = [
+    "CBoard"
+]

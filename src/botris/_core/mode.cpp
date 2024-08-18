@@ -4,6 +4,7 @@
 #include "engine/ShaktrisConstants.hpp"
 
 namespace nb = nanobind;
+using namespace nb::literals;
 
 void bind_modes(nb::module_ &m) {
     nb::class_<Botris>(m, "Botris")
@@ -15,5 +16,5 @@ void bind_modes(nb::module_ &m) {
         .def_ro_static("b2b_bonus", &Botris::b2b_bonus)
         .def("points", [](Botris &self, int linesCleared, spinType spin, bool pc, u16 &combo, u16 &b2b) {
             return self.points(linesCleared, spin, pc, combo, b2b);
-        });
+        }, "linesCleared"_a, "spin"_a, "pc"_a, "combo"_a, "b2b"_a);
 }

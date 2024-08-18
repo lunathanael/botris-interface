@@ -158,3 +158,17 @@ if not TYPE_CHECKING:
     CTurnDirection = TurnDirection
     CMovement = Movement
     CCoord = Coord
+
+__all__ = [
+    "CspinType",
+    "CRotateDirection",
+    "CColorType",
+    "CPieceType",
+    "CTurnDirection",
+    "CMovement",
+    "CCoord",
+    "n_minos",
+    "piece_definitions",
+    "rot_piece_def",
+    "piece_spawn_height"
+]
