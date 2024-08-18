@@ -1,6 +1,8 @@
 #include <nanobind/nanobind.h>
-#include "engine/Piece.hpp"
 #include <nanobind/stl/bind_vector.h>
+#include <nanobind/stl/array.h>
+
+#include "engine/Piece.hpp"
 
 namespace nb = nanobind;
 

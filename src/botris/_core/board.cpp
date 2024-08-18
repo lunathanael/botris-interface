@@ -1,5 +1,6 @@
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/array.h>
+
 #include "engine/Board.hpp"
 
 namespace nb = nanobind;

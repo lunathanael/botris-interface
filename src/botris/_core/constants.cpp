@@ -1,5 +1,6 @@
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/array.h>
+
 #include "engine/ShaktrisConstants.hpp"
 
 namespace nb = nanobind;
