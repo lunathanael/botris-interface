@@ -11,7 +11,6 @@ void bind_board(nb::module_ &m) {
         .def_ro_static("height", &Board::height)
 
         .def(nb::init<>())
-        .def(nb::init<Board>())
         .def("get", &Board::get)
         .def("get_column", &Board::get_column)
         .def("set", nb::overload_cast<size_t, size_t>(&Board::set))
@@ -29,4 +28,8 @@ void bind_board(nb::module_ &m) {
         .def("get_garbage_height", &Board::get_garbage_height)
         .def("is_low", &Board::is_low)
         .def_rw("board", &Board::board);
+        .def("copy", [](const Board &self) {
+            Board copy = self;
+            return copy;
+        })
 }

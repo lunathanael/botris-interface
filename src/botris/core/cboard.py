@@ -37,15 +37,14 @@ class CBoard:
         """
         pass
 
-    def __init__(self, board: CBoard):
+    def copy(self) -> CBoard:
         """
-        Initialize the board by calling the base class constructor.
-        This will copy the board data from the given board.
+        Copy the board.
 
-        Parameters:
-        -----------
-        board : CBoard
-            The board to copy data from.
+        Returns:
+        --------
+        CBoard
+            A copy of the board.
         """
         pass
 
@@ -266,3 +265,6 @@ class CBoard:
             True if the board is low, False otherwise.
         """
         pass
+
+if not TYPE_CHECKING:
+    CBoard = Board

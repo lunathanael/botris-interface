@@ -11,8 +11,7 @@ void bind_constants(nb::module_ &m) {
     nb::enum_<spinType>(constants, "spinType")
         .value("null", spinType::null)
         .value("mini", spinType::mini)
-        .value("normal", spinType::normal)
-        .export_values();
+        .value("normal", spinType::normal);
 
     nb::enum_<RotationDirection>(constants, "RotationDirection")
         .value("North", RotationDirection::North)
