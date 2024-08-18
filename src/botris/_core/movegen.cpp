@@ -5,6 +5,7 @@
 #include "engine/MoveGen.hpp"
 
 namespace nb = nanobind;
+using namespace nb::literals;
 
 void bind_movegen(nb::module_ &m) {
     auto tm = m.def_submodule("traditional_movegen", "Shaktris Traditional Movegen Module");

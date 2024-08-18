@@ -24,7 +24,7 @@ void bind_board(nb::module_ &m) {
         .def("bounded", &Board::bounded, "height"_a)
         .def("not_empty", &Board::not_empty, "height"_a)
         .def("full", &Board::full, "height"_a)
-        .def("has_imbalanced_split", &Board::has_imbalanced_split. "height"_a)
+        .def("has_imbalanced_split", &Board::has_imbalanced_split, "height"_a)
         .def("empty_cells", &Board::empty_cells, "height"_a)
         .def("is_convex", &Board::is_convex)
         .def("get_garbage_height", &Board::get_garbage_height)

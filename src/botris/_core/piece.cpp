@@ -5,6 +5,7 @@
 #include "engine/Piece.hpp"
 
 namespace nb = nanobind;
+using namespace nb::literals;
 
 void bind_piece(nb::module_ &m) {
     nb::class_<Piece>(m, "Piece")
@@ -21,7 +22,7 @@ void bind_piece(nb::module_ &m) {
         .def_rw("position", &Piece::position)
         .def_rw("rotation", &Piece::rotation)
         .def_rw("type", &Piece::type)
-        .def_rw("spin", &Piece::spin);
+        .def_rw("spin", &Piece::spin)
 
         .def("copy", [](const Piece &self) {
             Piece copy = self;

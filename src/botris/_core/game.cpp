@@ -10,6 +10,7 @@
 #include "engine/modes/Botris.hpp"
 
 namespace nb = nanobind;
+using namespace nb::literals;
 
 void bind_game(nb::module_ &m) {
     nb::class_<Game>(m, "Game")
@@ -17,11 +18,11 @@ void bind_game(nb::module_ &m) {
 
         .def(nb::init<>())
         .def("place_piece", nb::overload_cast<>(&Game::place_piece))
-        .def("place_piece", nb::overload_cast<const Piece&>(&Game::place_piece))
+        .def("place_piece", nb::overload_cast<const Piece&>(&Game::place_piece), "piece"_a)
         .def("do_hold", &Game::do_hold)
-        .def("add_garbage", &Game::add_garbage)
-        .def("damage_sent", &Game::damage_sent)
-        .def("process_movement", &Game::process_movement)
+        .def("add_garbage", &Game::add_garbage, "lines"_a, "location"_a)
+        .def("damage_sent", &Game::damage_sent, "linesCleared"_a, "spinType"_a, "pc"_a)
+        .def("process_movement", &Game::process_movement, "piece"_a, "movement"_a)
         .def("get_possible_piece_placements", &Game::get_possible_piece_placements)
         .def_rw("board", &Game::board)
         .def_rw("current_piece", &Game::current_piece)
