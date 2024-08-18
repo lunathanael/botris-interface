@@ -70,7 +70,7 @@ class CGame:
         """
         pass
 
-    @property.setter
+    @board.setter
     def board(self, value: CBoard) -> None:
         """
         Set the board.
@@ -94,7 +94,7 @@ class CGame:
         """
         pass
 
-    @property.setter
+    @current_piece.setter
     def current_piece(self, value: CPiece) -> None:
         """
         Set the current piece.
@@ -118,7 +118,7 @@ class CGame:
         """
         pass
 
-    @property.setter
+    @hold.setter
     def hold(self, value: CPieceType) -> None:
         """
         Set the held piece.
@@ -142,7 +142,7 @@ class CGame:
         """
         pass
 
-    @property.setter
+    @garbage_meter.setter
     def garbage_meter(self, value: int) -> None:
         """
         Set the garbage meter.
@@ -166,7 +166,7 @@ class CGame:
         """
         pass
 
-    @property.setter
+    @b2b.setter
     def b2b(self, value: int) -> None:
         """
         Set the back-to-back counter.
@@ -190,7 +190,7 @@ class CGame:
         """
         pass
 
-    @property.setter
+    @combo.setter
     def combo(self, value: int) -> None:
         """
         Set the combo counter.
@@ -217,7 +217,7 @@ class CGame:
         """
         pass
 
-    @property.setter
+    @queue.setter
     def queue(self, value: list[CPieceType]) -> None:
         """
         Set the queue.
@@ -241,7 +241,7 @@ class CGame:
         """
         pass
 
-    @property.setter
+    @mode.setter
     def mode(self, value: CBotris) -> None:
         """
         Set the Botris Mode instance.

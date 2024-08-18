@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
 from .cconstants import CspinType
-from botris._core.constants import Botris
+from botris._core import Botris
 
 class CBotris:
     """
