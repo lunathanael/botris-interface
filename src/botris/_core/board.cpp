@@ -27,9 +27,9 @@ void bind_board(nb::module_ &m) {
         .def("is_convex", &Board::is_convex)
         .def("get_garbage_height", &Board::get_garbage_height)
         .def("is_low", &Board::is_low)
-        .def_rw("board", &Board::board);
+        .def_rw("board", &Board::board)
         .def("copy", [](const Board &self) {
             Board copy = self;
             return copy;
-        })
+        });
 }
