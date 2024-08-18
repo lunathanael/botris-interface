@@ -66,4 +66,6 @@ void bind_constants(nb::module_ &m) {
     constants.attr("piece_definitions") = piece_definitions;
 
     constants.attr("rot_piece_def") = rot_piece_def;
+
+    constants.attr("piece_spawn_height") = piece_spawn_height;
 }

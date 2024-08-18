@@ -7,7 +7,7 @@ from botris._core import Board, Piece
 
 class CBoard:
     """
-    A Python wrapper for the C++ Board class, where each method calls the corresponding
+    A Python interface for the C++ Board class, where each method calls the corresponding
     method in the base class.
 
     Attributes:
