@@ -1,7 +1,7 @@
-from .cgame import CGame, Piece, Board
-from .cgame import Botris as BotrisMode
-from .cgame.constants import PieceType
+from .cgame import CGame
+from .cboard import CBoard
 
 __all__ = [
     "CGame",
+    "CBoard",
 ]
