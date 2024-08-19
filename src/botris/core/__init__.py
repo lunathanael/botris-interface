@@ -3,8 +3,8 @@ from .cboard import CBoard
 from .cconstants import CColorType, CPieceType
 from .cgame import CGame
 from .cmode import CBotris
-from .cmovegen_traditional import sky_piece_movegen, convex_movegen
-from .cmovegen_smeared import movegen, god_movegen
+#from .cmovegen_traditional import sky_piece_movegen, convex_movegen
+#from .cmovegen_smeared import movegen, god_movegen
 
 
 __all__ = [
@@ -21,8 +21,8 @@ __all__ = [
     "CGame",
     "CBotris",
 
-    "sky_piece_movegen",
-    "convex_movegen",
-    "movegen",
-    "god_movegen",
+    # "sky_piece_movegen",
+    # "convex_movegen",
+    # "movegen",
+    # "god_movegen",
 ]
