@@ -24,11 +24,11 @@ To create a bot, you need to implement the `Bot` interface provided by the libra
 
 ```python
 from botris.bots import Bot
-
+g
 class CoolBot(Bot):
     async def analyze(
-        self, game_state: GameState, players: List[PlayerData]
-    ) -> Awaitable[List[Command]]:
+        self, game_state, players
+    ):
         # Implement your bot logic here
         pass
 ```
