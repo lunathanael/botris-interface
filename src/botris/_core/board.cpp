@@ -31,8 +31,8 @@ void bind_board(nb::module_ &m) {
         .def("is_low", &Board::is_low)
 
         .def_rw("board", &Board::board)
-        .def("copy", [](const Board &self) {
-            Board copy = self;
-            return copy;
+        .def("copy", [](const Board &other) {
+            Board board_copy = other;
+            return board_copy;
         });
 }
