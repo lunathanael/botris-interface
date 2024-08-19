@@ -1,3 +1,21 @@
+"""
+The botris core module provides the python bindings for the core ShakTris based game engine.
+
+Available subpackages
+---------------------
+cboard
+    Contains the board data model used by the engine.
+cconstants
+    Contains the constants used by the engine.
+cgame
+    Contains the game data model used by the engine.
+cmode
+    Contains the mode data model used by the engine.
+cmovegen_traditional
+    Contains the move generation functions for traditional movegen.
+cmovegen_smeared
+    Contains the move generation functions for smeared movegen.
+"""
 from . import cboard, cconstants, cgame, cmode, cmovegen_traditional, cmovegen_smeared
 from .cboard import CBoard
 from .cconstants import CColorType, CPieceType

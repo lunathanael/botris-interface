@@ -5,7 +5,7 @@ build-backend = "scikit_build_core.build"
 [project]
 name = "botris-interface"
 dynamic = ["version"]
-description = "A performant library designed for creating and managing bots in a -like game environment. This library offers various tools and features to build, test, and deploy bots efficiently to Botris."
+description = "A performant library designed for creating and managing bots in a tetris-like game environment. This library offers various tools and features to build, test, and deploy bots efficiently to Botris."
 readme = "README.md"
 license = {text = "MIT License"}
 requires-python = ">=3.10,<4.0"

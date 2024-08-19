@@ -68,3 +68,7 @@ This project is licensed under the MIT License - see the [`LICENSE`](command:_gi
 ## GitHub Repository
 
 For more information, visit our [GitHub repository](https://github.com/lunathanael/botris-interface).
+
+## Credits
+
+Special thanks to [ShakTris](https://github.com/shakkar23/ShakTrisLib) providing a reliable and fast library for this project.
