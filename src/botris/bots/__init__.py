@@ -18,6 +18,7 @@ An example to create a bot from `Bot` class:
     ...
     >>> bot = LeftBot()
 """
+
 from .bot import Bot
 from .randombot import RandomBot
 

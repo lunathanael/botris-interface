@@ -723,8 +723,7 @@ class TetrisGame:
             The number of garbage lines to send to the player.
         """
         public_garbage_lines: List[PublicGarbageLine] = [
-            PublicGarbageLine(delay=self.options.garbage_delay)
-            for _ in range(attack)
+            PublicGarbageLine(delay=self.options.garbage_delay) for _ in range(attack)
         ]
         garbage_lines: List[GarbageLine] = generate_garbage(
             public_garbage_lines,

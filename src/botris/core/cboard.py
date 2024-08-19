@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from botris._core import Board
+
 from .cpiece import CPiece
 
 
@@ -111,7 +112,7 @@ class CBoard:
             The x-coordinate.
         y : int (size_t)
             The y-coordinate.
-        
+
         Returns:
         --------
         int
@@ -127,7 +128,7 @@ class CBoard:
         -----------
         x : int (size_t)
             The x-coordinate.
-        
+
         Returns:
         --------
         int (u32)
@@ -237,7 +238,7 @@ class CBoard:
         int (u32)
             A mask of non-empty rows.
         """
-        
+
     def full(self, height: int) -> int:
         """
         Get the number of rows that are matching the height.
@@ -246,7 +247,7 @@ class CBoard:
         -----------
         height : int
             The height to check.
-        
+
         Returns:
         --------
         int (u32)
@@ -330,9 +331,8 @@ class CBoard:
         """
         pass
 
+
 if not TYPE_CHECKING:
     CBoard = Board
 
-__all__ = [
-    "CBoard"
-]
+__all__ = ["CBoard"]

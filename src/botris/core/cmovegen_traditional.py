@@ -1,8 +1,9 @@
 from typing import TYPE_CHECKING
 
-from .cconstants import CPieceType
 from .cboard import CBoard
+from .cconstants import CPieceType
 from .cpiece import CPiece
+
 
 def sky_piece_movegen(board: CBoard, piece_type: CPieceType) -> list[CPiece]:
     """
@@ -24,6 +25,7 @@ def sky_piece_movegen(board: CBoard, piece_type: CPieceType) -> list[CPiece]:
     """
     pass
 
+
 def convex_movegen(board: CBoard, piece_type: CPieceType) -> list[CPiece]:
     """
     Generate the moves for a convex piece.
@@ -44,8 +46,10 @@ def convex_movegen(board: CBoard, piece_type: CPieceType) -> list[CPiece]:
     """
     pass
 
+
 if not TYPE_CHECKING:
-    from botris._core.traditional_movegen import sky_piece_movegen, convex_movegen
+    from botris._core.traditional_movegen import convex_movegen, sky_piece_movegen
+
     sky_piece_movegen = sky_piece_movegen
     convex_movegen = convex_movegen
 

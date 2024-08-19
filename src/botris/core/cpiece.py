@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from .cconstants import CPieceType, CRotateDirection, CCoord, CspinType, CTurnDirection
-
 from typing import TYPE_CHECKING
+
+from .cconstants import CCoord, CPieceType, CRotateDirection, CspinType, CTurnDirection
 
 
 class CPiece:
@@ -207,7 +207,9 @@ class CPiece:
         """
         pass
 
-    def __init__(self, type: CPieceType, dir: CRotateDirection, pos: CCoord, spn: CspinType):
+    def __init__(
+        self, type: CPieceType, dir: CRotateDirection, pos: CCoord, spn: CspinType
+    ):
         """
         Initialize the piece.
 
@@ -279,8 +281,10 @@ class CPiece:
         """
         pass
 
+
 if not TYPE_CHECKING:
     from botris._core import Piece
+
     CPiece = Piece
 
 __all__ = [

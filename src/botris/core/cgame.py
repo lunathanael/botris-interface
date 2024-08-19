@@ -1,16 +1,18 @@
 from __future__ import annotations
 
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
+from botris._core import Game
+
+from .cboard import CBoard
+from .cconstants import CMovement, CPieceType, CspinType
 from .cmode import CBotris
 from .cpiece import CPiece
-from .cconstants import CspinType, CMovement, CPieceType
-from .cboard import CBoard
-from botris._core import Game
+
 
 class CGame:
     """
-    A Python wrapper for the C++ Game class, where each method calls the corresponding 
+    A Python wrapper for the C++ Game class, where each method calls the corresponding
     method in the base class.
 
     Attributes:
@@ -33,7 +35,7 @@ class CGame:
         The queue.
     mode : CBotris
         The Botris mode instance.
-    
+
     Methods:
     --------
     __init__(self)
@@ -356,9 +358,8 @@ class CGame:
         """
         pass
 
+
 if not TYPE_CHECKING:
     CGame = Game
 
-__all__ = [
-    "CGame"
-]
+__all__ = ["CGame"]

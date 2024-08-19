@@ -1,16 +1,23 @@
+from enum import IntEnum, auto
 from typing import TYPE_CHECKING
 
-from botris._core.constants import n_minos, piece_definitions, rot_piece_def, piece_spawn_height
-from enum import IntEnum, auto
+from botris._core.constants import (
+    n_minos,
+    piece_definitions,
+    piece_spawn_height,
+    rot_piece_def,
+)
 
 
 class CspinType(IntEnum):
     """
     An enumeration of the spin types.
     """
+
     null = auto()
     mini = auto()
     normal = auto()
+
 
 class CCoord:
     """
@@ -23,6 +30,7 @@ class CCoord:
     y : int (i8)
         The y-coordinate.
     """
+
     def __init__(self, x: int, y: int):
         """
         Initialize the coordinate.
@@ -84,20 +92,24 @@ class CCoord:
         """
         pass
 
+
 class CRotateDirection(IntEnum):
     """
     An enumeration of the rotation directions.
     """
+
     North = auto()
     East = auto()
     South = auto()
     West = auto()
     RotateDirections_N = auto()
 
+
 class CColorType(IntEnum):
     """
     An enumeration of the color types of pieces.
     """
+
     S = auto()
     Z = auto()
     J = auto()
@@ -111,10 +123,12 @@ class CColorType(IntEnum):
     Garbage = auto()
     ColorTypes_N = auto()
 
+
 class CPieceType(IntEnum):
     """
     An enumeration of the types of pieces.
     """
+
     S = CColorType.S
     Z = CColorType.Z
     J = CColorType.J
@@ -126,22 +140,27 @@ class CPieceType(IntEnum):
     Empty = CColorType.Empty
     PieceTypes_N = auto()
 
+
 class CTurnDirection(IntEnum):
     """
     An enumeration of the turn directions.
     """
+
     Left = auto()
     Right = auto()
+
 
 class CMovement(IntEnum):
     """
     An enumeration of the movement directions.
     """
+
     Left = auto()
     Right = auto()
     RotateClockwise = auto()
     RotateCounterClockwise = auto()
     SonicDrop = auto()
+
 
 n_minos: int = n_minos
 piece_definitions: list[list[CCoord]] = piece_definitions
@@ -150,7 +169,16 @@ piece_spawn_height: int = piece_spawn_height
 
 
 if not TYPE_CHECKING:
-    from botris._core.constants import spinType, RotationDirection, ColorType, PieceType, TurnDirection, Movement, Coord
+    from botris._core.constants import (
+        ColorType,
+        Coord,
+        Movement,
+        PieceType,
+        RotationDirection,
+        TurnDirection,
+        spinType,
+    )
+
     CspinType = spinType
     CRotateDirection = RotationDirection
     CColorType = ColorType
@@ -170,5 +198,5 @@ __all__ = [
     "n_minos",
     "piece_definitions",
     "rot_piece_def",
-    "piece_spawn_height"
+    "piece_spawn_height",
 ]

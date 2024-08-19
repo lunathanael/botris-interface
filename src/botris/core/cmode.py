@@ -1,7 +1,9 @@
 from typing import TYPE_CHECKING
 
-from .cconstants import CspinType
 from botris._core import Botris
+
+from .cconstants import CspinType
+
 
 class CBotris:
     """
@@ -41,8 +43,10 @@ class CBotris:
         Initialize the Botris class.
         """
         pass
-    
-    def points(self, lines: int, spin: CspinType, pc: bool, combo: int, b2b: int) -> int:
+
+    def points(
+        self, lines: int, spin: CspinType, pc: bool, combo: int, b2b: int
+    ) -> int:
         """
         Calculate the points based on the number of lines cleared, spin type, and other factors.
 
@@ -66,9 +70,8 @@ class CBotris:
         """
         pass
 
+
 if not TYPE_CHECKING:
     CBotris = Botris
 
-__all__ = [
-    "CBotris"
-]
+__all__ = ["CBotris"]

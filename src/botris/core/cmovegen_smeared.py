@@ -1,8 +1,9 @@
 from typing import TYPE_CHECKING
 
-from .cconstants import CPieceType
 from .cboard import CBoard
+from .cconstants import CPieceType
 from .cpiece import CPiece
+
 
 def movegen(board: CBoard, piece_type: CPieceType) -> list[CPiece]:
     """
@@ -23,6 +24,7 @@ def movegen(board: CBoard, piece_type: CPieceType) -> list[CPiece]:
     """
     pass
 
+
 def god_movegen(board: CBoard, piece_type: CPieceType) -> list[CPiece]:
     """
     Generate the moves for a piece.
@@ -42,8 +44,10 @@ def god_movegen(board: CBoard, piece_type: CPieceType) -> list[CPiece]:
     """
     pass
 
+
 if not TYPE_CHECKING:
-    from botris._core.smeared_movegen import movegen, god_movegen
+    from botris._core.smeared_movegen import god_movegen, movegen
+
     movegen = movegen
     god_movegen = god_movegen
 

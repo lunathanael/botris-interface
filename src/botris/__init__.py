@@ -69,10 +69,11 @@ An example to connect to the server with the provided random bot:
     ...
     >>> asyncio.run(main())
 """
+
 from . import bots, core, engine, interface
+from ._version import __version__
 from .engine import TetrisGame
 from .interface import Interface, connect
-from ._version import __version__
 
 __all__ = [
     "bots",
