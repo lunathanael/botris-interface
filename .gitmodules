@@ -1,0 +1,6 @@
+[submodule "botris/_core/ShakTrisLib"]
+	path = botris/_core/ShakTrisLib
+	url = https://github.com/shakkar23/ShakTrisLib.git
+[submodule "src/botris/_core/ShakTrisLib"]
+	path = src/botris/_core/ShakTrisLib
+	url = https://github.com/shakkar23/ShakTrisLib.git

@@ -4,6 +4,7 @@
 [![GitHub issues](https://img.shields.io/github/issues/lunathanael/botris-interface)](https://github.com/lunathanael/botris-interface/issues)
 [![GitHub stars](https://img.shields.io/github/stars/lunathanael/botris-interface?style=social)](https://github.com/lunathanael/botris-interface/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/lunathanael/botris-interface?style=social)](https://github.com/lunathanael/botris-interface/network/members)
+[![Wheels](https://github.com/lunathanael/botris-interface/actions/workflows/build_wheels.yml/badge.svg)](https://github.com/lunathanael/botris-interface/actions/workflows/build_wheels.yml)
 
 botris-interface is a performant library designed for creating and managing bots in a Tetris-like game environment. This library offers various tools and features to build, test, and deploy bots efficiently to Botris.
 
@@ -67,3 +68,7 @@ This project is licensed under the MIT License - see the [`LICENSE`](command:_gi
 ## GitHub Repository
 
 For more information, visit our [GitHub repository](https://github.com/lunathanael/botris-interface).
+
+## Credits
+
+Special thanks to [ShakTris](https://github.com/shakkar23/ShakTrisLib) providing a reliable and fast library for this project.

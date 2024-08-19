@@ -1,7 +1,5 @@
-from __future__ import annotations
-
 import random
-from typing import Awaitable, Dict, List
+from typing import Awaitable
 
 from botris.bots.bot import Bot
 from botris.engine import Move, PieceData, TetrisGame

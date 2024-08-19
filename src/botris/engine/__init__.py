@@ -1,3 +1,17 @@
+"""
+The botris engine module provides the core logic for the local runner botris engine.
+
+Available subpackages
+---------------------
+models
+    Contains the data models used by the engine.
+pieces
+    Contains the piece data and piece manipulation functions.
+utils
+    Contains utility functions used by the engine.
+
+"""
+
 from . import models, pieces, utils
 from .models import (
     MOVES,
