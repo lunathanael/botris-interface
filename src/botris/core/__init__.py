@@ -1,4 +1,4 @@
-from . import cboard, cconstants, cgame, cmode, cmovegen_traditional, cmovegen_smeared
+from . import cboard, cconstants, cgame, cmode#, cmovegen_traditional, cmovegen_smeared
 from .cboard import CBoard
 from .cconstants import CColorType, CPieceType
 from .cgame import CGame
