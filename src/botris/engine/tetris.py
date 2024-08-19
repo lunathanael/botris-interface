@@ -7,7 +7,7 @@ import colorama
 from colorama import Back, Fore, Style
 from PIL import Image, ImageDraw, ImageFont
 
-from botris.interface import Command, GameState
+from botris.interface import Command, GameState, PublicGarbageLine
 
 from .models import (
     Board,
@@ -116,6 +116,12 @@ class TetrisGame:
     execute_move(self, move: Move) -> List[Event]:
         Executes the specified move and returns a list of events.
 
+    dangerously_drop_piece(self, piece_data: PieceData) -> List[Event]:
+        Drops a piece on the board without checking for collisions.
+
+    queue_attack(self, attack: int) -> None:
+        Queue an attack to be sent to the player.
+
     queue_garbage(self, hole_indices: List[int]) -> None:
         Queue garbage lines to be sent to the player.
 
@@ -127,6 +133,9 @@ class TetrisGame:
 
     render_board(self, render_current: bool=True) -> None:
         Renders the game board and displays relevant information.
+
+    draw_board(self, render_current: bool=True) -> Image:
+        Draws the game board and returns an image.
 
     generate_moves(self, include_held: bool=True, include_queue: bool=True, algo: Literal['bfs', 'dfs', 'dijk', 'dijk-short']='bfs') -> Dict[PieceData, List[Move]]:
         Generate a dictionary of possible moves.
@@ -704,6 +713,26 @@ class TetrisGame:
 
         return events
 
+    def queue_attack(self, attack: int) -> None:
+        """
+        Queue an attack to be sent to the player.
+
+        Parameters:
+        --------
+        attack : int
+            The number of garbage lines to send to the player.
+        """
+        public_garbage_lines: List[PublicGarbageLine] = [
+            PublicGarbageLine(delay=self.options.garbage_delay)
+            for _ in range(attack)
+        ]
+        garbage_lines: List[GarbageLine] = generate_garbage(
+            public_garbage_lines,
+            self.options.garbage_messiness,
+            self.options.board_width,
+        )
+        self.queue_garbage_lines(garbage_lines)
+
     def queue_garbage(self, hole_indices: list[int]) -> None:
         """
         Queue garbage lines to be sent to the player.
@@ -896,7 +925,8 @@ class TetrisGame:
         font_size: int = 8
 
         board_width_px = self.options.board_width * block_size
-        board_height_px = self.options.board_height * block_size
+        board_height = max(self.options.board_height, 20)
+        board_height_px = board_height * block_size
 
         img_width = board_width_px + queue_width
         img_height = board_height_px
@@ -905,14 +935,14 @@ class TetrisGame:
         draw = ImageDraw.Draw(img)
         draw.fontmode = "L"
 
-        for y in range(self.options.board_height):
+        for y in range(board_height):
             if y >= len(self.board):
                 break
             for x in range(self.options.board_width):
                 if self.board[y][x] is not None:
                     color = color_map[self.board[y][x]]
                     block_x = x * block_size
-                    block_y = (self.options.board_height - y - 1) * block_size
+                    block_y = (board_height - y - 1) * block_size
                     block_rect = (
                         block_x + border_width,
                         block_y + border_width,
@@ -936,7 +966,7 @@ class TetrisGame:
         queue_text_x = queue_x + border_width + 5
         queue_text_y = queue_y + border_width + 5
         queue_text = "Queue:"
-        font = ImageFont.truetype("arial.ttf", font_size)
+        font = ImageFont.load_default(font_size)
         draw.text(
             (queue_text_x, queue_text_y), queue_text, fill=(255, 255, 255), font=font
         )
