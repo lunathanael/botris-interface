@@ -17,11 +17,12 @@ cmovegen_smeared
     Contains the move generation functions for smeared movegen.
 """
 
-from . import cboard, cconstants, cgame, cmode, cmovegen_smeared, cmovegen_traditional
+from . import cboard, cconstants, cgame, cpiece, cmode, cmovegen_smeared, cmovegen_traditional
 from .cboard import CBoard
 from .cconstants import CColorType, CPieceType
 from .cgame import CGame
 from .cmode import CBotris
+from .cpiece import CPiece
 from .cmovegen_smeared import god_movegen, movegen
 from .cmovegen_traditional import convex_movegen, sky_piece_movegen
 
@@ -29,6 +30,7 @@ __all__ = [
     "cboard",
     "cconstants",
     "cgame",
+    "cpiece",
     "cmode",
     "cmovegen_traditional",
     "cmovegen_smeared",
@@ -37,6 +39,7 @@ __all__ = [
     "CPieceType",
     "CGame",
     "CBotris",
+    "CPiece",
     "sky_piece_movegen",
     "convex_movegen",
     "movegen",
