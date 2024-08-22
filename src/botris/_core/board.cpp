@@ -1,5 +1,6 @@
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/array.h>
+#include <nanobind/ndarray.h>
 
 #include "engine/Board.hpp"
 
@@ -31,6 +32,15 @@ void bind_board(nb::module_ &m) {
         .def("is_low", &Board::is_low)
 
         .def_rw("board", &Board::board)
+        .def("numpy_view", [](const Board &board) {
+            static constexpr size_t shape[1] = {Board::width}; 
+            return nb::ndarray<nb::numpy, const column_t, nb::shape<1>>(
+                /* data = */ board.board.data(),
+                /* ndim = */ 1,
+                /* shape pointer = */ shape,
+                /* owner = */ nb::handle()
+            );
+        }, nb::rv_policy::reference)
         .def("copy", [](const Board &other) {
             Board board_copy = other;
             return board_copy;
