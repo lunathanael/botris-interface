@@ -20,7 +20,7 @@ dependencies = [
     "pillow>=10.4.0,<11.0.0",
     "protobuf>=5.27.3,<6.0.0",
     "pydantic>=2.8.2,<3.0.0",
-    "websockets>=12.0,<13.0",
+    "websockets>=12.0,<14.0",
     "nanobind>=2.1.0,<3.0.0",
 ]
 
